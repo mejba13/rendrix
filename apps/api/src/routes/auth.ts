@@ -20,6 +20,7 @@ import {
 } from '../lib/error-handler';
 import { checkRateLimit } from '../lib/redis';
 import { env } from '../config/env';
+import { queueVerificationEmail, queuePasswordResetEmail, queueWelcomeEmail } from '../jobs/email';
 
 // Validation schemas
 const registerSchema = z.object({
@@ -120,7 +121,12 @@ export async function authRoutes(app: FastifyInstance) {
       },
     });
 
-    // TODO: Send verification email
+    // Send verification email
+    const verificationUrl = `${env.APP_URL}/verify-email?token=${verificationToken}`;
+    await queueVerificationEmail(user.email, {
+      firstName: user.firstName || 'there',
+      verificationUrl,
+    });
 
     // Generate tokens
     const accessToken = generateAccessToken(request, {
@@ -383,7 +389,12 @@ export async function authRoutes(app: FastifyInstance) {
         },
       });
 
-      // TODO: Send reset email with token
+      // Send password reset email
+      const resetUrl = `${env.APP_URL}/reset-password?token=${resetToken}`;
+      await queuePasswordResetEmail(user.email, {
+        firstName: user.firstName || undefined,
+        resetUrl,
+      });
     }
 
     // Always return success to prevent email enumeration
@@ -505,7 +516,12 @@ export async function authRoutes(app: FastifyInstance) {
       },
     });
 
-    // TODO: Send verification email
+    // Send verification email
+    const verificationUrl = `${env.APP_URL}/verify-email?token=${verificationToken}`;
+    await queueVerificationEmail(user.email, {
+      firstName: user.firstName || 'there',
+      verificationUrl,
+    });
 
     return reply.send({
       success: true,

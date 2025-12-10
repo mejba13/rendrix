@@ -104,7 +104,7 @@ export const PERMISSIONS = {
   STORES_DELETE: 'stores:delete',
   STORES_SETTINGS_MANAGE: 'stores:settings:manage',
 
-  // Products
+  // Products (also applies to categories)
   PRODUCTS_CREATE: 'products:create',
   PRODUCTS_READ: 'products:read',
   PRODUCTS_UPDATE: 'products:update',
@@ -117,9 +117,22 @@ export const PERMISSIONS = {
   ORDERS_REFUND: 'orders:refund',
 
   // Customers
+  CUSTOMERS_CREATE: 'customers:create',
   CUSTOMERS_READ: 'customers:read',
   CUSTOMERS_UPDATE: 'customers:update',
   CUSTOMERS_DELETE: 'customers:delete',
+
+  // Coupons
+  COUPONS_CREATE: 'coupons:create',
+  COUPONS_READ: 'coupons:read',
+  COUPONS_UPDATE: 'coupons:update',
+  COUPONS_DELETE: 'coupons:delete',
+
+  // Media
+  MEDIA_CREATE: 'media:create',
+  MEDIA_READ: 'media:read',
+  MEDIA_UPDATE: 'media:update',
+  MEDIA_DELETE: 'media:delete',
 
   // Analytics
   ANALYTICS_READ: 'analytics:read',
@@ -144,8 +157,17 @@ export const ROLE_PERMISSIONS: Record<MemberRole, Permission[]> = {
     PERMISSIONS.ORDERS_READ,
     PERMISSIONS.ORDERS_UPDATE,
     PERMISSIONS.ORDERS_FULFILL,
+    PERMISSIONS.CUSTOMERS_CREATE,
     PERMISSIONS.CUSTOMERS_READ,
     PERMISSIONS.CUSTOMERS_UPDATE,
+    PERMISSIONS.COUPONS_CREATE,
+    PERMISSIONS.COUPONS_READ,
+    PERMISSIONS.COUPONS_UPDATE,
+    PERMISSIONS.COUPONS_DELETE,
+    PERMISSIONS.MEDIA_CREATE,
+    PERMISSIONS.MEDIA_READ,
+    PERMISSIONS.MEDIA_UPDATE,
+    PERMISSIONS.MEDIA_DELETE,
     PERMISSIONS.ANALYTICS_READ,
   ],
   staff: [
@@ -155,12 +177,17 @@ export const ROLE_PERMISSIONS: Record<MemberRole, Permission[]> = {
     PERMISSIONS.ORDERS_READ,
     PERMISSIONS.ORDERS_UPDATE,
     PERMISSIONS.CUSTOMERS_READ,
+    PERMISSIONS.COUPONS_READ,
+    PERMISSIONS.MEDIA_READ,
+    PERMISSIONS.MEDIA_CREATE,
   ],
   viewer: [
     PERMISSIONS.STORES_READ,
     PERMISSIONS.PRODUCTS_READ,
     PERMISSIONS.ORDERS_READ,
     PERMISSIONS.CUSTOMERS_READ,
+    PERMISSIONS.COUPONS_READ,
+    PERMISSIONS.MEDIA_READ,
     PERMISSIONS.ANALYTICS_READ,
   ],
 };

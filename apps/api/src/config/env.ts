@@ -31,18 +31,30 @@ const envSchema = z.object({
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
 
-  // Email
+  // PayPal
+  PAYPAL_CLIENT_ID: z.string().optional(),
+  PAYPAL_CLIENT_SECRET: z.string().optional(),
+  PAYPAL_WEBHOOK_ID: z.string().optional(),
+  PAYPAL_MODE: z.enum(['sandbox', 'live']).default('sandbox'),
+
+  // Email (Resend)
+  RESEND_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.string().default('Rendrix <noreply@rendrix.com>'),
+
+  // Legacy SMTP (optional fallback)
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().optional(),
   SMTP_USER: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
   SMTP_FROM: z.string().email().optional(),
 
-  // AWS S3
+  // AWS S3 / MinIO
   AWS_ACCESS_KEY_ID: z.string().optional(),
   AWS_SECRET_ACCESS_KEY: z.string().optional(),
   AWS_REGION: z.string().default('us-east-1'),
   AWS_S3_BUCKET: z.string().optional(),
+  AWS_S3_ENDPOINT: z.string().optional(), // For MinIO or custom S3-compatible storage
+  AWS_S3_FORCE_PATH_STYLE: z.coerce.boolean().default(false), // Required for MinIO
 
   // App URLs
   APP_URL: z.string().url().default('http://localhost:3000'),

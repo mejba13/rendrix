@@ -9,6 +9,8 @@ import {
   requirePermission,
 } from '../lib/auth';
 import { NotFoundError, ValidationError } from '../lib/error-handler';
+import { env } from '../config/env';
+import { queueOrderShippedEmail } from '../jobs/email';
 
 const addressSchema = z.object({
   firstName: z.string().min(1).max(100),
@@ -350,7 +352,24 @@ export async function orderRoutes(app: FastifyInstance) {
         },
       });
 
-      // TODO: Send shipment notification email if body.notifyCustomer
+      // Send shipment notification email if notifyCustomer
+      if (body.notifyCustomer && order.email) {
+        const store = request.currentStore!;
+        const shippingAddress = order.shippingAddress as { firstName?: string; lastName?: string } | null;
+        const customerName = shippingAddress
+          ? `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim()
+          : 'Customer';
+
+        await queueOrderShippedEmail(order.email, {
+          orderNumber: order.orderNumber,
+          customerName: customerName || 'Customer',
+          trackingNumber: body.trackingNumber,
+          trackingUrl: body.trackingUrl,
+          carrier: body.carrier,
+          orderUrl: `${env.APP_URL}/account/orders/${order.id}`,
+          storeName: store.name,
+        });
+      }
 
       return reply.status(201).send({
         success: true,

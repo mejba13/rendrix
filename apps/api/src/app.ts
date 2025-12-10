@@ -16,9 +16,21 @@ import { userRoutes } from './routes/users';
 import { organizationRoutes } from './routes/organizations';
 import { storeRoutes } from './routes/stores';
 import { productRoutes } from './routes/products';
+import { categoryRoutes } from './routes/categories';
 import { orderRoutes } from './routes/orders';
+import { customerRoutes } from './routes/customers';
+import { couponRoutes } from './routes/coupons';
+import { mediaRoutes } from './routes/media';
+import { analyticsRoutes } from './routes/analytics';
+import { paymentRoutes } from './routes/payments';
 import { subscriptionRoutes } from './routes/subscriptions';
 import { healthRoutes } from './routes/health';
+
+// Storefront routes (public)
+import { storefrontProductRoutes } from './routes/storefront/products';
+import { storefrontCategoryRoutes } from './routes/storefront/categories';
+import { storefrontCheckoutRoutes } from './routes/storefront/checkout';
+import { storefrontStoreRoutes } from './routes/storefront/store';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({
@@ -68,8 +80,20 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(organizationRoutes, { prefix: '/api/v1/organizations' });
   await app.register(storeRoutes, { prefix: '/api/v1/stores' });
   await app.register(productRoutes, { prefix: '/api/v1/stores/:storeId/products' });
+  await app.register(categoryRoutes, { prefix: '/api/v1/stores/:storeId/categories' });
   await app.register(orderRoutes, { prefix: '/api/v1/stores/:storeId/orders' });
+  await app.register(customerRoutes, { prefix: '/api/v1/stores/:storeId/customers' });
+  await app.register(couponRoutes, { prefix: '/api/v1/stores/:storeId/coupons' });
+  await app.register(mediaRoutes, { prefix: '/api/v1/stores/:storeId/media' });
+  await app.register(analyticsRoutes, { prefix: '/api/v1/stores/:storeId/analytics' });
+  await app.register(paymentRoutes, { prefix: '/api/v1/stores/:storeId/payments' });
   await app.register(subscriptionRoutes, { prefix: '/api/v1/subscriptions' });
+
+  // Public storefront routes (no auth required)
+  await app.register(storefrontStoreRoutes, { prefix: '/api/v1/storefront' });
+  await app.register(storefrontProductRoutes, { prefix: '/api/v1/storefront/:storeId/products' });
+  await app.register(storefrontCategoryRoutes, { prefix: '/api/v1/storefront/:storeId/categories' });
+  await app.register(storefrontCheckoutRoutes, { prefix: '/api/v1/storefront/:storeId/checkout' });
 
   return app;
 }

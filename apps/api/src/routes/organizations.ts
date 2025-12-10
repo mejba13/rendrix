@@ -9,6 +9,8 @@ import {
   ConflictError,
   ValidationError,
 } from '../lib/error-handler';
+import { env } from '../config/env';
+import { queueTeamInviteEmail } from '../jobs/email';
 
 const createOrganizationSchema = z.object({
   name: z.string().min(2).max(255),
@@ -396,7 +398,15 @@ export async function organizationRoutes(app: FastifyInstance) {
         },
       });
 
-      // TODO: Send invite email with token
+      // Send invite email
+      const inviteUrl = `${env.APP_URL}/invites/accept?token=${token}`;
+      const inviter = request.currentUser!;
+      await queueTeamInviteEmail(body.email, {
+        inviterName: `${inviter.firstName || ''} ${inviter.lastName || ''}`.trim() || inviter.email,
+        organizationName: organization.name,
+        role: body.role,
+        inviteUrl,
+      });
 
       return reply.status(201).send({
         success: true,
