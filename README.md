@@ -1,7 +1,8 @@
 # Rendrix - Master Your Commerce Universe
 
 <p align="center">
-  <img src="https://via.placeholder.com/200x60?text=Rendrix" alt="Rendrix Logo" />
+  <img width="3456" height="1928" alt="CleanShot 2025-12-19 at 8  01 36@2x" src="https://github.com/user-attachments/assets/4c419c96-f86f-43b3-a1f5-73142bc20fdd" />
+
 </p>
 
 <p align="center">
