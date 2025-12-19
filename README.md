@@ -175,6 +175,151 @@ After seeding, you can login with:
 
 ---
 
+## Docker Setup
+
+### Prerequisites
+
+- Docker 24.0+
+- Docker Compose 2.20+
+
+### Quick Start (Development)
+
+Run the entire stack with a single command:
+
+```bash
+# Start all services (apps + infrastructure)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+```
+
+### Development Mode
+
+Development mode includes hot reload for all applications:
+
+```bash
+# Build and start development containers
+docker-compose up -d --build
+
+# Start only infrastructure (run apps locally)
+docker-compose up -d postgres redis meilisearch minio mailhog
+
+# Rebuild after dependency changes
+docker-compose up -d --build --force-recreate api web storefront
+```
+
+### Production Mode
+
+```bash
+# Build production images
+docker-compose -f docker-compose.prod.yml build
+
+# Start production stack
+docker-compose -f docker-compose.prod.yml up -d
+
+# Run database migrations
+docker-compose -f docker-compose.prod.yml exec api npx prisma migrate deploy
+
+# Scale services
+docker-compose -f docker-compose.prod.yml up -d --scale api=3 --scale web=2
+```
+
+### Service Ports
+
+| Service | Development | Production |
+|---------|-------------|------------|
+| Web Dashboard | 3000 | 3000 |
+| Customer Storefront | 3001 | 3001 |
+| API Server | 4000 | 4000 |
+| PostgreSQL | 5432 | - (internal) |
+| Redis | 6379 | - (internal) |
+| Meilisearch | 7700 | - (internal) |
+| MinIO | 9000, 9001 | - |
+| Mailhog | 1025, 8025 | - |
+
+### Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+```bash
+cp .env.example .env
+```
+
+Required variables for production:
+- `JWT_SECRET` - Secure JWT signing key (min 32 chars)
+- `JWT_REFRESH_SECRET` - Secure refresh token key
+- `DB_PASSWORD` - PostgreSQL password
+- `REDIS_PASSWORD` - Redis password
+- `MEILISEARCH_KEY` - Meilisearch master key
+
+### Common Docker Commands
+
+```bash
+# View container logs
+docker-compose logs -f api
+docker-compose logs -f web
+
+# Execute commands in container
+docker-compose exec api sh
+docker-compose exec postgres psql -U postgres -d rendrix
+
+# Restart a specific service
+docker-compose restart api
+
+# View running containers
+docker-compose ps
+
+# Clean up (remove containers, networks, volumes)
+docker-compose down -v
+
+# Prune unused Docker resources
+docker system prune -a
+```
+
+### Troubleshooting
+
+**Port conflicts:**
+```bash
+# Check what's using a port
+lsof -i :3000
+# Kill the process or change the port in docker-compose.yml
+```
+
+**Container won't start:**
+```bash
+# Check logs for errors
+docker-compose logs api
+
+# Rebuild from scratch
+docker-compose down -v
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+**Hot reload not working:**
+```bash
+# On macOS, ensure file events are propagating
+# The WATCHPACK_POLLING=true env var is set for Next.js apps
+
+# Restart the container
+docker-compose restart web
+```
+
+**Database connection issues:**
+```bash
+# Ensure postgres is healthy
+docker-compose ps postgres
+
+# Check DATABASE_URL points to 'postgres' (container name), not 'localhost'
+# Inside containers: postgresql://postgres:postgres@postgres:5432/rendrix
+```
+
+---
+
 ## Project Structure
 
 ```
