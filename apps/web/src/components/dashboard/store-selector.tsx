@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Check, ChevronsUpDown, Plus, Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import Link from 'next/link';
 
 export function StoreSelector() {
   const { stores, currentStore, setStores, switchStore } = useStoreStore();
+  const [open, setOpen] = useState(false);
 
   // Fetch stores
   const { data, isLoading } = useQuery({
@@ -38,11 +39,13 @@ export function StoreSelector() {
     }
   }, [data, setStores]);
 
-  const [open, setOpen] = React.useState(false);
-
   if (isLoading) {
     return (
-      <Button variant="outline" className="w-full justify-between" disabled>
+      <Button
+        variant="outline"
+        className="w-full justify-between bg-white/[0.04] border-white/[0.08] text-white/50 hover:bg-white/[0.08]"
+        disabled
+      >
         <span className="flex items-center gap-2">
           <Store className="h-4 w-4" />
           Loading...
@@ -54,7 +57,10 @@ export function StoreSelector() {
   if (stores.length === 0) {
     return (
       <Link href="/dashboard/stores/new">
-        <Button variant="outline" className="w-full justify-start gap-2">
+        <Button
+          variant="outline"
+          className="w-full justify-start gap-2 bg-white/[0.04] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.08]"
+        >
           <Plus className="h-4 w-4" />
           Create your first store
         </Button>
@@ -68,7 +74,7 @@ export function StoreSelector() {
         variant="outline"
         role="combobox"
         aria-expanded={open}
-        className="w-full justify-between"
+        className="w-full justify-between bg-white/[0.04] border-white/[0.08] text-white hover:bg-white/[0.08] hover:text-white"
         onClick={() => setOpen(!open)}
       >
         <span className="flex items-center gap-2 truncate">
@@ -79,15 +85,17 @@ export function StoreSelector() {
               className="h-4 w-4 rounded"
             />
           ) : (
-            <Store className="h-4 w-4" />
+            <div className="w-4 h-4 rounded bg-primary/20 flex items-center justify-center">
+              <Store className="h-3 w-3 text-primary" />
+            </div>
           )}
           <span className="truncate">{currentStore?.name || 'Select store'}</span>
         </span>
-        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 text-white/40" />
       </Button>
 
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-1 w-full rounded-md border bg-popover p-1 shadow-md">
+        <div className="absolute left-0 top-full z-50 mt-1 w-full rounded-xl border border-white/[0.08] bg-[#0a0a0a] p-1 shadow-elevated">
           {stores.map((store) => (
             <button
               key={store.id}
@@ -96,23 +104,27 @@ export function StoreSelector() {
                 setOpen(false);
               }}
               className={cn(
-                'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent',
-                currentStore?.id === store.id && 'bg-accent'
+                'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none transition-colors',
+                currentStore?.id === store.id
+                  ? 'bg-white/[0.08] text-white'
+                  : 'text-white/70 hover:bg-white/[0.04] hover:text-white'
               )}
             >
               {store.logoUrl ? (
                 <img src={store.logoUrl} alt={store.name} className="h-4 w-4 rounded" />
               ) : (
-                <Store className="h-4 w-4" />
+                <div className="w-4 h-4 rounded bg-primary/20 flex items-center justify-center">
+                  <Store className="h-3 w-3 text-primary" />
+                </div>
               )}
               <span className="flex-1 truncate text-left">{store.name}</span>
-              {currentStore?.id === store.id && <Check className="h-4 w-4" />}
+              {currentStore?.id === store.id && <Check className="h-4 w-4 text-primary" />}
             </button>
           ))}
-          <div className="mt-1 border-t pt-1">
+          <div className="mt-1 border-t border-white/[0.08] pt-1">
             <Link
               href="/dashboard/stores/new"
-              className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent"
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 outline-none hover:bg-white/[0.04] hover:text-white transition-colors"
               onClick={() => setOpen(false)}
             >
               <Plus className="h-4 w-4" />
@@ -124,5 +136,3 @@ export function StoreSelector() {
     </div>
   );
 }
-
-import React from 'react';

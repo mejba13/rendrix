@@ -6,11 +6,10 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Store, Loader2 } from 'lucide-react';
+import { Store, Loader2, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthStore } from '@/store/auth';
 import { useToast } from '@/hooks/use-toast';
 
@@ -67,76 +66,182 @@ export default function RegisterPage() {
     }
   };
 
+  const features = [
+    'Create unlimited stores',
+    'Multi-tenant architecture',
+    'Real-time analytics',
+    'Enterprise-grade security',
+  ];
+
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <Link href="/" className="mb-4 flex items-center justify-center gap-2">
-            <Store className="h-8 w-8" />
-            <span className="text-2xl font-bold">Rendrix</span>
+    <div className="min-h-screen bg-black flex">
+      {/* Left Panel - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-black to-black" />
+        <div className="absolute inset-0 pattern-grid opacity-20" />
+        <div className="relative z-10 flex flex-col justify-between p-12">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center">
+              <Store className="w-5 h-5 text-black" />
+            </div>
+            <span className="text-2xl font-semibold text-white">Rendrix</span>
           </Link>
-          <CardTitle>Create your account</CardTitle>
-          <CardDescription>Start your 14-day free trial</CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
+
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <h1 className="text-4xl font-medium text-white leading-tight">
+                Start your
+                <br />
+                <span className="gradient-text">commerce journey</span>
+              </h1>
+              <p className="text-lg text-white/50 max-w-md">
+                Join thousands of businesses using Rendrix to scale their ecommerce operations.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {features.map((feature) => (
+                <div key={feature} className="flex items-center gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="text-white/70">{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-sm text-white/30">
+            &copy; 2025 Rendrix. All rights reserved.
+          </p>
+        </div>
+      </div>
+
+      {/* Right Panel - Register Form */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo */}
+          <div className="lg:hidden mb-8">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center">
+                <Store className="w-5 h-5 text-black" />
+              </div>
+              <span className="text-2xl font-semibold text-white">Rendrix</span>
+            </Link>
+          </div>
+
+          <div className="space-y-2 mb-8">
+            <h2 className="text-2xl font-semibold text-white">Create your account</h2>
+            <p className="text-white/50">Start your 14-day free trial</p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">First name</Label>
-                <Input id="firstName" {...register('firstName')} />
+                <Label htmlFor="firstName" className="text-white/70">First name</Label>
+                <Input
+                  id="firstName"
+                  placeholder="John"
+                  className="h-12 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-primary/50"
+                  {...register('firstName')}
+                />
                 {errors.firstName && (
-                  <p className="text-sm text-destructive">{errors.firstName.message}</p>
+                  <p className="text-sm text-red-400">{errors.firstName.message}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Last name</Label>
-                <Input id="lastName" {...register('lastName')} />
+                <Label htmlFor="lastName" className="text-white/70">Last name</Label>
+                <Input
+                  id="lastName"
+                  placeholder="Doe"
+                  className="h-12 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-primary/50"
+                  {...register('lastName')}
+                />
                 {errors.lastName && (
-                  <p className="text-sm text-destructive">{errors.lastName.message}</p>
+                  <p className="text-sm text-red-400">{errors.lastName.message}</p>
                 )}
               </div>
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-white/70">Email</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="you@example.com"
+                className="h-12 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-primary/50"
                 {...register('email')}
               />
               {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
+                <p className="text-sm text-red-400">{errors.email.message}</p>
               )}
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" {...register('password')} />
+              <Label htmlFor="password" className="text-white/70">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Create a strong password"
+                className="h-12 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-primary/50"
+                {...register('password')}
+              />
               {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
+                <p className="text-sm text-red-400">{errors.password.message}</p>
               )}
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm password</Label>
-              <Input id="confirmPassword" type="password" {...register('confirmPassword')} />
+              <Label htmlFor="confirmPassword" className="text-white/70">Confirm password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm your password"
+                className="h-12 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-primary/50"
+                {...register('confirmPassword')}
+              />
               {errors.confirmPassword && (
-                <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+                <p className="text-sm text-red-400">{errors.confirmPassword.message}</p>
               )}
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Account
+
+            <Button
+              type="submit"
+              className="w-full h-12 btn-primary text-black font-medium text-base"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <span className="flex items-center gap-2">
+                  Create Account
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+              )}
             </Button>
-            <p className="text-center text-sm text-muted-foreground">
+
+            <p className="text-xs text-center text-white/40">
+              By creating an account, you agree to our{' '}
+              <Link href="/terms" className="text-primary hover:text-primary/80">
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link href="/privacy" className="text-primary hover:text-primary/80">
+                Privacy Policy
+              </Link>
+            </p>
+          </form>
+
+          <div className="mt-8 pt-8 border-t border-white/[0.08]">
+            <p className="text-center text-white/50">
               Already have an account?{' '}
-              <Link href="/login" className="text-primary hover:underline">
+              <Link href="/login" className="text-primary hover:text-primary/80 font-medium transition-colors">
                 Sign in
               </Link>
             </p>
-          </CardFooter>
-        </form>
-      </Card>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
