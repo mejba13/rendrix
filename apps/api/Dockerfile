@@ -5,9 +5,9 @@
 # ============================================
 
 # Base stage with Node.js and pnpm
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
-RUN apk add --no-cache libc6-compat
+RUN apt-get update && apt-get install -y openssl libssl-dev ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # ============================================
 # Dependencies stage - install all deps
@@ -114,11 +114,17 @@ COPY packages/config/package.json ./packages/config/
 # Install all dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy Prisma schema
-COPY packages/database/prisma ./packages/database/prisma
+# Copy packages source code (needed for building)
+COPY packages/database ./packages/database
+COPY packages/types ./packages/types
+COPY packages/utils ./packages/utils
+COPY packages/config ./packages/config
 
-# Generate Prisma client
-RUN pnpm --filter @rendrix/database db:generate
+# Generate Prisma client with correct binary targets for Debian
+# Remove any existing generated client to force fresh generation
+RUN rm -rf node_modules/.prisma node_modules/@prisma/client/runtime/*.node 2>/dev/null || true
+RUN cd packages/database && npx prisma generate
+RUN pnpm turbo build --filter=@rendrix/database --filter=@rendrix/types --filter=@rendrix/utils
 
 WORKDIR /app
 

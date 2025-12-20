@@ -31,6 +31,7 @@ import { storefrontProductRoutes } from './routes/storefront/products';
 import { storefrontCategoryRoutes } from './routes/storefront/categories';
 import { storefrontCheckoutRoutes } from './routes/storefront/checkout';
 import { storefrontStoreRoutes } from './routes/storefront/store';
+import { storefrontAuthRoutes } from './routes/storefront/auth';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({
@@ -94,6 +95,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(storefrontProductRoutes, { prefix: '/api/v1/storefront/:storeId/products' });
   await app.register(storefrontCategoryRoutes, { prefix: '/api/v1/storefront/:storeId/categories' });
   await app.register(storefrontCheckoutRoutes, { prefix: '/api/v1/storefront/:storeId/checkout' });
+  await app.register(storefrontAuthRoutes, { prefix: '/api/v1/storefront' });
 
   return app;
 }

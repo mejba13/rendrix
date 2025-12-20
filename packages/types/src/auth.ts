@@ -1,4 +1,4 @@
-import type { User, Organization, MemberRole } from './entities';
+import type { User, MemberRole } from './entities';
 
 // Authentication types
 export interface LoginCredentials {

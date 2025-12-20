@@ -1,4 +1,4 @@
-import type { AuditableEntity, ID, Status, Json } from './common';
+import type { AuditableEntity, ID, Json } from './common';
 
 // User entity
 export interface User extends AuditableEntity {

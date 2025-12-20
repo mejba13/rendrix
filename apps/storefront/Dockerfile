@@ -98,6 +98,17 @@ COPY packages/config/package.json ./packages/config/
 # Install all dependencies
 RUN pnpm install --frozen-lockfile
 
+# Copy storefront config files (tsconfig, next.config, tailwind, postcss)
+COPY apps/storefront/tsconfig.json ./apps/storefront/
+COPY apps/storefront/next.config.js ./apps/storefront/
+COPY apps/storefront/tailwind.config.ts ./apps/storefront/
+COPY apps/storefront/postcss.config.js ./apps/storefront/
+
+# Copy package source code (types and utils are used by storefront)
+COPY packages/types ./packages/types
+COPY packages/utils ./packages/utils
+COPY packages/config ./packages/config
+
 WORKDIR /app
 
 EXPOSE 3001
