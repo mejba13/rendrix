@@ -226,12 +226,15 @@ model Store {
   theme        Theme?       @relation(fields: [themeId], references: [id])
 
   // Store content
-  products     Product[]
-  categories   Category[]
-  orders       Order[]
-  customers    Customer[]
-  coupons      Coupon[]
-  media        Media[]
+  products       Product[]
+  categories     Category[]
+  orders         Order[]
+  customers      Customer[]
+  coupons        Coupon[]
+  media          Media[]
+  blogPosts      BlogPost[]
+  blogCategories BlogCategory[]
+  pages          Page[]
 
   @@unique([organizationId, slug])
   @@index([organizationId])
@@ -562,6 +565,91 @@ model Coupon {
   @@index([storeId])
   @@index([code])
   @@map("coupons")
+}
+
+// ==================== BLOG POSTS ====================
+
+model BlogPost {
+  id             String    @id @default(uuid()) @db.Uuid
+  storeId        String    @map("store_id") @db.Uuid
+  title          String    @db.VarChar(255)
+  slug           String    @db.VarChar(255)
+  excerpt        String?
+  content        String?
+  featuredImage  String?   @map("featured_image")
+  authorName     String?   @map("author_name") @db.VarChar(255)
+  status         String    @default("draft") @db.VarChar(50) // draft, published, scheduled
+  visibility     String    @default("public") @db.VarChar(50) // public, private, password
+  password       String?   @db.VarChar(255)
+  allowComments  Boolean   @default(true) @map("allow_comments")
+  isFeatured     Boolean   @default(false) @map("is_featured")
+  viewCount      Int       @default(0) @map("view_count")
+  seoTitle       String?   @map("seo_title") @db.VarChar(255)
+  seoDescription String?   @map("seo_description")
+  tags           Json      @default("[]")
+  publishedAt    DateTime? @map("published_at")
+  scheduledAt    DateTime? @map("scheduled_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  store      Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  categories BlogCategory[]  @relation("BlogPostCategories")
+
+  @@unique([storeId, slug])
+  @@index([storeId])
+  @@index([storeId, status])
+  @@index([publishedAt])
+  @@map("blog_posts")
+}
+
+model BlogCategory {
+  id          String   @id @default(uuid()) @db.Uuid
+  storeId     String   @map("store_id") @db.Uuid
+  name        String   @db.VarChar(255)
+  slug        String   @db.VarChar(255)
+  description String?
+  imageUrl    String?  @map("image_url")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  store Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  posts BlogPost[] @relation("BlogPostCategories")
+
+  @@unique([storeId, slug])
+  @@index([storeId])
+  @@map("blog_categories")
+}
+
+// ==================== PAGES ====================
+
+model Page {
+  id             String    @id @default(uuid()) @db.Uuid
+  storeId        String    @map("store_id") @db.Uuid
+  title          String    @db.VarChar(255)
+  slug           String    @db.VarChar(255)
+  content        String?
+  template       String    @default("default") @db.VarChar(50) // default, full-width, sidebar, landing
+  status         String    @default("draft") @db.VarChar(50) // draft, published
+  visibility     String    @default("public") @db.VarChar(50) // public, private
+  showInNav      Boolean   @default(false) @map("show_in_nav")
+  navOrder       Int       @default(0) @map("nav_order")
+  parentId       String?   @map("parent_id") @db.Uuid
+  seoTitle       String?   @map("seo_title") @db.VarChar(255)
+  seoDescription String?   @map("seo_description")
+  featuredImage  String?   @map("featured_image")
+  publishedAt    DateTime? @map("published_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  store    Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  parent   Page?  @relation("PageHierarchy", fields: [parentId], references: [id])
+  children Page[] @relation("PageHierarchy")
+
+  @@unique([storeId, slug])
+  @@index([storeId])
+  @@index([storeId, status])
+  @@index([parentId])
+  @@map("pages")
 }
 
 // ==================== MEDIA ====================

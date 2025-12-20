@@ -16,6 +16,8 @@ import {
   ChevronRight,
   Sparkles,
   Image,
+  FileText,
+  BookOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StoreSelector } from './store-selector';
@@ -26,6 +28,8 @@ const navigation = [
   { name: 'Orders', href: '/dashboard/orders', icon: ShoppingCart },
   { name: 'Customers', href: '/dashboard/customers', icon: Users },
   { name: 'Coupons', href: '/dashboard/coupons', icon: Tag },
+  { name: 'Blog', href: '/dashboard/blog', icon: BookOpen },
+  { name: 'Pages', href: '/dashboard/pages', icon: FileText },
   { name: 'Media', href: '/dashboard/media', icon: Image },
   { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Theme', href: '/dashboard/theme', icon: Paintbrush },
