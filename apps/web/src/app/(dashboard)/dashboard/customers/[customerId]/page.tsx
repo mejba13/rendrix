@@ -8,7 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   ArrowLeft,
-  User,
   Mail,
   Phone,
   MapPin,
@@ -59,7 +58,7 @@ import {
 } from '@/hooks/use-customers';
 import { AddressFormDialog, AddressCard } from '@/components/customers/address-form';
 import { formatCurrency, formatDate, formatFullName } from '@rendrix/utils';
-import type { CustomerAddress, UpdateCustomerInput } from '@rendrix/types';
+import type { CustomerAddress } from '@rendrix/types';
 
 const customerSchema = z.object({
   firstName: z.string().optional(),

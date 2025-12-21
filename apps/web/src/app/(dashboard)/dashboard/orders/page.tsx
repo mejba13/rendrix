@@ -8,7 +8,6 @@ import {
   ShoppingCart,
   Download,
   RefreshCw,
-  Calendar,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';

@@ -1,8 +1,20 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-interface FetchOptions extends RequestInit {
+interface FetchOptions extends Omit<RequestInit, 'body'> {
   token?: string;
   organizationId?: string;
+}
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public status: number,
+    public details?: Record<string, unknown>
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
 }
 
 class ApiClient {
@@ -55,11 +67,11 @@ class ApiClient {
     }
   }
 
-  async fetch<T = unknown>(
+  private async request<T = unknown>(
     endpoint: string,
-    options: FetchOptions = {}
+    options: FetchOptions & { body?: unknown } = {}
   ): Promise<T> {
-    const { token, organizationId, ...fetchOptions } = options;
+    const { token, organizationId, body, ...fetchOptions } = options;
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -78,9 +90,10 @@ class ApiClient {
       headers['X-Organization-Id'] = orgId;
     }
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    const response = await fetch(`${API_URL}/api/v1${endpoint}`, {
       ...fetchOptions,
       headers,
+      body: body ? JSON.stringify(body) : undefined,
     });
 
     const data = await response.json();
@@ -91,7 +104,7 @@ class ApiClient {
         const refreshed = await this.refreshAccessToken();
         if (refreshed) {
           // Retry the original request
-          return this.fetch(endpoint, options);
+          return this.request(endpoint, options);
         }
       }
 
@@ -130,19 +143,37 @@ class ApiClient {
     }
   }
 
+  // HTTP methods
+  async get<T = unknown>(endpoint: string, options?: FetchOptions): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'GET' });
+  }
+
+  async post<T = unknown>(endpoint: string, body?: unknown, options?: FetchOptions): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'POST', body });
+  }
+
+  async patch<T = unknown>(endpoint: string, body?: unknown, options?: FetchOptions): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'PATCH', body });
+  }
+
+  async put<T = unknown>(endpoint: string, body?: unknown, options?: FetchOptions): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'PUT', body });
+  }
+
+  async delete<T = unknown>(endpoint: string, options?: FetchOptions): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'DELETE' });
+  }
+
   // Auth methods
   async login(email: string, password: string) {
-    const response = await this.fetch<{
+    const response = await this.post<{
       success: boolean;
       data: {
         user: { id: string; email: string; firstName: string | null; lastName: string | null };
         organizations: { id: string; name: string; slug: string; role: string }[];
         tokens: { accessToken: string; refreshToken: string };
       };
-    }>('/api/v1/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    });
+    }>('/auth/login', { email, password });
 
     this.setTokens(response.data.tokens.accessToken, response.data.tokens.refreshToken);
 
@@ -154,16 +185,13 @@ class ApiClient {
   }
 
   async register(email: string, password: string, firstName?: string, lastName?: string) {
-    const response = await this.fetch<{
+    const response = await this.post<{
       success: boolean;
       data: {
         user: { id: string; email: string };
         tokens: { accessToken: string; refreshToken: string };
       };
-    }>('/api/v1/auth/register', {
-      method: 'POST',
-      body: JSON.stringify({ email, password, firstName, lastName }),
-    });
+    }>('/auth/register', { email, password, firstName, lastName });
 
     this.setTokens(response.data.tokens.accessToken, response.data.tokens.refreshToken);
     return response.data;
@@ -171,10 +199,7 @@ class ApiClient {
 
   async logout() {
     try {
-      await this.fetch('/api/v1/auth/logout', {
-        method: 'POST',
-        body: JSON.stringify({ refreshToken: this.refreshToken }),
-      });
+      await this.post('/auth/logout', { refreshToken: this.refreshToken });
     } finally {
       this.clearTokens();
       this.setOrganizationId(null);
@@ -182,7 +207,7 @@ class ApiClient {
   }
 
   async getMe() {
-    return this.fetch<{
+    return this.get<{
       success: boolean;
       data: {
         user: {
@@ -194,20 +219,8 @@ class ApiClient {
         };
         organizations: { id: string; name: string; slug: string; role: string }[];
       };
-    }>('/api/v1/auth/me');
+    }>('/auth/me');
   }
 }
 
-export class ApiError extends Error {
-  constructor(
-    message: string,
-    public code: string,
-    public status: number,
-    public details?: Record<string, unknown>
-  ) {
-    super(message);
-    this.name = 'ApiError';
-  }
-}
-
-export const api = new ApiClient();
+export const apiClient = new ApiClient();

@@ -247,8 +247,7 @@ export function useExportCustomers() {
       if (params?.tags?.length) searchParams.set('tags', params.tags.join(','));
 
       const response = await apiClient.get<Blob>(
-        `/stores/${currentStore?.id}/customers/export?${searchParams.toString()}`,
-        { responseType: 'blob' }
+        `/stores/${currentStore?.id}/customers/export?${searchParams.toString()}`
       );
       return response;
     },

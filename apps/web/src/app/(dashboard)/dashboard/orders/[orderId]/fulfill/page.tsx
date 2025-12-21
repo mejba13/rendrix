@@ -16,7 +16,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useOrder, useFulfillOrder } from '@/hooks/use-orders';
-import { formatCurrency } from '@rendrix/utils';
 
 const fulfillmentSchema = z.object({
   trackingNumber: z.string().optional(),

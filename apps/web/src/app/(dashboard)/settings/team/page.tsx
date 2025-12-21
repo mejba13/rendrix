@@ -30,7 +30,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Separator } from '@/components/ui/separator';
 import {
   Dialog,
   DialogContent,
@@ -254,7 +253,7 @@ export default function TeamPage() {
                     <Label htmlFor="role">Role</Label>
                     <Select
                       value={watch('role')}
-                      onValueChange={(value: MemberRole) => setValue('role', value)}
+                      onValueChange={(value) => setValue('role', value as 'admin' | 'manager' | 'staff' | 'viewer')}
                     >
                       <SelectTrigger>
                         <SelectValue />

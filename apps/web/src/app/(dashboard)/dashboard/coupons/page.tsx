@@ -7,9 +7,6 @@ import {
   Plus,
   Ticket,
   RefreshCw,
-  Download,
-  Copy,
-  Check,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
@@ -55,7 +52,7 @@ export default function CouponsPage() {
   });
   const [search, setSearch] = React.useState('');
   const [deleteCouponId, setDeleteCouponId] = React.useState<string | null>(null);
-  const [copiedCode, setCopiedCode] = React.useState<string | null>(null);
+  const [_copiedCode, setCopiedCode] = React.useState<string | null>(null);
 
   const { data, isLoading, error, refetch } = useCoupons(filters);
   const deleteCoupon = useDeleteCoupon();

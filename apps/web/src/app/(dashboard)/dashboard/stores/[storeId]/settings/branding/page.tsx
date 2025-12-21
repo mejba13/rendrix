@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Save, Upload, ImageIcon, Trash2 } from 'lucide-react';
+import { Loader2, Save, ImageIcon, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -59,8 +59,8 @@ export default function BrandingSettingsPage() {
       await updateStore.mutateAsync({
         storeId,
         data: {
-          logoUrl: data.logoUrl || null,
-          faviconUrl: data.faviconUrl || null,
+          logoUrl: data.logoUrl || undefined,
+          faviconUrl: data.faviconUrl || undefined,
         },
       });
       toast({

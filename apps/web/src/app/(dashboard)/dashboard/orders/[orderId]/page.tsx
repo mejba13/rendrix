@@ -44,13 +44,13 @@ import { formatCurrency, formatDate, formatFullName, formatAddress } from '@rend
 
 export default function OrderDetailPage() {
   const params = useParams();
-  const router = useRouter();
+  void useRouter();
   const { toast } = useToast();
   const orderId = params.orderId as string;
 
   const { data: order, isLoading, error } = useOrder(orderId);
   const cancelOrder = useCancelOrder();
-  const updateOrder = useUpdateOrder();
+  void useUpdateOrder();
 
   const handleCancel = async () => {
     try {

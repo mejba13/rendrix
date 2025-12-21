@@ -99,7 +99,7 @@ interface PayPalButtonProps {
   disabled?: boolean;
 }
 
-export function PayPalButton({ orderId, onApprove, onError, disabled }: PayPalButtonProps) {
+export function PayPalButton({ orderId, onApprove: _onApprove, onError, disabled }: PayPalButtonProps) {
   const [isLoading, setIsLoading] = React.useState(false);
 
   // This is a placeholder. In production, you would use the official PayPal SDK:

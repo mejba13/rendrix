@@ -11,7 +11,6 @@ import {
   BarChart3,
   Globe,
   Layers,
-  Sparkles,
   Users,
   CreditCard,
   Package,

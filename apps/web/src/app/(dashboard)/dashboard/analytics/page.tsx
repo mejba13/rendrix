@@ -4,7 +4,6 @@ import * as React from 'react';
 import Link from 'next/link';
 import {
   TrendingUp,
-  TrendingDown,
   DollarSign,
   ShoppingCart,
   Users,
@@ -16,7 +15,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
@@ -29,7 +27,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useStoreStore } from '@/store/store';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { OrderStatusBadge } from '@/components/orders/order-status-badge';
-import { formatCurrency, formatRelativeTime, formatFullName } from '@rendrix/utils';
+import { formatCurrency, formatFullName } from '@rendrix/utils';
 
 type DateRange = '7d' | '30d' | '90d' | '12m';
 

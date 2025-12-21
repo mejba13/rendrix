@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { apiClient } from '@/lib/api-client';
 import { useStoreStore } from '@/store/store';
 
 export type BlogPostStatus = 'draft' | 'published' | 'scheduled';
@@ -128,10 +128,10 @@ export function useBlogPosts(params: BlogPostsParams = {}) {
         }
       });
 
-      const response = await api.get<BlogPostsResponse>(
+      const response = await apiClient.get<BlogPostsResponse>(
         `/stores/${currentStore.id}/blogs/posts?${searchParams.toString()}`
       );
-      return response.data;
+      return response;
     },
     enabled: !!currentStore,
   });
@@ -145,10 +145,10 @@ export function useBlogPost(postId: string | undefined) {
     queryFn: async () => {
       if (!currentStore || !postId) throw new Error('No store or post selected');
 
-      const response = await api.get<BlogPostResponse>(
+      const response = await apiClient.get<BlogPostResponse>(
         `/stores/${currentStore.id}/blogs/posts/${postId}`
       );
-      return response.data.data;
+      return response.data;
     },
     enabled: !!currentStore && !!postId,
   });
@@ -162,11 +162,11 @@ export function useCreateBlogPost() {
     mutationFn: async (data: CreateBlogPostInput) => {
       if (!currentStore) throw new Error('No store selected');
 
-      const response = await api.post<BlogPostResponse>(
+      const response = await apiClient.post<BlogPostResponse>(
         `/stores/${currentStore.id}/blogs/posts`,
         data
       );
-      return response.data.data;
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blogPosts', currentStore?.id] });
@@ -182,11 +182,11 @@ export function useUpdateBlogPost() {
     mutationFn: async ({ postId, data }: { postId: string; data: UpdateBlogPostInput }) => {
       if (!currentStore) throw new Error('No store selected');
 
-      const response = await api.patch<BlogPostResponse>(
+      const response = await apiClient.patch<BlogPostResponse>(
         `/stores/${currentStore.id}/blogs/posts/${postId}`,
         data
       );
-      return response.data.data;
+      return response.data;
     },
     onSuccess: (_, { postId }) => {
       queryClient.invalidateQueries({ queryKey: ['blogPosts', currentStore?.id] });
@@ -203,7 +203,7 @@ export function useDeleteBlogPost() {
     mutationFn: async (postId: string) => {
       if (!currentStore) throw new Error('No store selected');
 
-      await api.delete(`/stores/${currentStore.id}/blogs/posts/${postId}`);
+      await apiClient.delete(`/stores/${currentStore.id}/blogs/posts/${postId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blogPosts', currentStore?.id] });
@@ -225,7 +225,7 @@ export function useBulkBlogPostAction() {
     }) => {
       if (!currentStore) throw new Error('No store selected');
 
-      const response = await api.post(
+      const response = await apiClient.post<{ success: boolean; data: { affected: number } }>(
         `/stores/${currentStore.id}/blogs/posts/bulk`,
         { action, postIds }
       );
@@ -246,10 +246,10 @@ export function useBlogCategories() {
     queryFn: async () => {
       if (!currentStore) throw new Error('No store selected');
 
-      const response = await api.get<BlogCategoriesResponse>(
+      const response = await apiClient.get<BlogCategoriesResponse>(
         `/stores/${currentStore.id}/blogs/categories`
       );
-      return response.data.data;
+      return response.data;
     },
     enabled: !!currentStore,
   });
@@ -263,11 +263,11 @@ export function useCreateBlogCategory() {
     mutationFn: async (data: CreateBlogCategoryInput) => {
       if (!currentStore) throw new Error('No store selected');
 
-      const response = await api.post(
+      const response = await apiClient.post<{ success: boolean; data: BlogCategory }>(
         `/stores/${currentStore.id}/blogs/categories`,
         data
       );
-      return response.data.data;
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blogCategories', currentStore?.id] });
@@ -283,11 +283,11 @@ export function useUpdateBlogCategory() {
     mutationFn: async ({ categoryId, data }: { categoryId: string; data: UpdateBlogCategoryInput }) => {
       if (!currentStore) throw new Error('No store selected');
 
-      const response = await api.patch(
+      const response = await apiClient.patch<{ success: boolean; data: BlogCategory }>(
         `/stores/${currentStore.id}/blogs/categories/${categoryId}`,
         data
       );
-      return response.data.data;
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blogCategories', currentStore?.id] });
@@ -303,12 +303,10 @@ export function useDeleteBlogCategory() {
     mutationFn: async (categoryId: string) => {
       if (!currentStore) throw new Error('No store selected');
 
-      await api.delete(`/stores/${currentStore.id}/blogs/categories/${categoryId}`);
+      await apiClient.delete(`/stores/${currentStore.id}/blogs/categories/${categoryId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blogCategories', currentStore?.id] });
     },
   });
 }
-
-export type { BlogPostListItem };

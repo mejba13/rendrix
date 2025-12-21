@@ -91,7 +91,7 @@ export function createCustomerColumns({
           </Badge>
         );
       },
-      filterFn: (row, id, value) => {
+      filterFn: (row, _id, value) => {
         if (value === 'all') return true;
         return row.original.acceptsMarketing === (value === 'true');
       },

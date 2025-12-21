@@ -12,16 +12,13 @@ import {
   Eye,
   EyeOff,
   Archive,
-  LayoutGrid,
-  List,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -101,7 +98,7 @@ export default function ProductsPage() {
     }
   };
 
-  const handleDuplicate = (productId: string) => {
+  const handleDuplicate = (_productId: string) => {
     toast({
       title: 'Coming soon',
       description: 'Product duplication feature will be available soon.',

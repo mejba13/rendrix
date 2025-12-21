@@ -4,7 +4,6 @@ import { ColumnDef } from '@tanstack/react-table';
 import {
   MoreHorizontal,
   Eye,
-  Pencil,
   Copy,
   Trash2,
   ToggleLeft,

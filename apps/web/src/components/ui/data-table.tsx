@@ -178,7 +178,7 @@ export function DataTable<TData, TValue>({
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
                     <p>No results found.</p>
-                    {searchKey && table.getColumn(searchKey)?.getFilterValue() && (
+                    {searchKey && Boolean(table.getColumn(searchKey)?.getFilterValue()) && (
                       <Button
                         variant="ghost"
                         size="sm"

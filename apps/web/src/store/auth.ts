@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   login: async (email, password) => {
     const data = await api.login(email, password);
     set({
-      user: data.user,
+      user: { ...data.user, avatarUrl: null },
       organizations: data.organizations,
       currentOrganization: data.organizations[0] || null,
       isAuthenticated: true,

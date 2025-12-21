@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   Upload,
   Image as ImageIcon,
-  Folder,
   Grid,
   List,
   Trash2,
@@ -24,7 +23,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -107,7 +106,7 @@ export default function MediaPage() {
   const uploadMedia = useUploadMedia();
   const deleteMedia = useDeleteMedia();
   const bulkDelete = useBulkDeleteMedia();
-  const updateMedia = useUpdateMedia();
+  void useUpdateMedia();
 
   // Debounced search
   React.useEffect(() => {
@@ -188,12 +187,6 @@ export default function MediaPage() {
       newSelected.add(id);
     }
     setSelectedItems(newSelected);
-  };
-
-  const selectAll = () => {
-    if (data?.data) {
-      setSelectedItems(new Set(data.data.map((item) => item.id)));
-    }
   };
 
   const deselectAll = () => {

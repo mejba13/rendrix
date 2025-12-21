@@ -34,7 +34,7 @@ import {
 import { DataTable } from '@/components/ui/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { useCustomers, useDeleteCustomer, type CustomerListItem } from '@/hooks/use-customers';
+import { useCustomers, useDeleteCustomer } from '@/hooks/use-customers';
 import { useStoreStore } from '@/store/store';
 import { createCustomerColumns } from '@/components/customers/customer-columns';
 import { formatCurrency } from '@rendrix/utils';

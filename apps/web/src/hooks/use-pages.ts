@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { apiClient } from '@/lib/api-client';
 import { useStoreStore } from '@/store/store';
 
 export type PageStatus = 'draft' | 'published';
@@ -114,10 +114,10 @@ export function usePages(params: PagesParams = {}) {
         }
       });
 
-      const response = await api.get<PagesResponse>(
+      const response = await apiClient.get<PagesResponse>(
         `/stores/${currentStore.id}/pages?${searchParams.toString()}`
       );
-      return response.data;
+      return response;
     },
     enabled: !!currentStore,
   });
@@ -131,10 +131,10 @@ export function usePageTree() {
     queryFn: async () => {
       if (!currentStore) throw new Error('No store selected');
 
-      const response = await api.get<PageTreeResponse>(
+      const response = await apiClient.get<PageTreeResponse>(
         `/stores/${currentStore.id}/pages/tree`
       );
-      return response.data.data;
+      return response.data;
     },
     enabled: !!currentStore,
   });
@@ -148,10 +148,10 @@ export function usePage(pageId: string | undefined) {
     queryFn: async () => {
       if (!currentStore || !pageId) throw new Error('No store or page selected');
 
-      const response = await api.get<PageResponse>(
+      const response = await apiClient.get<PageResponse>(
         `/stores/${currentStore.id}/pages/${pageId}`
       );
-      return response.data.data;
+      return response.data;
     },
     enabled: !!currentStore && !!pageId,
   });
@@ -165,11 +165,11 @@ export function useCreatePage() {
     mutationFn: async (data: CreatePageInput) => {
       if (!currentStore) throw new Error('No store selected');
 
-      const response = await api.post<PageResponse>(
+      const response = await apiClient.post<PageResponse>(
         `/stores/${currentStore.id}/pages`,
         data
       );
-      return response.data.data;
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pages', currentStore?.id] });
@@ -186,11 +186,11 @@ export function useUpdatePage() {
     mutationFn: async ({ pageId, data }: { pageId: string; data: UpdatePageInput }) => {
       if (!currentStore) throw new Error('No store selected');
 
-      const response = await api.patch<PageResponse>(
+      const response = await apiClient.patch<PageResponse>(
         `/stores/${currentStore.id}/pages/${pageId}`,
         data
       );
-      return response.data.data;
+      return response.data;
     },
     onSuccess: (_, { pageId }) => {
       queryClient.invalidateQueries({ queryKey: ['pages', currentStore?.id] });
@@ -208,7 +208,7 @@ export function useDeletePage() {
     mutationFn: async (pageId: string) => {
       if (!currentStore) throw new Error('No store selected');
 
-      await api.delete(`/stores/${currentStore.id}/pages/${pageId}`);
+      await apiClient.delete(`/stores/${currentStore.id}/pages/${pageId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pages', currentStore?.id] });
@@ -225,10 +225,10 @@ export function useDuplicatePage() {
     mutationFn: async (pageId: string) => {
       if (!currentStore) throw new Error('No store selected');
 
-      const response = await api.post<PageResponse>(
+      const response = await apiClient.post<PageResponse>(
         `/stores/${currentStore.id}/pages/${pageId}/duplicate`
       );
-      return response.data.data;
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pages', currentStore?.id] });
@@ -251,7 +251,7 @@ export function useBulkPageAction() {
     }) => {
       if (!currentStore) throw new Error('No store selected');
 
-      const response = await api.post(
+      const response = await apiClient.post<{ success: boolean; data: { affected: number } }>(
         `/stores/${currentStore.id}/pages/bulk`,
         { action, pageIds }
       );
@@ -272,11 +272,11 @@ export function useReorderPages() {
     mutationFn: async (pages: { id: string; navOrder: number; parentId?: string | null }[]) => {
       if (!currentStore) throw new Error('No store selected');
 
-      const response = await api.post(
+      const response = await apiClient.post<{ success: boolean }>(
         `/stores/${currentStore.id}/pages/reorder`,
         { pages }
       );
-      return response.data;
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pages', currentStore?.id] });
