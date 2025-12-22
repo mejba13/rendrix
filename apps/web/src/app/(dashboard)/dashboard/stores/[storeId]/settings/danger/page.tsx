@@ -91,7 +91,7 @@ export default function DangerZonePage() {
   const { toast } = useToast();
   const storeId = params.storeId as string;
 
-  const { data: store, isLoading } = useStore(storeId);
+  const { data: store, isLoading, error } = useStore(storeId);
   const updateStore = useUpdateStore();
   const deleteStore = useDeleteStore();
 
@@ -197,6 +197,41 @@ export default function DangerZonePage() {
         <Skeleton className="h-48 rounded-2xl bg-white/[0.02]" />
         <Skeleton className="h-48 rounded-2xl bg-white/[0.02]" />
         <Skeleton className="h-48 rounded-2xl bg-white/[0.02]" />
+      </div>
+    );
+  }
+
+  if (error || !store || !store.name) {
+    const isAuthError = error?.message?.toLowerCase().includes('token') ||
+                        error?.message?.toLowerCase().includes('unauthorized');
+    return (
+      <div className="flex flex-col items-center justify-center py-16 space-y-4">
+        <AlertCircle className="w-12 h-12 text-red-400" />
+        <h2 className="text-lg font-semibold text-white">
+          {isAuthError ? 'Session Expired' : 'Failed to load store'}
+        </h2>
+        <p className="text-sm text-white/60 text-center max-w-md">
+          {isAuthError
+            ? 'Your session has expired. Please log in again to continue.'
+            : (error?.message || 'Unable to load store data. Please try refreshing the page.')}
+        </p>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => window.location.reload()}
+            variant="outline"
+            className="bg-white/[0.02] border-white/[0.08] text-white hover:bg-white/[0.06]"
+          >
+            Refresh Page
+          </Button>
+          {isAuthError && (
+            <Button
+              onClick={() => router.push('/login')}
+              className="bg-primary hover:bg-primary/90 text-black"
+            >
+              Log In Again
+            </Button>
+          )}
+        </div>
       </div>
     );
   }
