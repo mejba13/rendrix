@@ -10,9 +10,10 @@ import {
   RefreshCw,
   UserCheck,
   DollarSign,
+  ShoppingBag,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -165,42 +166,56 @@ export default function CustomersPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="shadow-soft">
-          <CardHeader className="pb-2">
-            <CardDescription>Total Customers</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-soft">
-          <CardHeader className="pb-2">
-            <CardDescription>Marketing Subscribers</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <UserCheck className="h-5 w-5 text-emerald-500" />
-              <span className="text-2xl font-bold text-emerald-600">{stats.marketing}</span>
+        <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-orange-500/10 flex items-center justify-center">
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-white">{stats.total}</h3>
+              <p className="text-sm text-white/40">Total Customers</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="shadow-soft">
-          <CardHeader className="pb-2">
-            <CardDescription>Avg. Spent per Customer</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-primary" />
-              <span className="text-2xl font-bold">{formatCurrency(stats.avgSpent, 'USD')}</span>
+        <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/10 flex items-center justify-center">
+                <UserCheck className="h-5 w-5 text-emerald-500" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-emerald-500">{stats.marketing}</h3>
+              <p className="text-sm text-white/40">Marketing Subscribers</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="shadow-soft">
-          <CardHeader className="pb-2">
-            <CardDescription>Avg. Orders per Customer</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.avgOrders.toFixed(1)}</div>
+        <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/10 flex items-center justify-center">
+                <DollarSign className="h-5 w-5 text-green-500" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-white">{formatCurrency(stats.avgSpent, 'USD')}</h3>
+              <p className="text-sm text-white/40">Avg. Spent per Customer</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/10 flex items-center justify-center">
+                <ShoppingBag className="h-5 w-5 text-blue-500" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-white">{stats.avgOrders.toFixed(1)}</h3>
+              <p className="text-sm text-white/40">Avg. Orders per Customer</p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -261,7 +276,7 @@ export default function CustomersPage() {
 
       {/* Customers Table */}
       {isLoading ? (
-        <Card className="shadow-soft">
+        <Card>
           <div className="p-6 space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex items-center gap-4">
@@ -278,7 +293,7 @@ export default function CustomersPage() {
           </div>
         </Card>
       ) : error ? (
-        <Card className="shadow-soft">
+        <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
               <Users className="h-6 w-6 text-destructive" />
@@ -293,7 +308,7 @@ export default function CustomersPage() {
           </CardContent>
         </Card>
       ) : data?.data.length === 0 && !filters.search ? (
-        <Card className="shadow-soft">
+        <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <Users className="h-8 w-8 text-primary" />

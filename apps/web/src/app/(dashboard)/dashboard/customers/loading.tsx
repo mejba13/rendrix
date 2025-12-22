@@ -20,7 +20,7 @@ export default function CustomersLoading() {
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Card key={i} className="shadow-soft">
+          <Card key={i}>
             <CardHeader className="pb-2">
               <Skeleton className="h-4 w-[100px]" />
             </CardHeader>
@@ -39,7 +39,7 @@ export default function CustomersLoading() {
       </div>
 
       {/* Table */}
-      <Card className="shadow-soft">
+      <Card>
         <div className="p-6 space-y-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="flex items-center gap-4">

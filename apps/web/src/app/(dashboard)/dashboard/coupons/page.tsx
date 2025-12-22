@@ -7,9 +7,12 @@ import {
   Plus,
   Ticket,
   RefreshCw,
+  CheckCircle2,
+  Clock,
+  Repeat,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -195,36 +198,56 @@ export default function CouponsPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="shadow-soft">
-          <CardHeader className="pb-2">
-            <CardDescription>Total Coupons</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
+        <Card className="hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-violet-500/10 flex items-center justify-center">
+                <Ticket className="h-5 w-5 text-purple-500" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-white">{stats.total}</h3>
+              <p className="text-sm text-white/40">Total Coupons</p>
+            </div>
           </CardContent>
         </Card>
-        <Card className="shadow-soft">
-          <CardHeader className="pb-2">
-            <CardDescription>Active</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">{stats.active}</div>
+        <Card className="hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/10 flex items-center justify-center">
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-emerald-500">{stats.active}</h3>
+              <p className="text-sm text-white/40">Active</p>
+            </div>
           </CardContent>
         </Card>
-        <Card className="shadow-soft">
-          <CardHeader className="pb-2">
-            <CardDescription>Expired</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-amber-600">{stats.expired}</div>
+        <Card className="hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-yellow-500/10 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-amber-500" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-amber-500">{stats.expired}</h3>
+              <p className="text-sm text-white/40">Expired</p>
+            </div>
           </CardContent>
         </Card>
-        <Card className="shadow-soft">
-          <CardHeader className="pb-2">
-            <CardDescription>Total Redemptions</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalUsage}</div>
+        <Card className="hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/10 flex items-center justify-center">
+                <Repeat className="h-5 w-5 text-blue-500" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-white">{stats.totalUsage}</h3>
+              <p className="text-sm text-white/40">Total Redemptions</p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -290,7 +313,7 @@ export default function CouponsPage() {
 
       {/* Coupons Table */}
       {isLoading ? (
-        <Card className="shadow-soft">
+        <Card>
           <div className="p-6 space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex items-center gap-4">
@@ -309,7 +332,7 @@ export default function CouponsPage() {
           </div>
         </Card>
       ) : error ? (
-        <Card className="shadow-soft">
+        <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
               <Ticket className="h-6 w-6 text-destructive" />
@@ -324,7 +347,7 @@ export default function CouponsPage() {
           </CardContent>
         </Card>
       ) : data?.data.length === 0 && !filters.search && !filters.type ? (
-        <Card className="shadow-soft">
+        <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <Ticket className="h-8 w-8 text-primary" />

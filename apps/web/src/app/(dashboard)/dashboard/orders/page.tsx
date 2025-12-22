@@ -8,9 +8,12 @@ import {
   ShoppingCart,
   Download,
   RefreshCw,
+  DollarSign,
+  Clock,
+  CheckCircle2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -154,36 +157,56 @@ export default function OrdersPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="shadow-soft">
-          <CardHeader className="pb-2">
-            <CardDescription>Total Orders</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
+        <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/10 flex items-center justify-center">
+                <ShoppingCart className="h-5 w-5 text-blue-500" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-white">{stats.total}</h3>
+              <p className="text-sm text-white/40">Total Orders</p>
+            </div>
           </CardContent>
         </Card>
-        <Card className="shadow-soft">
-          <CardHeader className="pb-2">
-            <CardDescription>Revenue (visible)</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(stats.revenue, 'USD')}</div>
+        <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/10 flex items-center justify-center">
+                <DollarSign className="h-5 w-5 text-green-500" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-white">{formatCurrency(stats.revenue, 'USD')}</h3>
+              <p className="text-sm text-white/40">Revenue (visible)</p>
+            </div>
           </CardContent>
         </Card>
-        <Card className="shadow-soft">
-          <CardHeader className="pb-2">
-            <CardDescription>Pending</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-amber-600">{stats.pending}</div>
+        <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-yellow-500/10 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-amber-500" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-amber-500">{stats.pending}</h3>
+              <p className="text-sm text-white/40">Pending</p>
+            </div>
           </CardContent>
         </Card>
-        <Card className="shadow-soft">
-          <CardHeader className="pb-2">
-            <CardDescription>Fulfilled</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">{stats.fulfilled}</div>
+        <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/10 flex items-center justify-center">
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-emerald-500">{stats.fulfilled}</h3>
+              <p className="text-sm text-white/40">Fulfilled</p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -267,7 +290,7 @@ export default function OrdersPage() {
 
       {/* Orders Table */}
       {isLoading ? (
-        <Card className="shadow-soft">
+        <Card>
           <div className="p-6 space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex items-center gap-4">
@@ -288,7 +311,7 @@ export default function OrdersPage() {
           </div>
         </Card>
       ) : error ? (
-        <Card className="shadow-soft">
+        <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
               <ShoppingCart className="h-6 w-6 text-destructive" />
@@ -301,7 +324,7 @@ export default function OrdersPage() {
           </CardContent>
         </Card>
       ) : data?.data.length === 0 && !filters.search && !filters.status ? (
-        <Card className="shadow-soft">
+        <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <ShoppingCart className="h-8 w-8 text-primary" />

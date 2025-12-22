@@ -14,7 +14,7 @@ import {
   Archive,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -178,46 +178,62 @@ export default function ProductsPage() {
       {/* Stats Cards */}
       {data && (
         <div className="grid gap-4 md:grid-cols-4">
-          <Card className="shadow-soft">
-            <CardHeader className="pb-2">
-              <CardDescription>Total Products</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{data.meta.total}</div>
+          <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-violet-500/10 flex items-center justify-center">
+                  <Package className="h-5 w-5 text-purple-500" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-2xl font-semibold text-white">{data.meta.total}</h3>
+                <p className="text-sm text-white/40">Total Products</p>
+              </div>
             </CardContent>
           </Card>
-          <Card className="shadow-soft">
-            <CardHeader className="pb-2">
-              <CardDescription>Active</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <div className="text-2xl font-bold">
-                  {data.data.filter((p) => p.status === 'active').length}
+          <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/10 flex items-center justify-center">
+                  <Eye className="h-5 w-5 text-emerald-500" />
                 </div>
                 <Badge variant="success" className="font-normal">Live</Badge>
               </div>
-            </CardContent>
-          </Card>
-          <Card className="shadow-soft">
-            <CardHeader className="pb-2">
-              <CardDescription>Draft</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {data.data.filter((p) => p.status === 'draft').length}
+              <div className="space-y-1">
+                <h3 className="text-2xl font-semibold text-white">
+                  {data.data.filter((p) => p.status === 'active').length}
+                </h3>
+                <p className="text-sm text-white/40">Active</p>
               </div>
             </CardContent>
           </Card>
-          <Card className="shadow-soft">
-            <CardHeader className="pb-2">
-              <CardDescription>Out of Stock</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <div className="text-2xl font-bold text-destructive">
-                  {data.data.filter((p) => p.trackInventory && p.quantity === 0).length}
+          <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-yellow-500/10 flex items-center justify-center">
+                  <Archive className="h-5 w-5 text-amber-500" />
                 </div>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-2xl font-semibold text-white">
+                  {data.data.filter((p) => p.status === 'draft').length}
+                </h3>
+                <p className="text-sm text-white/40">Draft</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500/20 to-rose-500/10 flex items-center justify-center">
+                  <Package className="h-5 w-5 text-red-500" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-2xl font-semibold text-red-500">
+                  {data.data.filter((p) => p.trackInventory && p.quantity === 0).length}
+                </h3>
+                <p className="text-sm text-white/40">Out of Stock</p>
               </div>
             </CardContent>
           </Card>
@@ -261,7 +277,7 @@ export default function ProductsPage() {
 
       {/* Products Table */}
       {isLoading ? (
-        <Card className="shadow-soft">
+        <Card>
           <div className="p-6 space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex items-center gap-4">
@@ -277,7 +293,7 @@ export default function ProductsPage() {
           </div>
         </Card>
       ) : error ? (
-        <Card className="shadow-soft">
+        <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
               <Package className="h-6 w-6 text-destructive" />
@@ -296,7 +312,7 @@ export default function ProductsPage() {
           </CardContent>
         </Card>
       ) : data?.data.length === 0 && !filters.search && !filters.status && !filters.type ? (
-        <Card className="shadow-soft">
+        <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <Package className="h-8 w-8 text-primary" />

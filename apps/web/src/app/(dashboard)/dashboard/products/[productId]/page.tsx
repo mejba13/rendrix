@@ -178,7 +178,7 @@ export default function ProductDetailPage() {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Images */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle>Product Images</CardTitle>
             </CardHeader>
@@ -215,7 +215,7 @@ export default function ProductDetailPage() {
           </Card>
 
           {/* Description */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle>Description</CardTitle>
             </CardHeader>
@@ -245,7 +245,7 @@ export default function ProductDetailPage() {
 
           {/* Variants */}
           {product.variants && product.variants.length > 0 && (
-            <Card className="shadow-soft">
+            <Card>
               <CardHeader>
                 <CardTitle>Variants ({product.variants.length})</CardTitle>
               </CardHeader>
@@ -281,7 +281,7 @@ export default function ProductDetailPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Pricing */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <DollarSign className="h-5 w-5" />
@@ -320,7 +320,7 @@ export default function ProductDetailPage() {
           </Card>
 
           {/* Inventory */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Truck className="h-5 w-5" />
@@ -357,7 +357,7 @@ export default function ProductDetailPage() {
           </Card>
 
           {/* Product Info */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5" />

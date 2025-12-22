@@ -320,7 +320,7 @@ export default function MediaPage() {
           ))}
         </div>
       ) : error ? (
-        <Card className="shadow-soft">
+        <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
               <ImageIcon className="h-6 w-6 text-destructive" />
@@ -333,7 +333,7 @@ export default function MediaPage() {
           </CardContent>
         </Card>
       ) : data?.data.length === 0 ? (
-        <Card className="shadow-soft">
+        <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <ImageIcon className="h-8 w-8 text-primary" />

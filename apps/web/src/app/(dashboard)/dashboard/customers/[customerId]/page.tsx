@@ -347,7 +347,7 @@ export default function CustomerDetailPage() {
 
             <TabsContent value="details" className="space-y-6">
               <form onSubmit={handleSubmit(onSubmit)}>
-                <Card className="shadow-soft">
+                <Card>
                   <CardHeader>
                     <CardTitle>Customer Information</CardTitle>
                     <CardDescription>
@@ -433,7 +433,7 @@ export default function CustomerDetailPage() {
             </TabsContent>
 
             <TabsContent value="addresses" className="space-y-6">
-              <Card className="shadow-soft">
+              <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
                     <CardTitle>Addresses</CardTitle>
@@ -481,7 +481,7 @@ export default function CustomerDetailPage() {
             </TabsContent>
 
             <TabsContent value="orders" className="space-y-6">
-              <Card className="shadow-soft">
+              <Card>
                 <CardHeader>
                   <CardTitle>Order History</CardTitle>
                   <CardDescription>
@@ -529,7 +529,7 @@ export default function CustomerDetailPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Customer Stats */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle>Summary</CardTitle>
             </CardHeader>
@@ -569,7 +569,7 @@ export default function CustomerDetailPage() {
           </Card>
 
           {/* Marketing Status */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle>Marketing</CardTitle>
             </CardHeader>
@@ -594,7 +594,7 @@ export default function CustomerDetailPage() {
 
           {/* Tags */}
           {customer.tags && customer.tags.length > 0 && (
-            <Card className="shadow-soft">
+            <Card>
               <CardHeader>
                 <CardTitle>Tags</CardTitle>
               </CardHeader>
@@ -611,7 +611,7 @@ export default function CustomerDetailPage() {
           )}
 
           {/* Contact Info */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle>Contact</CardTitle>
             </CardHeader>

@@ -199,7 +199,7 @@ export default function OrderDetailPage() {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Order Items */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Package className="h-5 w-5" />
@@ -290,7 +290,7 @@ export default function OrderDetailPage() {
 
           {/* Fulfillments */}
           {order.fulfillments && order.fulfillments.length > 0 && (
-            <Card className="shadow-soft">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Truck className="h-5 w-5" />
@@ -349,7 +349,7 @@ export default function OrderDetailPage() {
 
           {/* Transactions */}
           {order.transactions && order.transactions.length > 0 && (
-            <Card className="shadow-soft">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CreditCard className="h-5 w-5" />
@@ -397,7 +397,7 @@ export default function OrderDetailPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Customer */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
@@ -433,7 +433,7 @@ export default function OrderDetailPage() {
           </Card>
 
           {/* Addresses */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
@@ -485,7 +485,7 @@ export default function OrderDetailPage() {
 
           {/* Notes */}
           {order.notes && (
-            <Card className="shadow-soft">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Clock className="h-5 w-5" />
@@ -499,7 +499,7 @@ export default function OrderDetailPage() {
           )}
 
           {/* Timeline */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5" />

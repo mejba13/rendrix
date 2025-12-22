@@ -118,118 +118,130 @@ export default function AnalyticsPage() {
 
       {/* Overview Stats */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="shadow-soft">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardDescription>Total Revenue</CardDescription>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(overview?.revenue?.total || 0, 'USD')}
+        <Card className="hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/10 flex items-center justify-center">
+                <DollarSign className="h-5 w-5 text-green-500" />
+              </div>
+              <div className="flex items-center text-sm">
+                {(overview?.revenue?.change || 0) >= 0 ? (
+                  <>
+                    <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                    <span className="text-emerald-500">
+                      +{overview?.revenue?.change?.toFixed(1)}%
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <ArrowDownRight className="h-4 w-4 text-red-500" />
+                    <span className="text-red-500">
+                      {overview?.revenue?.change?.toFixed(1)}%
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
-            <div className="flex items-center text-sm mt-1">
-              {(overview?.revenue?.change || 0) >= 0 ? (
-                <>
-                  <ArrowUpRight className="h-4 w-4 text-emerald-500" />
-                  <span className="text-emerald-500">
-                    +{overview?.revenue?.change?.toFixed(1)}%
-                  </span>
-                </>
-              ) : (
-                <>
-                  <ArrowDownRight className="h-4 w-4 text-destructive" />
-                  <span className="text-destructive">
-                    {overview?.revenue?.change?.toFixed(1)}%
-                  </span>
-                </>
-              )}
-              <span className="text-muted-foreground ml-1">from last period</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-soft">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardDescription>Total Orders</CardDescription>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{overview?.orders?.total || 0}</div>
-            <div className="flex items-center text-sm mt-1">
-              {(overview?.orders?.change || 0) >= 0 ? (
-                <>
-                  <ArrowUpRight className="h-4 w-4 text-emerald-500" />
-                  <span className="text-emerald-500">
-                    +{overview?.orders?.change?.toFixed(1)}%
-                  </span>
-                </>
-              ) : (
-                <>
-                  <ArrowDownRight className="h-4 w-4 text-destructive" />
-                  <span className="text-destructive">
-                    {overview?.orders?.change?.toFixed(1)}%
-                  </span>
-                </>
-              )}
-              <span className="text-muted-foreground ml-1">from last period</span>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-white">
+                {formatCurrency(overview?.revenue?.total || 0, 'USD')}
+              </h3>
+              <p className="text-sm text-white/40">Total Revenue</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-soft">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardDescription>New Customers</CardDescription>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{overview?.customers?.total || 0}</div>
-            <div className="flex items-center text-sm mt-1">
-              {(overview?.customers?.change || 0) >= 0 ? (
-                <>
-                  <ArrowUpRight className="h-4 w-4 text-emerald-500" />
-                  <span className="text-emerald-500">
-                    +{overview?.customers?.change?.toFixed(1)}%
-                  </span>
-                </>
-              ) : (
-                <>
-                  <ArrowDownRight className="h-4 w-4 text-destructive" />
-                  <span className="text-destructive">
-                    {overview?.customers?.change?.toFixed(1)}%
-                  </span>
-                </>
-              )}
-              <span className="text-muted-foreground ml-1">from last period</span>
+        <Card className="hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/10 flex items-center justify-center">
+                <ShoppingCart className="h-5 w-5 text-blue-500" />
+              </div>
+              <div className="flex items-center text-sm">
+                {(overview?.orders?.change || 0) >= 0 ? (
+                  <>
+                    <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                    <span className="text-emerald-500">
+                      +{overview?.orders?.change?.toFixed(1)}%
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <ArrowDownRight className="h-4 w-4 text-red-500" />
+                    <span className="text-red-500">
+                      {overview?.orders?.change?.toFixed(1)}%
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-white">{overview?.orders?.total || 0}</h3>
+              <p className="text-sm text-white/40">Total Orders</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-soft">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardDescription>Avg. Order Value</CardDescription>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(overview?.averageOrderValue?.total || 0, 'USD')}
+        <Card className="hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-orange-500/10 flex items-center justify-center">
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex items-center text-sm">
+                {(overview?.customers?.change || 0) >= 0 ? (
+                  <>
+                    <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                    <span className="text-emerald-500">
+                      +{overview?.customers?.change?.toFixed(1)}%
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <ArrowDownRight className="h-4 w-4 text-red-500" />
+                    <span className="text-red-500">
+                      {overview?.customers?.change?.toFixed(1)}%
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
-            <div className="flex items-center text-sm mt-1">
-              {(overview?.averageOrderValue?.change || 0) >= 0 ? (
-                <>
-                  <ArrowUpRight className="h-4 w-4 text-emerald-500" />
-                  <span className="text-emerald-500">
-                    +{overview?.averageOrderValue?.change?.toFixed(1)}%
-                  </span>
-                </>
-              ) : (
-                <>
-                  <ArrowDownRight className="h-4 w-4 text-destructive" />
-                  <span className="text-destructive">
-                    {overview?.averageOrderValue?.change?.toFixed(1)}%
-                  </span>
-                </>
-              )}
-              <span className="text-muted-foreground ml-1">from last period</span>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-white">{overview?.customers?.total || 0}</h3>
+              <p className="text-sm text-white/40">New Customers</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:border-white/[0.12] transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-violet-500/10 flex items-center justify-center">
+                <TrendingUp className="h-5 w-5 text-purple-500" />
+              </div>
+              <div className="flex items-center text-sm">
+                {(overview?.averageOrderValue?.change || 0) >= 0 ? (
+                  <>
+                    <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                    <span className="text-emerald-500">
+                      +{overview?.averageOrderValue?.change?.toFixed(1)}%
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <ArrowDownRight className="h-4 w-4 text-red-500" />
+                    <span className="text-red-500">
+                      {overview?.averageOrderValue?.change?.toFixed(1)}%
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl font-semibold text-white">
+                {formatCurrency(overview?.averageOrderValue?.total || 0, 'USD')}
+              </h3>
+              <p className="text-sm text-white/40">Avg. Order Value</p>
             </div>
           </CardContent>
         </Card>
@@ -238,9 +250,9 @@ export default function AnalyticsPage() {
       {/* Charts Row */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Revenue Chart */}
-        <Card className="shadow-soft">
+        <Card>
           <CardHeader>
-            <CardTitle>Revenue Over Time</CardTitle>
+            <CardTitle className="text-lg">Revenue Over Time</CardTitle>
             <CardDescription>{dateRangeLabels[dateRange]}</CardDescription>
           </CardHeader>
           <CardContent>
@@ -266,7 +278,7 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Top Products */}
-        <Card className="shadow-soft">
+        <Card>
           <CardHeader>
             <CardTitle>Top Products</CardTitle>
             <CardDescription>Best performing products by revenue</CardDescription>
@@ -306,7 +318,7 @@ export default function AnalyticsPage() {
       {/* Second Row */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Top Customers */}
-        <Card className="shadow-soft">
+        <Card>
           <CardHeader>
             <CardTitle>Top Customers</CardTitle>
             <CardDescription>Customers with highest lifetime value</CardDescription>
@@ -353,7 +365,7 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Recent Orders */}
-        <Card className="shadow-soft">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Recent Orders</CardTitle>

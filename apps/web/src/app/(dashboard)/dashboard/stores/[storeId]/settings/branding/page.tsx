@@ -90,7 +90,7 @@ export default function BrandingSettingsPage() {
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       {/* Logo */}
-      <Card className="shadow-soft">
+      <Card>
         <CardHeader>
           <CardTitle>Store Logo</CardTitle>
           <CardDescription>
@@ -144,7 +144,7 @@ export default function BrandingSettingsPage() {
       </Card>
 
       {/* Favicon */}
-      <Card className="shadow-soft">
+      <Card>
         <CardHeader>
           <CardTitle>Favicon</CardTitle>
           <CardDescription>
@@ -198,7 +198,7 @@ export default function BrandingSettingsPage() {
       </Card>
 
       {/* Preview */}
-      <Card className="shadow-soft">
+      <Card>
         <CardHeader>
           <CardTitle>Preview</CardTitle>
           <CardDescription>

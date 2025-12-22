@@ -17,12 +17,13 @@ import {
   Loader2,
   Store,
   ChevronRight,
-  ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useStore } from '@/hooks/use-stores';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { ViewStoreButton } from '@/components/store/view-store-button';
+import { StorePreviewModal } from '@/components/store/store-preview-modal';
 
 // Settings navigation structure
 interface NavItem {
@@ -143,8 +144,16 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
   const pathname = usePathname();
   const storeId = params.storeId as string;
   const { data: store, isLoading } = useStore(storeId);
+  const [showPreview, setShowPreview] = React.useState(false);
+  const [previewDevice, setPreviewDevice] = React.useState<'desktop' | 'tablet' | 'mobile'>('desktop');
 
   const basePath = `/dashboard/stores/${storeId}/settings`;
+
+  // In development, use localhost:3001 for storefront preview
+  const isDev = process.env.NODE_ENV === 'development' || typeof window !== 'undefined' && window.location.hostname === 'localhost';
+  const productionUrl = store?.customDomain || (store?.subdomain ? `${store.subdomain}.rendrix.com` : `${store?.slug}.rendrix.com`);
+  const storeUrl = isDev ? `localhost:3001?store=${store?.slug}` : productionUrl;
+  const storeUrlProtocol = isDev ? 'http' : 'https';
 
   // Find current page info
   const currentPage = React.useMemo(() => {
@@ -213,21 +222,17 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
             <div className="flex items-center gap-4">
               <SaveStatus isSaving={false} lastSaved={new Date()} />
 
-              <Button
-                variant="outline"
-                size="sm"
-                className="bg-white/[0.02] border-white/[0.08] hover:bg-white/[0.06] text-white/70"
-                asChild
-              >
-                <a
-                  href={`https://${store?.subdomain || store?.slug}.rendrix.com`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  View Store
-                </a>
-              </Button>
+              {store && (
+                <ViewStoreButton
+                  storeUrl={`${storeUrlProtocol}://${storeUrl}`}
+                  storeName={store.name}
+                  size="sm"
+                  onPreview={(device) => {
+                    setPreviewDevice(device);
+                    setShowPreview(true);
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -315,6 +320,16 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
           <div className="max-w-3xl">{children}</div>
         </main>
       </div>
+
+      {/* Store Preview Modal */}
+      {showPreview && store && (
+        <StorePreviewModal
+          url={`${storeUrlProtocol}://${storeUrl}`}
+          storeName={store.name}
+          initialDevice={previewDevice}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </div>
   );
 }

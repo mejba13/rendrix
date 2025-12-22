@@ -176,7 +176,7 @@ export default function FulfillOrderPage() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Items to Fulfill */}
-        <Card className="shadow-soft">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Package className="h-5 w-5" />
@@ -234,7 +234,7 @@ export default function FulfillOrderPage() {
         </Card>
 
         {/* Shipping Information */}
-        <Card className="shadow-soft">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Truck className="h-5 w-5" />
@@ -279,7 +279,7 @@ export default function FulfillOrderPage() {
         </Card>
 
         {/* Notification */}
-        <Card className="shadow-soft">
+        <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">

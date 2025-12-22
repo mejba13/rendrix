@@ -269,7 +269,7 @@ export default function CouponDetailPage() {
             </TabsList>
 
             <TabsContent value="details" className="space-y-6">
-              <Card className="shadow-soft">
+              <Card>
                 <CardHeader>
                   <CardTitle>Discount Details</CardTitle>
                 </CardHeader>
@@ -314,7 +314,7 @@ export default function CouponDetailPage() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-soft">
+              <Card>
                 <CardHeader>
                   <CardTitle>Validity Period</CardTitle>
                 </CardHeader>
@@ -350,7 +350,7 @@ export default function CouponDetailPage() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-soft">
+              <Card>
                 <CardHeader>
                   <CardTitle>Usage Limits</CardTitle>
                 </CardHeader>
@@ -386,7 +386,7 @@ export default function CouponDetailPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Usage Stats */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle>Usage Statistics</CardTitle>
             </CardHeader>
@@ -424,7 +424,7 @@ export default function CouponDetailPage() {
           </Card>
 
           {/* Quick Actions */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
@@ -468,7 +468,7 @@ export default function CouponDetailPage() {
           </Card>
 
           {/* Meta Info */}
-          <Card className="shadow-soft">
+          <Card>
             <CardHeader>
               <CardTitle>Information</CardTitle>
             </CardHeader>

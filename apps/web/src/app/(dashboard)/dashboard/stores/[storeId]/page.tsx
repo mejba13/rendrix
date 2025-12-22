@@ -19,8 +19,6 @@ import {
   Globe,
   Calendar,
   Clock,
-  Eye,
-  Share2,
   MoreHorizontal,
   Zap,
   Shield,
@@ -41,6 +39,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { ViewStoreButton } from '@/components/store/view-store-button';
+import { StorePreviewModal } from '@/components/store/store-preview-modal';
 
 interface StoreData {
   id: string;
@@ -252,6 +252,8 @@ export default function StoreManagementPage() {
   const params = useParams();
   const storeId = params.storeId as string;
   const [copied, setCopied] = React.useState(false);
+  const [showPreview, setShowPreview] = React.useState(false);
+  const [previewDevice, setPreviewDevice] = React.useState<'desktop' | 'tablet' | 'mobile'>('desktop');
 
   const { data: storeResponse, isLoading, error } = useQuery({
     queryKey: ['store', storeId],
@@ -264,10 +266,18 @@ export default function StoreManagementPage() {
 
   const store = storeResponse;
   const config = store ? industryConfig[store.industry] || industryConfig.general : industryConfig.general;
-  const storeUrl = store?.customDomain || (store?.subdomain ? `${store.subdomain}.rendrix.com` : `${store?.slug}.rendrix.com`);
+
+  // In development, use localhost:3001 for storefront preview
+  // In production, use the actual subdomain URL
+  const isDev = process.env.NODE_ENV === 'development' || typeof window !== 'undefined' && window.location.hostname === 'localhost';
+  const productionUrl = store?.customDomain || (store?.subdomain ? `${store.subdomain}.rendrix.com` : `${store?.slug}.rendrix.com`);
+  const storeUrl = isDev ? `localhost:3001?store=${store?.slug}` : productionUrl;
+  const storeUrlProtocol = isDev ? 'http' : 'https';
+  // Display URL (for showing to users - always show the production URL format)
+  const displayUrl = productionUrl;
 
   const copyToClipboard = async () => {
-    await navigator.clipboard.writeText(`https://${storeUrl}`);
+    await navigator.clipboard.writeText(`${storeUrlProtocol}://${storeUrl}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -344,10 +354,11 @@ export default function StoreManagementPage() {
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <Globe className="w-4 h-4 text-white/40" />
-                  <span className="text-sm text-white/40">{storeUrl}</span>
+                  <span className="text-sm text-white/40">{displayUrl}</span>
                   <button
                     onClick={copyToClipboard}
                     className="p-1 hover:bg-white/[0.08] rounded transition-colors"
+                    title={isDev ? 'Copy dev URL' : 'Copy URL'}
                   >
                     {copied ? (
                       <Check className="w-3.5 h-3.5 text-emerald-400" />
@@ -355,6 +366,11 @@ export default function StoreManagementPage() {
                       <Copy className="w-3.5 h-3.5 text-white/40" />
                     )}
                   </button>
+                  {isDev && (
+                    <span className="text-xs text-amber-400/60 px-1.5 py-0.5 rounded bg-amber-500/10">
+                      Dev
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -362,25 +378,15 @@ export default function StoreManagementPage() {
 
           {/* Action buttons */}
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
+            <ViewStoreButton
+              storeUrl={`${storeUrlProtocol}://${storeUrl}`}
+              storeName={store.name}
               size="sm"
-              className="bg-white/[0.02] border-white/[0.08] hover:bg-white/[0.06] text-white/70"
-              asChild
-            >
-              <a href={`https://${storeUrl}`} target="_blank" rel="noopener noreferrer">
-                <Eye className="w-4 h-4 mr-2" />
-                Preview
-              </a>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-white/[0.02] border-white/[0.08] hover:bg-white/[0.06] text-white/70"
-            >
-              <Share2 className="w-4 h-4 mr-2" />
-              Share
-            </Button>
+              onPreview={(device) => {
+                setPreviewDevice(device);
+                setShowPreview(true);
+              }}
+            />
             <Button
               size="sm"
               className="bg-primary hover:bg-primary/90 text-black font-medium"
@@ -586,6 +592,16 @@ export default function StoreManagementPage() {
           </div>
         </div>
       </div>
+
+      {/* Store Preview Modal */}
+      {showPreview && (
+        <StorePreviewModal
+          url={`${storeUrlProtocol}://${storeUrl}`}
+          storeName={store.name}
+          initialDevice={previewDevice}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </div>
   );
 }
