@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api-client';
+import { api } from '@/lib/api';
 import type {
   Store,
   StoreSettings,
@@ -76,8 +76,8 @@ export function useStores(params: StoresParams = {}) {
       if (params.industry) searchParams.set('industry', params.industry);
       if (params.search) searchParams.set('search', params.search);
 
-      const response = await apiClient.get<StoresResponse>(
-        `/stores?${searchParams.toString()}`
+      const response = await api.fetch<StoresResponse>(
+        `/api/v1/stores?${searchParams.toString()}`
       );
       return response;
     },
@@ -89,7 +89,9 @@ export function useStore(storeId: string) {
   return useQuery({
     queryKey: ['store', storeId],
     queryFn: async () => {
-      const response = await apiClient.get<{ success: boolean; data: StoreDetail }>(`/stores/${storeId}`);
+      const response = await api.fetch<{ success: boolean; data: StoreDetail }>(
+        `/api/v1/stores/${storeId}`
+      );
       return response.data;
     },
     enabled: !!storeId,
@@ -102,8 +104,14 @@ export function useCreateStore() {
 
   return useMutation({
     mutationFn: async (data: CreateStoreInput) => {
-      const response = await apiClient.post<Store>('/stores', data);
-      return response;
+      const response = await api.fetch<{ success: boolean; data: Store }>(
+        '/api/v1/stores',
+        {
+          method: 'POST',
+          body: JSON.stringify(data),
+        }
+      );
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stores'] });
@@ -123,8 +131,14 @@ export function useUpdateStore() {
       storeId: string;
       data: UpdateStoreInput;
     }) => {
-      const response = await apiClient.patch<Store>(`/stores/${storeId}`, data);
-      return response;
+      const response = await api.fetch<{ success: boolean; data: Store }>(
+        `/api/v1/stores/${storeId}`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify(data),
+        }
+      );
+      return response.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['stores'] });
@@ -145,11 +159,14 @@ export function useUpdateStoreSettings() {
       storeId: string;
       data: Partial<StoreSettings>;
     }) => {
-      const response = await apiClient.patch<Store>(
-        `/stores/${storeId}/settings`,
-        data
+      const response = await api.fetch<{ success: boolean; data: Store }>(
+        `/api/v1/stores/${storeId}/settings`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify(data),
+        }
       );
-      return response;
+      return response.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['store', variables.storeId] });
@@ -169,11 +186,14 @@ export function useUpdateStoreSeo() {
       storeId: string;
       data: Partial<StoreSeoSettings>;
     }) => {
-      const response = await apiClient.patch<Store>(
-        `/stores/${storeId}/seo`,
-        data
+      const response = await api.fetch<{ success: boolean; data: Store }>(
+        `/api/v1/stores/${storeId}/seo`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify(data),
+        }
       );
-      return response;
+      return response.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['store', variables.storeId] });
@@ -187,7 +207,10 @@ export function useDeleteStore() {
 
   return useMutation({
     mutationFn: async (storeId: string) => {
-      await apiClient.delete(`/stores/${storeId}`);
+      await api.fetch<{ success: boolean; data: { message: string } }>(
+        `/api/v1/stores/${storeId}`,
+        { method: 'DELETE' }
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stores'] });
@@ -207,11 +230,14 @@ export function useUpdateSubdomain() {
       storeId: string;
       subdomain: string;
     }) => {
-      const response = await apiClient.patch<Store>(
-        `/stores/${storeId}/subdomain`,
-        { subdomain }
+      const response = await api.fetch<{ success: boolean; data: Store }>(
+        `/api/v1/stores/${storeId}/subdomain`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify({ subdomain }),
+        }
       );
-      return response;
+      return response.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['stores'] });
@@ -232,17 +258,23 @@ export function useSetCustomDomain() {
       storeId: string;
       domain: string;
     }) => {
-      const response = await apiClient.post<{
-        domain: string;
-        verified: boolean;
-        dnsRecords: Array<{
-          type: string;
-          name: string;
-          value: string;
+      const response = await api.fetch<{
+        success: boolean;
+        data: {
+          domain: string;
           verified: boolean;
-        }>;
-      }>(`/stores/${storeId}/domain`, { domain });
-      return response;
+          dnsRecords: Array<{
+            type: string;
+            name: string;
+            value: string;
+            verified: boolean;
+          }>;
+        };
+      }>(`/api/v1/stores/${storeId}/domain`, {
+        method: 'POST',
+        body: JSON.stringify({ domain }),
+      });
+      return response.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['store', variables.storeId] });
@@ -256,11 +288,16 @@ export function useVerifyDomain() {
 
   return useMutation({
     mutationFn: async (storeId: string) => {
-      const response = await apiClient.post<{
-        verified: boolean;
-        message: string;
-      }>(`/stores/${storeId}/domain/verify`);
-      return response;
+      const response = await api.fetch<{
+        success: boolean;
+        data: {
+          verified: boolean;
+          message: string;
+        };
+      }>(`/api/v1/stores/${storeId}/domain/verify`, {
+        method: 'POST',
+      });
+      return response.data;
     },
     onSuccess: (_, storeId) => {
       queryClient.invalidateQueries({ queryKey: ['store', storeId] });
@@ -274,7 +311,10 @@ export function useRemoveCustomDomain() {
 
   return useMutation({
     mutationFn: async (storeId: string) => {
-      await apiClient.delete(`/stores/${storeId}/domain`);
+      await api.fetch<{ success: boolean }>(
+        `/api/v1/stores/${storeId}/domain`,
+        { method: 'DELETE' }
+      );
     },
     onSuccess: (_, storeId) => {
       queryClient.invalidateQueries({ queryKey: ['store', storeId] });
