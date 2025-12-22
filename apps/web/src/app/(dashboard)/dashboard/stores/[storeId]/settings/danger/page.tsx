@@ -91,9 +91,12 @@ export default function DangerZonePage() {
   const { toast } = useToast();
   const storeId = params.storeId as string;
 
-  const { data: store, isLoading, error } = useStore(storeId);
+  const { data: store, isLoading, error, refetch } = useStore(storeId);
   const updateStore = useUpdateStore();
   const deleteStore = useDeleteStore();
+
+  // Store name with fallback
+  const storeName = store?.name || 'this store';
 
   const [showDeactivateDialog, setShowDeactivateDialog] = React.useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
@@ -201,43 +204,51 @@ export default function DangerZonePage() {
     );
   }
 
-  if (error || !store || !store.name) {
-    const isAuthError = error?.message?.toLowerCase().includes('token') ||
-                        error?.message?.toLowerCase().includes('unauthorized');
-    return (
-      <div className="flex flex-col items-center justify-center py-16 space-y-4">
-        <AlertCircle className="w-12 h-12 text-red-400" />
-        <h2 className="text-lg font-semibold text-white">
-          {isAuthError ? 'Session Expired' : 'Failed to load store'}
-        </h2>
-        <p className="text-sm text-white/60 text-center max-w-md">
-          {isAuthError
-            ? 'Your session has expired. Please log in again to continue.'
-            : (error?.message || 'Unable to load store data. Please try refreshing the page.')}
-        </p>
-        <div className="flex gap-3">
-          <Button
-            onClick={() => window.location.reload()}
-            variant="outline"
-            className="bg-white/[0.02] border-white/[0.08] text-white hover:bg-white/[0.06]"
-          >
-            Refresh Page
-          </Button>
-          {isAuthError && (
-            <Button
-              onClick={() => router.push('/login')}
-              className="bg-primary hover:bg-primary/90 text-black"
-            >
-              Log In Again
-            </Button>
-          )}
-        </div>
-      </div>
-    );
-  }
+  // Check if we have store data issues
+  const hasStoreError = Boolean(error) || !store || !store.name;
+  const isAuthError = error?.message?.toLowerCase().includes('token') ||
+                      error?.message?.toLowerCase().includes('unauthorized');
 
   return (
     <div className="space-y-6">
+      {/* Error/Retry Banner - Show when store data has issues */}
+      {hasStoreError && (
+        <div className="flex items-center justify-between p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-white">
+                {isAuthError ? 'Session Issue' : 'Unable to load store data'}
+              </p>
+              <p className="text-xs text-white/60 mt-0.5">
+                {isAuthError
+                  ? 'Please refresh or log in again to enable all features.'
+                  : 'Some features may be limited. Click retry to reload.'}
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => refetch()}
+              className="bg-white/[0.02] border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+            >
+              Retry
+            </Button>
+            {isAuthError && (
+              <Button
+                size="sm"
+                onClick={() => router.push('/login')}
+                className="bg-amber-500 text-black hover:bg-amber-600"
+              >
+                Log In
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Warning Banner */}
       <div className="flex items-start gap-3 p-4 rounded-xl bg-red-500/5 border border-red-500/20">
         <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
@@ -361,19 +372,25 @@ export default function DangerZonePage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-white/80">
-                This will permanently delete <span className="font-medium text-white">{store?.name}</span>.
+                This will permanently delete <span className="font-medium text-white">{storeName}</span>.
               </p>
             </div>
             <Button
               type="button"
               variant="outline"
               onClick={() => setShowDeleteDialog(true)}
-              className="bg-white/[0.02] border-red-500/30 hover:bg-red-500/10 text-red-400 hover:text-red-400"
+              disabled={hasStoreError}
+              className="bg-white/[0.02] border-red-500/30 hover:bg-red-500/10 text-red-400 hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Delete Store
             </Button>
           </div>
+          {hasStoreError && (
+            <p className="text-xs text-amber-400">
+              Store data must be loaded to delete. Click &quot;Retry&quot; above to reload.
+            </p>
+          )}
         </div>
       </DangerCard>
 
