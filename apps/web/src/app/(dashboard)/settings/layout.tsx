@@ -13,6 +13,7 @@ import {
   Users,
   Settings,
   ChevronRight,
+  MessageCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -53,6 +54,12 @@ const settingsNavItems = [
     href: '/settings/team',
     icon: Users,
     description: 'Invite and manage team members',
+  },
+  {
+    title: 'Chat Assistant',
+    href: '/settings/chatbot',
+    icon: MessageCircle,
+    description: 'Configure AI assistant settings',
   },
 ];
 

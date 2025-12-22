@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { DashboardSidebar } from '@/components/dashboard/sidebar';
 import { DashboardHeader } from '@/components/dashboard/header';
+import { ChatProvider, ChatWidget } from '@/components/chat';
 import { Loader2 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -44,16 +45,20 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-black">
-      <DashboardSidebar />
-      <div className="flex flex-1 flex-col">
-        <DashboardHeader />
-        <main className="flex-1 overflow-auto p-6 bg-[#0a0a0a]">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
-        </main>
+    <ChatProvider>
+      <div className="flex min-h-screen bg-black">
+        <DashboardSidebar />
+        <div className="flex flex-1 flex-col">
+          <DashboardHeader />
+          <main className="flex-1 overflow-auto p-6 bg-[#0a0a0a]">
+            <div className="max-w-7xl mx-auto">
+              {children}
+            </div>
+          </main>
+        </div>
+        {/* Chat Widget */}
+        <ChatWidget />
       </div>
-    </div>
+    </ChatProvider>
   );
 }
