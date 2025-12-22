@@ -5,7 +5,16 @@ import { useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Save } from 'lucide-react';
+import {
+  Loader2,
+  Check,
+  AlertCircle,
+  Info,
+  Store,
+  Upload,
+  X,
+  ImageIcon,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,32 +27,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { useStore, useUpdateStore, useUpdateStoreSettings } from '@/hooks/use-stores';
-
-const TIMEZONES = [
-  { value: 'America/New_York', label: 'Eastern Time (ET)' },
-  { value: 'America/Chicago', label: 'Central Time (CT)' },
-  { value: 'America/Denver', label: 'Mountain Time (MT)' },
-  { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
-  { value: 'Europe/London', label: 'London (GMT)' },
-  { value: 'Europe/Paris', label: 'Central European (CET)' },
-  { value: 'Asia/Tokyo', label: 'Japan (JST)' },
-  { value: 'Asia/Shanghai', label: 'China (CST)' },
-  { value: 'Australia/Sydney', label: 'Sydney (AEST)' },
-];
-
-const CURRENCIES = [
-  { value: 'USD', label: 'US Dollar ($)' },
-  { value: 'EUR', label: 'Euro (€)' },
-  { value: 'GBP', label: 'British Pound (£)' },
-  { value: 'CAD', label: 'Canadian Dollar (CA$)' },
-  { value: 'AUD', label: 'Australian Dollar (A$)' },
-  { value: 'JPY', label: 'Japanese Yen (¥)' },
-];
+import { useStore, useUpdateStore } from '@/hooks/use-stores';
+import { cn } from '@/lib/utils';
 
 const INDUSTRIES = [
   { value: 'toys', label: 'Toys & Games' },
@@ -59,25 +46,163 @@ const INDUSTRIES = [
 ];
 
 const generalSchema = z.object({
-  name: z.string().min(2, 'Store name must be at least 2 characters'),
-  description: z.string().max(1000).optional(),
+  name: z.string().min(2, 'Store name must be at least 2 characters').max(255),
+  description: z.string().max(1000).optional().nullable(),
   industry: z.string(),
   status: z.enum(['active', 'inactive']),
 });
 
-const settingsSchema = z.object({
-  currency: z.string(),
-  timezone: z.string(),
-  weightUnit: z.enum(['kg', 'lb']),
-  dimensionUnit: z.enum(['cm', 'in']),
-  taxesIncluded: z.boolean(),
-  enableReviews: z.boolean(),
-  enableWishlist: z.boolean(),
-  maintenanceMode: z.boolean(),
-});
-
 type GeneralFormData = z.infer<typeof generalSchema>;
-type SettingsFormData = z.infer<typeof settingsSchema>;
+
+// Settings card component
+function SettingsCard({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
+      <div className="p-6 border-b border-white/[0.06]">
+        <h2 className="text-lg font-semibold text-white">{title}</h2>
+        {description && (
+          <p className="text-sm text-white/50 mt-1">{description}</p>
+        )}
+      </div>
+      <div className="p-6">{children}</div>
+    </div>
+  );
+}
+
+// Form field component
+function FormField({
+  label,
+  description,
+  error,
+  children,
+  required,
+}: {
+  label: string;
+  description?: string;
+  error?: string;
+  children: React.ReactNode;
+  required?: boolean;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label className="text-sm font-medium text-white/80">
+        {label}
+        {required && <span className="text-primary ml-1">*</span>}
+      </Label>
+      {children}
+      {description && !error && (
+        <p className="text-xs text-white/40 flex items-center gap-1.5">
+          <Info className="w-3 h-3" />
+          {description}
+        </p>
+      )}
+      {error && (
+        <p className="text-xs text-red-400 flex items-center gap-1.5">
+          <AlertCircle className="w-3 h-3" />
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// Image upload component
+function ImageUpload({
+  label,
+  value,
+  onChange,
+  description,
+}: {
+  label: string;
+  value?: string | null;
+  onChange: (url: string | null) => void;
+  description?: string;
+}) {
+  const [isDragging, setIsDragging] = React.useState(false);
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-sm font-medium text-white/80">{label}</Label>
+      <div
+        className={cn(
+          "relative w-32 aspect-square border-2 border-dashed rounded-xl transition-all duration-200",
+          isDragging
+            ? "border-primary bg-primary/5"
+            : "border-white/[0.08] hover:border-white/[0.15]"
+        )}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsDragging(false);
+        }}
+      >
+        {value ? (
+          <div className="relative w-full h-full group">
+            <img
+              src={value}
+              alt={label}
+              className="w-full h-full object-cover rounded-xl"
+            />
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-2">
+              <Button
+                type="button"
+                size="icon"
+                variant="secondary"
+                className="h-8 w-8 bg-white/10 hover:bg-white/20 text-white"
+              >
+                <Upload className="w-4 h-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="secondary"
+                className="h-8 w-8 bg-red-500/20 hover:bg-red-500/30 text-red-400"
+                onClick={() => onChange(null)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-white/40">
+            <ImageIcon className="w-6 h-6" />
+            <span className="text-xs">Upload</span>
+          </div>
+        )}
+        <input
+          type="file"
+          accept="image/*"
+          className="absolute inset-0 opacity-0 cursor-pointer"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = () => {
+                onChange(reader.result as string);
+              };
+              reader.readAsDataURL(file);
+            }
+          }}
+        />
+      </div>
+      {description && (
+        <p className="text-xs text-white/40">{description}</p>
+      )}
+    </div>
+  );
+}
 
 export default function GeneralSettingsPage() {
   const params = useParams();
@@ -86,9 +211,18 @@ export default function GeneralSettingsPage() {
 
   const { data: store, isLoading } = useStore(storeId);
   const updateStore = useUpdateStore();
-  const updateSettings = useUpdateStoreSettings();
 
-  const generalForm = useForm<GeneralFormData>({
+  const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
+  const [faviconUrl, setFaviconUrl] = React.useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors, isDirty },
+  } = useForm<GeneralFormData>({
     resolver: zodResolver(generalSchema),
     defaultValues: {
       name: '',
@@ -98,372 +232,195 @@ export default function GeneralSettingsPage() {
     },
   });
 
-  const settingsForm = useForm<SettingsFormData>({
-    resolver: zodResolver(settingsSchema),
-    defaultValues: {
-      currency: 'USD',
-      timezone: 'America/New_York',
-      weightUnit: 'kg',
-      dimensionUnit: 'cm',
-      taxesIncluded: false,
-      enableReviews: true,
-      enableWishlist: true,
-      maintenanceMode: false,
-    },
-  });
-
-  // Update forms when store loads
   React.useEffect(() => {
     if (store) {
-      generalForm.reset({
+      reset({
         name: store.name,
         description: store.description || '',
         industry: store.industry,
         status: store.status as 'active' | 'inactive',
       });
-
-      if (store.settings) {
-        settingsForm.reset({
-          currency: store.settings.currency || 'USD',
-          timezone: store.settings.timezone || 'America/New_York',
-          weightUnit: store.settings.weightUnit || 'kg',
-          dimensionUnit: store.settings.dimensionUnit || 'cm',
-          taxesIncluded: store.settings.taxesIncluded || false,
-          enableReviews: store.settings.enableReviews ?? true,
-          enableWishlist: store.settings.enableWishlist ?? true,
-          maintenanceMode: store.settings.maintenanceMode || false,
-        });
-      }
+      setLogoUrl(store.logoUrl || null);
+      setFaviconUrl(store.faviconUrl || null);
     }
-  }, [store, generalForm, settingsForm]);
+  }, [store, reset]);
 
-  const handleGeneralSubmit = async (data: GeneralFormData) => {
+  const onSubmit = async (data: GeneralFormData) => {
     try {
       await updateStore.mutateAsync({
         storeId,
         data: {
           name: data.name,
-          description: data.description,
+          description: data.description || undefined,
           status: data.status,
+          logoUrl: logoUrl || undefined,
+          faviconUrl: faviconUrl || undefined,
         },
       });
       toast({
         title: 'Settings saved',
-        description: 'Store information has been updated.',
+        description: 'Your store settings have been updated.',
       });
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'Failed to update store. Please try again.',
+        description: error instanceof Error ? error.message : 'Failed to save settings',
         variant: 'destructive',
       });
     }
   };
 
-  const handleSettingsSubmit = async (data: SettingsFormData) => {
-    try {
-      await updateSettings.mutateAsync({
-        storeId,
-        data,
-      });
-      toast({
-        title: 'Settings saved',
-        description: 'Store settings have been updated.',
-      });
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to update settings. Please try again.',
-        variant: 'destructive',
-      });
-    }
-  };
+  const watchedStatus = watch('status');
 
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-[300px]" />
-        <Skeleton className="h-[400px]" />
+        <Skeleton className="h-64 rounded-2xl bg-white/[0.02]" />
+        <Skeleton className="h-48 rounded-2xl bg-white/[0.02]" />
+        <Skeleton className="h-32 rounded-2xl bg-white/[0.02]" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Store Information */}
-      <form onSubmit={generalForm.handleSubmit(handleGeneralSubmit)}>
-        <Card className="shadow-soft">
-          <CardHeader>
-            <CardTitle>Store Information</CardTitle>
-            <CardDescription>
-              Basic information about your store.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Store name</Label>
-              <Input id="name" {...generalForm.register('name')} />
-              {generalForm.formState.errors.name && (
-                <p className="text-sm text-destructive">
-                  {generalForm.formState.errors.name.message}
-                </p>
-              )}
-            </div>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Store Identity */}
+      <SettingsCard
+        title="Store Identity"
+        description="Basic information about your store that appears across your storefront."
+      >
+        <div className="space-y-6">
+          <FormField
+            label="Store Name"
+            required
+            error={errors.name?.message}
+            description="This is your store's display name."
+          >
+            <Input
+              {...register('name')}
+              placeholder="My Awesome Store"
+              className="h-11 bg-white/[0.03] border-white/[0.08] text-white placeholder:text-white/30 focus:border-primary/50"
+            />
+          </FormField>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                rows={3}
-                placeholder="Tell customers about your store..."
-                {...generalForm.register('description')}
-              />
-            </div>
+          <FormField
+            label="Description"
+            description="A brief description of your store (max 1000 characters)."
+          >
+            <Textarea
+              {...register('description')}
+              placeholder="Tell customers what makes your store special..."
+              className="min-h-[100px] bg-white/[0.03] border-white/[0.08] text-white placeholder:text-white/30 focus:border-primary/50 resize-none"
+            />
+          </FormField>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="industry">Industry</Label>
-                <Select
-                  value={generalForm.watch('industry')}
-                  onValueChange={(value) => generalForm.setValue('industry', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select industry" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {INDUSTRIES.map((industry) => (
-                      <SelectItem key={industry.value} value={industry.value}>
-                        {industry.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select
-                  value={generalForm.watch('status')}
-                  onValueChange={(value: 'active' | 'inactive') =>
-                    generalForm.setValue('status', value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="flex justify-end pt-4">
-              <Button
-                type="submit"
-                disabled={!generalForm.formState.isDirty || updateStore.isPending}
-              >
-                {updateStore.isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                <Save className="mr-2 h-4 w-4" />
-                Save changes
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </form>
-
-      {/* Store Settings */}
-      <form onSubmit={settingsForm.handleSubmit(handleSettingsSubmit)}>
-        <Card className="shadow-soft">
-          <CardHeader>
-            <CardTitle>Store Settings</CardTitle>
-            <CardDescription>
-              Configure currency, measurements, and features.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Regional Settings */}
-            <div className="space-y-4">
-              <h4 className="text-sm font-medium">Regional</h4>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="currency">Currency</Label>
-                  <Select
-                    value={settingsForm.watch('currency')}
-                    onValueChange={(value) => settingsForm.setValue('currency', value, { shouldDirty: true })}
+          <FormField
+            label="Industry"
+            required
+            description="Select the primary category for your store."
+          >
+            <Select
+              value={watch('industry')}
+              onValueChange={(value) => setValue('industry', value, { shouldDirty: true })}
+            >
+              <SelectTrigger className="h-11 bg-white/[0.03] border-white/[0.08] text-white">
+                <SelectValue placeholder="Select an industry" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#151515] border-white/[0.08]">
+                {INDUSTRIES.map((industry) => (
+                  <SelectItem
+                    key={industry.value}
+                    value={industry.value}
+                    className="text-white hover:bg-white/[0.08] focus:bg-white/[0.08]"
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CURRENCIES.map((currency) => (
-                        <SelectItem key={currency.value} value={currency.value}>
-                          {currency.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                    {industry.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormField>
+        </div>
+      </SettingsCard>
 
-                <div className="space-y-2">
-                  <Label htmlFor="timezone">Timezone</Label>
-                  <Select
-                    value={settingsForm.watch('timezone')}
-                    onValueChange={(value) => settingsForm.setValue('timezone', value, { shouldDirty: true })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {TIMEZONES.map((tz) => (
-                        <SelectItem key={tz.value} value={tz.value}>
-                          {tz.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+      {/* Branding */}
+      <SettingsCard
+        title="Branding"
+        description="Upload your store logo and favicon to build brand recognition."
+      >
+        <div className="flex gap-8">
+          <ImageUpload
+            label="Store Logo"
+            value={logoUrl}
+            onChange={setLogoUrl}
+            description="512x512px, PNG or SVG"
+          />
+          <ImageUpload
+            label="Favicon"
+            value={faviconUrl}
+            onChange={setFaviconUrl}
+            description="32x32px, PNG or ICO"
+          />
+        </div>
+      </SettingsCard>
+
+      {/* Store Status */}
+      <SettingsCard
+        title="Store Status"
+        description="Control whether your store is visible to customers."
+      >
+        <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+          <div className="flex items-center gap-4">
+            <div className={cn(
+              "w-12 h-12 rounded-xl flex items-center justify-center",
+              watchedStatus === 'active' ? "bg-emerald-500/20" : "bg-amber-500/20"
+            )}>
+              <Store className={cn(
+                "w-6 h-6",
+                watchedStatus === 'active' ? "text-emerald-400" : "text-amber-400"
+              )} />
             </div>
-
-            <Separator />
-
-            {/* Measurements */}
-            <div className="space-y-4">
-              <h4 className="text-sm font-medium">Measurements</h4>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="weightUnit">Weight unit</Label>
-                  <Select
-                    value={settingsForm.watch('weightUnit')}
-                    onValueChange={(value: 'kg' | 'lb') =>
-                      settingsForm.setValue('weightUnit', value, { shouldDirty: true })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="kg">Kilograms (kg)</SelectItem>
-                      <SelectItem value="lb">Pounds (lb)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="dimensionUnit">Dimension unit</Label>
-                  <Select
-                    value={settingsForm.watch('dimensionUnit')}
-                    onValueChange={(value: 'cm' | 'in') =>
-                      settingsForm.setValue('dimensionUnit', value, { shouldDirty: true })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cm">Centimeters (cm)</SelectItem>
-                      <SelectItem value="in">Inches (in)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+            <div>
+              <p className="font-medium text-white">
+                Store is {watchedStatus === 'active' ? 'Active' : 'Inactive'}
+              </p>
+              <p className="text-sm text-white/50">
+                {watchedStatus === 'active'
+                  ? 'Your store is visible and accepting orders.'
+                  : 'Your store is hidden from customers.'}
+              </p>
             </div>
+          </div>
+          <Switch
+            checked={watchedStatus === 'active'}
+            onCheckedChange={(checked) => setValue('status', checked ? 'active' : 'inactive', { shouldDirty: true })}
+            className="data-[state=checked]:bg-primary"
+          />
+        </div>
+      </SettingsCard>
 
-            <Separator />
-
-            {/* Features */}
-            <div className="space-y-4">
-              <h4 className="text-sm font-medium">Features</h4>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="taxesIncluded">Taxes included in prices</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Display prices with tax included
-                  </p>
-                </div>
-                <Switch
-                  id="taxesIncluded"
-                  checked={settingsForm.watch('taxesIncluded')}
-                  onCheckedChange={(checked) =>
-                    settingsForm.setValue('taxesIncluded', checked, { shouldDirty: true })
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="enableReviews">Product reviews</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Allow customers to leave reviews on products
-                  </p>
-                </div>
-                <Switch
-                  id="enableReviews"
-                  checked={settingsForm.watch('enableReviews')}
-                  onCheckedChange={(checked) =>
-                    settingsForm.setValue('enableReviews', checked, { shouldDirty: true })
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="enableWishlist">Wishlist</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Allow customers to save products to a wishlist
-                  </p>
-                </div>
-                <Switch
-                  id="enableWishlist"
-                  checked={settingsForm.watch('enableWishlist')}
-                  onCheckedChange={(checked) =>
-                    settingsForm.setValue('enableWishlist', checked, { shouldDirty: true })
-                  }
-                />
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Maintenance */}
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="maintenanceMode" className="text-amber-600">
-                  Maintenance mode
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Temporarily hide your store from customers
-                </p>
-              </div>
-              <Switch
-                id="maintenanceMode"
-                checked={settingsForm.watch('maintenanceMode')}
-                onCheckedChange={(checked) =>
-                  settingsForm.setValue('maintenanceMode', checked, { shouldDirty: true })
-                }
-              />
-            </div>
-
-            <div className="flex justify-end pt-4">
-              <Button
-                type="submit"
-                disabled={!settingsForm.formState.isDirty || updateSettings.isPending}
-              >
-                {updateSettings.isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                <Save className="mr-2 h-4 w-4" />
-                Save settings
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </form>
-    </div>
+      {/* Save Button */}
+      <div className="flex items-center justify-between pt-4 border-t border-white/[0.06]">
+        <p className="text-sm text-white/40">
+          {isDirty ? 'You have unsaved changes' : 'All changes saved'}
+        </p>
+        <Button
+          type="submit"
+          disabled={!isDirty || updateStore.isPending}
+          className="bg-primary hover:bg-primary/90 text-black font-medium min-w-[140px]"
+        >
+          {updateStore.isPending ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Check className="w-4 h-4 mr-2" />
+              Save Changes
+            </>
+          )}
+        </Button>
+      </div>
+    </form>
   );
 }

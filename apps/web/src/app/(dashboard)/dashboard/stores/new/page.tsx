@@ -41,8 +41,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { api } from '@/lib/api';
+import { api, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/store/auth';
 
 // Schema
 const storeSchema = z.object({
@@ -419,6 +420,7 @@ export default function NewStorePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { currentOrganization, isLoading: isAuthLoading } = useAuthStore();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -495,6 +497,16 @@ export default function NewStorePage() {
   };
 
   const onSubmit = async (data: StoreForm) => {
+    // Check if user has an organization
+    if (!currentOrganization) {
+      toast({
+        title: 'Organization required',
+        description: 'You need an organization to create a store. Please try logging out and logging back in.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await api.fetch('/api/v1/stores', {
@@ -519,9 +531,22 @@ export default function NewStorePage() {
         router.push('/dashboard');
       }, 2500);
     } catch (error) {
+      let errorMessage = 'Please try again';
+      if (error instanceof ApiError) {
+        errorMessage = error.message;
+        // Log additional details for debugging
+        console.error('Store creation error:', {
+          code: error.code,
+          status: error.status,
+          details: error.details,
+        });
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       toast({
         title: 'Failed to create store',
-        description: error instanceof Error ? error.message : 'Please try again',
+        description: errorMessage,
         variant: 'destructive',
       });
       setIsSubmitting(false);
