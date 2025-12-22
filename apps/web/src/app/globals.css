@@ -491,3 +491,91 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+/* Global Infrastructure Section Animations */
+@keyframes globeFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes starTwinkle {
+  0%, 100% {
+    opacity: inherit;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+@keyframes arcDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes pointAppear {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes dataTravel {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+.animate-globe-float {
+  animation: globeFloat 6s ease-in-out infinite;
+}
+
+.animate-star-twinkle {
+  animation: starTwinkle 3s ease-in-out infinite;
+}
+
+.animate-pulse-ring {
+  animation: pulseRing 2s ease-out infinite;
+}
+
+.animate-arc-draw {
+  animation: arcDraw 2s ease-out forwards;
+}
+
+.animate-point-appear {
+  animation: pointAppear 0.5s ease-out forwards;
+}
+
+.animate-data-travel {
+  animation: dataTravel 2.5s ease-in-out infinite;
+}

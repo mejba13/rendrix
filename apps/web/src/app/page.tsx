@@ -21,6 +21,7 @@ import {
   TrendingUp,
   Play,
 } from 'lucide-react';
+import { GlobalInfrastructureSection } from '@/components/landing/global-infrastructure-section';
 
 // Animated counter hook
 function useCountUp(end: number, duration: number = 2000, start: number = 0, shouldStart: boolean = false) {
@@ -630,6 +631,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Global Infrastructure Section */}
+      <GlobalInfrastructureSection />
 
       {/* Platform Features Grid */}
       <section className="py-32 border-t border-white/5">
