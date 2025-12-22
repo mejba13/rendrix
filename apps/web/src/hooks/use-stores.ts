@@ -89,8 +89,8 @@ export function useStore(storeId: string) {
   return useQuery({
     queryKey: ['store', storeId],
     queryFn: async () => {
-      const response = await apiClient.get<StoreDetail>(`/stores/${storeId}`);
-      return response;
+      const response = await apiClient.get<{ success: boolean; data: StoreDetail }>(`/stores/${storeId}`);
+      return response.data;
     },
     enabled: !!storeId,
   });
