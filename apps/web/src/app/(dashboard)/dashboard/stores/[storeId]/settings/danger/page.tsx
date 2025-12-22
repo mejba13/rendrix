@@ -426,38 +426,38 @@ export default function DangerZonePage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Delete Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      {/* Delete Dialog - Only renders when store data is available */}
+      <AlertDialog open={showDeleteDialog && !hasStoreError} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent className="bg-[#0a0a0a] border-white/[0.08]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">Delete store permanently?</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="text-white/60 space-y-3">
                 <p>This action cannot be undone. Type the store name to confirm.</p>
-                <div className="flex items-center justify-center p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                  <code className="text-red-400 font-mono text-lg font-semibold select-all">
+                <div className="flex items-center justify-center p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+                  <code className="text-red-400 font-mono text-xl font-bold select-all tracking-wide">
                     {store?.name}
                   </code>
                 </div>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="py-2">
+          <div className="py-3">
             <Input
               value={confirmStoreName}
               onChange={(e) => setConfirmStoreName(e.target.value)}
               placeholder={`Type "${store?.name}" to confirm`}
-              className="bg-white/[0.03] border-white/[0.08] text-white placeholder:text-white/30 text-center font-mono"
+              className="bg-white/[0.03] border-white/[0.08] text-white placeholder:text-white/30 text-center font-mono h-12 text-lg"
               autoComplete="off"
               autoFocus
             />
             {confirmStoreName && confirmStoreName !== store?.name && (
               <p className="text-xs text-red-400 text-center mt-2">
-                Name doesn't match. Please type exactly: {store?.name}
+                Name doesn&apos;t match. Please type exactly: <span className="font-mono font-bold">{store?.name}</span>
               </p>
             )}
             {confirmStoreName === store?.name && (
-              <p className="text-xs text-emerald-400 text-center mt-2">
+              <p className="text-sm text-emerald-400 text-center mt-2 font-medium">
                 Name matches. You can now delete the store.
               </p>
             )}
@@ -471,7 +471,7 @@ export default function DangerZonePage() {
             </AlertDialogCancel>
             <Button
               onClick={handleDelete}
-              disabled={confirmStoreName !== store?.name || deleteStore.isPending}
+              disabled={confirmStoreName !== store?.name || deleteStore.isPending || !store?.name}
               className="bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {deleteStore.isPending && (
