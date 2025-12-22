@@ -71,6 +71,12 @@ class ApiClient {
     endpoint: string,
     options: FetchOptions & { body?: unknown } = {}
   ): Promise<T> {
+    // Auto-load tokens from localStorage if not already loaded
+    if (!this.accessToken && typeof window !== 'undefined') {
+      this.loadTokens();
+      this.loadOrganizationId();
+    }
+
     const { token, organizationId, body, ...fetchOptions } = options;
 
     const headers: Record<string, string> = {
@@ -131,6 +137,10 @@ class ApiClient {
 
       if (!response.ok) {
         this.clearTokens();
+        // Redirect to login when refresh fails
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
         return false;
       }
 
@@ -139,6 +149,10 @@ class ApiClient {
       return true;
     } catch {
       this.clearTokens();
+      // Redirect to login on error
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
       return false;
     }
   }

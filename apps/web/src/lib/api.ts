@@ -118,6 +118,10 @@ class ApiClient {
 
       if (!response.ok) {
         this.clearTokens();
+        // Redirect to login when refresh fails
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
         return false;
       }
 
@@ -126,6 +130,10 @@ class ApiClient {
       return true;
     } catch {
       this.clearTokens();
+      // Redirect to login on error
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
       return false;
     }
   }
