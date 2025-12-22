@@ -211,3 +211,79 @@ export function percentageChange(oldValue: number, newValue: number): number {
   if (oldValue === 0) return newValue === 0 ? 0 : 100;
   return ((newValue - oldValue) / Math.abs(oldValue)) * 100;
 }
+
+// Pagination helpers
+export interface PaginationOptions {
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginationResult {
+  skip: number;
+  take: number;
+  page: number;
+  limit: number;
+}
+
+export function paginate(options: PaginationOptions = {}): PaginationResult {
+  const page = Math.max(1, options.page || 1);
+  const limit = Math.min(100, Math.max(1, options.limit || 20));
+  const skip = (page - 1) * limit;
+
+  return {
+    skip,
+    take: limit,
+    page,
+    limit,
+  };
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export function createPaginationMeta(
+  total: number,
+  page: number,
+  limit: number
+): PaginationMeta {
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    page,
+    limit,
+    total,
+    totalPages,
+    hasNextPage: page < totalPages,
+    hasPrevPage: page > 1,
+  };
+}
+
+// Generate unique slug
+export async function generateUniqueSlug(
+  name: string,
+  checkExists: (slug: string) => Promise<boolean>
+): Promise<string> {
+  const baseSlug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 100);
+
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (await checkExists(slug)) {
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  return slug;
+}

@@ -59,10 +59,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   register: async (email, password, firstName, lastName) => {
     const data = await api.register(email, password, firstName, lastName);
+    // Registration now returns organizations (auto-created default org)
+    const organizations = (data as unknown as { organizations?: Organization[] }).organizations || [];
+    const currentOrg = organizations[0] || null;
+
+    // Set organization ID in API client
+    if (currentOrg) {
+      api.setOrganizationId(currentOrg.id);
+    }
+
     set({
       user: data.user as User,
-      organizations: [],
-      currentOrganization: null,
+      organizations,
+      currentOrganization: currentOrg,
       isAuthenticated: true,
     });
   },
@@ -91,6 +100,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const currentOrg = savedOrgId
         ? data.data.organizations.find((o) => o.id === savedOrgId) || data.data.organizations[0]
         : data.data.organizations[0];
+
+      // Set organization ID in API client
+      if (currentOrg) {
+        api.setOrganizationId(currentOrg.id);
+      }
 
       set({
         user: data.data.user,

@@ -92,21 +92,104 @@ export async function authRoutes(app: FastifyInstance) {
     // Hash password
     const passwordHash = await hashPassword(body.password);
 
-    // Create user
-    const user = await prisma.user.create({
-      data: {
-        email: body.email,
-        passwordHash,
-        firstName: body.firstName,
-        lastName: body.lastName,
-      },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        createdAt: true,
-      },
+    // Get free plan for default organization
+    const freePlan = await prisma.plan.findUnique({
+      where: { slug: 'free' },
+    });
+
+    // Create user with default organization in a transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // Create user
+      const user = await tx.user.create({
+        data: {
+          email: body.email,
+          passwordHash,
+          firstName: body.firstName,
+          lastName: body.lastName,
+        },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          createdAt: true,
+        },
+      });
+
+      // Generate organization name and slug from user info
+      const orgName = body.firstName
+        ? `${body.firstName}'s Organization`
+        : `My Organization`;
+
+      const baseSlug = body.firstName
+        ? body.firstName.toLowerCase().replace(/[^a-z0-9]/g, '') + '-org'
+        : 'my-org';
+
+      // Generate unique slug
+      let orgSlug = baseSlug;
+      let counter = 1;
+      while (await tx.organization.findUnique({ where: { slug: orgSlug } })) {
+        orgSlug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+
+      // Create default organization with subscription
+      let organization;
+      if (freePlan) {
+        const subscription = await tx.subscription.create({
+          data: {
+            planId: freePlan.id,
+            organizationId: '', // Placeholder
+            status: 'active',
+            billingInterval: 'monthly',
+            currentPeriodStart: new Date(),
+            currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          },
+        });
+
+        organization = await tx.organization.create({
+          data: {
+            name: orgName,
+            slug: orgSlug,
+            ownerId: user.id,
+            subscriptionId: subscription.id,
+            settings: {
+              timezone: 'America/New_York',
+              currency: 'USD',
+            },
+          },
+        });
+
+        await tx.subscription.update({
+          where: { id: subscription.id },
+          data: { organizationId: organization.id },
+        });
+      } else {
+        // Create without subscription if no free plan exists
+        organization = await tx.organization.create({
+          data: {
+            name: orgName,
+            slug: orgSlug,
+            ownerId: user.id,
+            settings: {
+              timezone: 'America/New_York',
+              currency: 'USD',
+            },
+          },
+        });
+      }
+
+      // Add user as owner of organization
+      await tx.organizationMember.create({
+        data: {
+          organizationId: organization.id,
+          userId: user.id,
+          role: 'owner',
+          permissions: [],
+        },
+      });
+
+      return { user, organization };
     });
 
     // Generate email verification token
@@ -115,7 +198,7 @@ export async function authRoutes(app: FastifyInstance) {
 
     await prisma.emailVerification.create({
       data: {
-        email: user.email,
+        email: result.user.email,
         tokenHash,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },
@@ -123,39 +206,33 @@ export async function authRoutes(app: FastifyInstance) {
 
     // Send verification email
     const verificationUrl = `${env.APP_URL}/verify-email?token=${verificationToken}`;
-    await queueVerificationEmail(user.email, {
-      firstName: user.firstName || 'there',
+    await queueVerificationEmail(result.user.email, {
+      firstName: result.user.firstName || 'there',
       verificationUrl,
     });
 
     // Generate tokens
     const accessToken = generateAccessToken(request, {
-      sub: user.id,
-      email: user.email,
+      sub: result.user.id,
+      email: result.user.email,
     });
-    const refreshToken = await generateRefreshToken(user.id);
-
-    // Get user's organizations
-    const memberships = await prisma.organizationMember.findMany({
-      where: { userId: user.id },
-      include: { organization: true },
-    });
+    const refreshToken = await generateRefreshToken(result.user.id);
 
     return reply.status(201).send({
       success: true,
       data: {
         user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
+          id: result.user.id,
+          email: result.user.email,
+          firstName: result.user.firstName,
+          lastName: result.user.lastName,
         },
-        organizations: memberships.map((m) => ({
-          id: m.organization.id,
-          name: m.organization.name,
-          slug: m.organization.slug,
-          role: m.role,
-        })),
+        organizations: [{
+          id: result.organization.id,
+          name: result.organization.name,
+          slug: result.organization.slug,
+          role: 'owner',
+        }],
         tokens: {
           accessToken,
           refreshToken,

@@ -157,7 +157,8 @@ class ApiClient {
     const response = await this.fetch<{
       success: boolean;
       data: {
-        user: { id: string; email: string };
+        user: { id: string; email: string; firstName: string | null; lastName: string | null };
+        organizations: { id: string; name: string; slug: string; role: string }[];
         tokens: { accessToken: string; refreshToken: string };
       };
     }>('/api/v1/auth/register', {
@@ -166,6 +167,12 @@ class ApiClient {
     });
 
     this.setTokens(response.data.tokens.accessToken, response.data.tokens.refreshToken);
+
+    // Set organization ID from auto-created organization
+    if (response.data.organizations.length > 0) {
+      this.setOrganizationId(response.data.organizations[0].id);
+    }
+
     return response.data;
   }
 

@@ -18,12 +18,14 @@ import {
   Image,
   FileText,
   BookOpen,
+  Building2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StoreSelector } from './store-selector';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'My Stores', href: '/dashboard/stores', icon: Building2 },
   { name: 'Products', href: '/dashboard/products', icon: Package },
   { name: 'Orders', href: '/dashboard/orders', icon: ShoppingCart },
   { name: 'Customers', href: '/dashboard/customers', icon: Users },
