@@ -17,37 +17,40 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useStoreStore } from '@/store/store';
+import { useAnalytics } from '@/hooks/use-analytics';
+import { formatCurrency } from '@rendrix/utils';
 
 export default function DashboardPage() {
   const { currentStore } = useStoreStore();
+  const { data: analytics, isLoading } = useAnalytics('7d');
+
+  const overview = analytics?.overview;
 
   const stats = [
     {
       title: 'Total Revenue',
-      value: '$45,231.89',
-      change: '+20.1%',
-      changeValue: '+$7,543',
-      trend: 'up',
+      value: overview?.revenue?.total ? formatCurrency(overview.revenue.total, 'USD') : '$0.00',
+      change: overview?.revenue?.change ? `${overview.revenue.change > 0 ? '+' : ''}${overview.revenue.change.toFixed(1)}%` : '+0%',
+      trend: (overview?.revenue?.change || 0) >= 0 ? 'up' : 'down',
       icon: DollarSign,
       color: 'from-green-500/20 to-emerald-500/10',
       iconColor: 'text-green-500',
     },
     {
       title: 'Orders',
-      value: '356',
-      change: '+12.5%',
-      changeValue: '+42 orders',
-      trend: 'up',
+      value: overview?.orders?.total?.toString() || '0',
+      change: overview?.orders?.change ? `${overview.orders.change > 0 ? '+' : ''}${overview.orders.change.toFixed(1)}%` : '+0%',
+      trend: (overview?.orders?.change || 0) >= 0 ? 'up' : 'down',
       icon: ShoppingCart,
       color: 'from-blue-500/20 to-cyan-500/10',
       iconColor: 'text-blue-500',
     },
     {
       title: 'Products',
-      value: '128',
-      change: '+8 new',
-      changeValue: 'this week',
+      value: analytics?.topProducts?.length?.toString() || '0',
+      change: '+0%',
       trend: 'up',
       icon: Package,
       color: 'from-purple-500/20 to-violet-500/10',
@@ -55,52 +58,71 @@ export default function DashboardPage() {
     },
     {
       title: 'Customers',
-      value: '2,350',
-      change: '+180',
-      changeValue: 'new signups',
-      trend: 'up',
+      value: overview?.customers?.total?.toString() || '0',
+      change: overview?.customers?.change ? `${overview.customers.change > 0 ? '+' : ''}${overview.customers.change.toFixed(1)}%` : '+0%',
+      trend: (overview?.customers?.change || 0) >= 0 ? 'up' : 'down',
       icon: Users,
       color: 'from-primary/20 to-orange-500/10',
       iconColor: 'text-primary',
     },
   ];
 
-  const recentOrders = [
-    {
-      id: '#ORD-7823',
-      customer: 'Sarah Johnson',
-      amount: '$156.00',
-      status: 'completed',
-      time: '2 min ago',
-    },
-    {
-      id: '#ORD-7822',
-      customer: 'Michael Chen',
-      amount: '$89.00',
-      status: 'processing',
-      time: '15 min ago',
-    },
-    {
-      id: '#ORD-7821',
-      customer: 'Emily Davis',
-      amount: '$234.50',
-      status: 'pending',
-      time: '1 hour ago',
-    },
-    {
-      id: '#ORD-7820',
-      customer: 'James Wilson',
-      amount: '$67.00',
-      status: 'completed',
-      time: '2 hours ago',
-    },
-  ];
+  const recentOrders = analytics?.recentOrders || [];
 
   const quickActions = [
     { label: 'Add Product', href: '/dashboard/products/new', icon: Package },
     { label: 'Create Coupon', href: '/dashboard/coupons/new', icon: Plus },
     { label: 'View Analytics', href: '/dashboard/analytics', icon: TrendingUp },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        {/* Header Skeleton */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <Skeleton className="h-8 w-[150px] mb-2" />
+            <Skeleton className="h-5 w-[280px]" />
+          </div>
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-10 w-[120px]" />
+            <Skeleton className="h-10 w-[130px]" />
+          </div>
+        </div>
+
+        {/* Stats Grid Skeleton */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="bg-white/[0.02] border-white/[0.08]">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <Skeleton className="w-10 h-10 rounded-xl" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+                <div className="space-y-1">
+                  <Skeleton className="h-8 w-24" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Quick Actions Skeleton */}
+        <div className="grid gap-4 md:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-[72px] rounded-xl" />
+          ))}
+        </div>
+
+        {/* Content Grid Skeleton */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Skeleton className="lg:col-span-2 h-[400px] rounded-xl" />
+          <Skeleton className="h-[400px] rounded-xl" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -121,12 +143,14 @@ export default function DashboardPage() {
             <Clock className="w-4 h-4 mr-2" />
             Last 7 days
           </Button>
-          <Button className="btn-primary text-black font-medium">
-            <span className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Add Product
-            </span>
-          </Button>
+          <Link href="/dashboard/products/new">
+            <Button className="btn-primary text-black font-medium">
+              <span className="flex items-center gap-2">
+                <Plus className="w-4 h-4" />
+                Add Product
+              </span>
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -203,68 +227,76 @@ export default function DashboardPage() {
             </Link>
           </CardHeader>
           <CardContent>
-            <div className="space-y-1">
-              {recentOrders.map((order, index) => (
-                <div
-                  key={order.id}
-                  className={`flex items-center justify-between p-3 rounded-lg hover:bg-white/[0.02] transition-colors ${
-                    index !== recentOrders.length - 1 ? 'border-b border-white/[0.04]' : ''
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center">
-                      <ShoppingCart className="h-4 w-4 text-white/50" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-white">{order.customer}</p>
-                      <p className="text-xs text-white/40">{order.id}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-white">{order.amount}</p>
-                      <p className="text-xs text-white/40">{order.time}</p>
-                    </div>
-                    <StatusBadge status={order.status} />
-                  </div>
+            {recentOrders.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="w-12 h-12 rounded-full bg-white/[0.04] flex items-center justify-center mb-3">
+                  <ShoppingCart className="h-6 w-6 text-white/30" />
                 </div>
-              ))}
-            </div>
+                <p className="text-white/50 text-sm">No orders yet</p>
+                <p className="text-white/30 text-xs mt-1">Orders will appear here once customers make purchases</p>
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {recentOrders.slice(0, 5).map((order, index) => (
+                  <Link
+                    key={order.id}
+                    href={`/dashboard/orders/${order.id}`}
+                    className={`flex items-center justify-between p-3 rounded-lg hover:bg-white/[0.02] transition-colors ${
+                      index !== Math.min(recentOrders.length, 5) - 1 ? 'border-b border-white/[0.04]' : ''
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center">
+                        <ShoppingCart className="h-4 w-4 text-white/50" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-white">{order.email}</p>
+                        <p className="text-xs text-white/40">#{order.orderNumber}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-white">{formatCurrency(order.total, 'USD')}</p>
+                        <p className="text-xs text-white/40">
+                          {new Date(order.placedAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <StatusBadge status={order.status} />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Activity / Summary */}
+        {/* Activity / Top Customers */}
         <Card className="bg-white/[0.02] border-white/[0.08]">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-medium text-white">Activity</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-4">
-              <ActivityItem
-                icon={<Package className="h-4 w-4" />}
-                title="New product added"
-                description="Premium Leather Wallet"
-                time="2 hours ago"
-              />
-              <ActivityItem
-                icon={<Users className="h-4 w-4" />}
-                title="New customer signup"
-                description="john@example.com"
-                time="4 hours ago"
-              />
-              <ActivityItem
-                icon={<ShoppingCart className="h-4 w-4" />}
-                title="Order completed"
-                description="#ORD-7819 - $123.00"
-                time="5 hours ago"
-              />
-              <ActivityItem
-                icon={<TrendingUp className="h-4 w-4" />}
-                title="Sales milestone"
-                description="Reached $10,000 this month"
-                time="1 day ago"
-              />
-            </div>
+            {analytics?.topCustomers && analytics.topCustomers.length > 0 ? (
+              <div className="space-y-4">
+                {analytics.topCustomers.slice(0, 4).map((customer) => (
+                  <ActivityItem
+                    key={customer.id}
+                    icon={<Users className="h-4 w-4" />}
+                    title={`${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Customer'}
+                    description={`${customer.orderCount} orders - ${formatCurrency(customer.totalSpent, 'USD')}`}
+                    time={customer.email}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="w-12 h-12 rounded-full bg-white/[0.04] flex items-center justify-center mb-3">
+                  <Users className="h-6 w-6 text-white/30" />
+                </div>
+                <p className="text-white/50 text-sm">No activity yet</p>
+                <p className="text-white/30 text-xs mt-1">Customer activity will appear here</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -300,25 +332,33 @@ export default function DashboardPage() {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const styles = {
+  const styles: Record<string, string> = {
     completed: 'bg-green-500/10 text-green-500 border-green-500/20',
+    delivered: 'bg-green-500/10 text-green-500 border-green-500/20',
     processing: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+    shipped: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
     pending: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+    confirmed: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
+    cancelled: 'bg-red-500/10 text-red-500 border-red-500/20',
   };
 
-  const icons = {
+  const icons: Record<string, React.ReactNode> = {
     completed: <CheckCircle2 className="h-3 w-3" />,
+    delivered: <CheckCircle2 className="h-3 w-3" />,
     processing: <Clock className="h-3 w-3" />,
+    shipped: <Package className="h-3 w-3" />,
     pending: <AlertCircle className="h-3 w-3" />,
+    confirmed: <CheckCircle2 className="h-3 w-3" />,
+    cancelled: <AlertCircle className="h-3 w-3" />,
   };
 
   return (
     <div
       className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium border ${
-        styles[status as keyof typeof styles]
+        styles[status] || styles.pending
       }`}
     >
-      {icons[status as keyof typeof icons]}
+      {icons[status] || icons.pending}
       <span className="capitalize">{status}</span>
     </div>
   );
@@ -344,7 +384,7 @@ function ActivityItem({
         <p className="text-sm font-medium text-white">{title}</p>
         <p className="text-xs text-white/40 truncate">{description}</p>
       </div>
-      <span className="text-xs text-white/30 flex-shrink-0">{time}</span>
+      <span className="text-xs text-white/30 flex-shrink-0 truncate max-w-[100px]">{time}</span>
     </div>
   );
 }

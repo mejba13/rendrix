@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Check, ChevronsUpDown, Plus, Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,21 @@ import Link from 'next/link';
 export function StoreSelector() {
   const { stores, currentStore, setStores, switchStore } = useStoreStore();
   const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [open, handleClickOutside]);
 
   // Fetch stores
   const { data, isLoading } = useQuery({
@@ -69,7 +84,7 @@ export function StoreSelector() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <Button
         variant="outline"
         role="combobox"
