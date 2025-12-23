@@ -28,6 +28,14 @@ import {
   Mail,
   Share2,
   Gift,
+  Zap,
+  Globe,
+  MousePointer,
+  TrendingUp,
+  Video,
+  Lightbulb,
+  Award,
+  FileBarChart,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StoreSelector } from './store-selector';
@@ -49,7 +57,22 @@ const navigation: NavItem[] = [
   { name: 'Blog', href: '/dashboard/blog', icon: BookOpen },
   { name: 'Pages', href: '/dashboard/pages', icon: FileText },
   { name: 'Media', href: '/dashboard/media', icon: Image },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+  {
+    name: 'Analytics',
+    href: '/dashboard/analytics',
+    icon: BarChart3,
+    children: [
+      { name: 'Highlights', href: '/dashboard/analytics', icon: TrendingUp },
+      { name: 'Real-time', href: '/dashboard/analytics/realtime', icon: Zap },
+      { name: 'Traffic', href: '/dashboard/analytics/traffic', icon: Globe },
+      { name: 'Behavior', href: '/dashboard/analytics/behavior', icon: MousePointer },
+      { name: 'Marketing', href: '/dashboard/analytics/marketing', icon: Megaphone },
+      { name: 'Session Recordings', href: '/dashboard/analytics/sessions', icon: Video },
+      { name: 'Insights', href: '/dashboard/analytics/insights', icon: Lightbulb },
+      { name: 'Benchmarks', href: '/dashboard/analytics/benchmarks', icon: Award },
+      { name: 'All Reports', href: '/dashboard/analytics/reports', icon: FileBarChart },
+    ],
+  },
   { name: 'Theme', href: '/dashboard/theme', icon: Paintbrush },
   {
     name: 'Marketing',
