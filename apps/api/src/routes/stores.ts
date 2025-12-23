@@ -13,10 +13,13 @@ const createStoreSchema = z.object({
   name: z.string().min(2).max(255),
   slug: z
     .string()
-    .min(3)
     .max(100)
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
-    .optional(),
+    .optional()
+    .transform((val) => (val && val.length >= 3 ? val : undefined))
+    .refine(
+      (val) => !val || /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(val),
+      'Slug must only contain lowercase letters, numbers, and hyphens'
+    ),
   industry: z
     .enum([
       'toys',

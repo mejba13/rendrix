@@ -48,7 +48,10 @@ import { useAuthStore } from '@/store/auth';
 // Schema
 const storeSchema = z.object({
   name: z.string().min(2, 'Store name must be at least 2 characters').max(255),
-  slug: z.string().min(3).max(100).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional().or(z.literal('')),
+  slug: z.string().max(100).optional().refine(
+    (val) => !val || /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(val),
+    'Slug must only contain lowercase letters, numbers, and hyphens'
+  ),
   industry: z.enum([
     'toys', 'kitchen', 'nail_care', 'home_decor', 'garments',
     'beauty', 'sports', 'gadgets', 'home_appliances', 'general'
@@ -420,7 +423,7 @@ export default function NewStorePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { currentOrganization, isLoading: isAuthLoading } = useAuthStore();
+  const { currentOrganization } = useAuthStore();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -441,6 +444,7 @@ export default function NewStorePage() {
       industry: 'general',
       description: '',
     },
+    mode: 'onChange',
   });
 
   const watchedName = watch('name');
@@ -497,6 +501,8 @@ export default function NewStorePage() {
   };
 
   const onSubmit = async (data: StoreForm) => {
+    console.log('onSubmit called with data:', data);
+
     // Check if user has an organization
     if (!currentOrganization) {
       toast({
@@ -507,8 +513,13 @@ export default function NewStorePage() {
       return;
     }
 
+    // Ensure API client has tokens loaded
+    api.loadTokens();
+    api.loadOrganizationId();
+
     setIsSubmitting(true);
     try {
+      console.log('Sending store creation request...');
       await api.fetch('/api/v1/stores', {
         method: 'POST',
         body: JSON.stringify({
@@ -518,6 +529,7 @@ export default function NewStorePage() {
           description: data.description || undefined,
         }),
       });
+      console.log('Store created successfully');
 
       setIsSuccess(true);
       await queryClient.invalidateQueries({ queryKey: ['stores'] });
@@ -651,7 +663,17 @@ export default function NewStorePage() {
 
       {/* Form Content */}
       <div className="relative z-10 flex-1">
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit, (formErrors) => {
+          console.log('Form validation failed:', formErrors);
+          const errorMessages = Object.entries(formErrors)
+            .map(([field, error]) => `${field}: ${error?.message}`)
+            .join(', ');
+          toast({
+            title: 'Please fix form errors',
+            description: errorMessages || 'Please check all required fields',
+            variant: 'destructive',
+          });
+        })}>
           {/* Step 1: Store Details */}
           <div className={cn(
             "transition-all duration-500",
@@ -705,7 +727,9 @@ export default function NewStorePage() {
                         </div>
                         <Input
                           id="slug"
-                          className="h-14 px-5 text-base bg-white/[0.03] border-white/[0.08] text-transparent rounded-xl focus:border-primary/50 focus:bg-white/[0.05] transition-all duration-300"
+                          readOnly
+                          tabIndex={-1}
+                          className="h-14 px-5 text-base bg-white/[0.03] border-white/[0.08] text-transparent rounded-xl focus:border-primary/50 focus:bg-white/[0.05] transition-all duration-300 cursor-default"
                           {...register('slug')}
                         />
                       </div>
@@ -1005,6 +1029,16 @@ export default function NewStorePage() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
+                onClick={() => {
+                  console.log('Launch button clicked, form errors:', errors);
+                  if (Object.keys(errors).length > 0) {
+                    toast({
+                      title: 'Please fix form errors',
+                      description: Object.values(errors).map(e => e?.message).filter(Boolean).join(', ') || 'Please check all fields',
+                      variant: 'destructive',
+                    });
+                  }
+                }}
                 className="gap-2 bg-gradient-to-r from-primary to-orange-600 text-black font-semibold hover:opacity-90 rounded-xl h-12 px-8 shadow-lg shadow-primary/25 min-w-[160px] group"
               >
                 {isSubmitting ? (
