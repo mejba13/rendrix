@@ -8,6 +8,10 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Rendrix - Master Your Commerce Universe',
   description: 'Create, manage, and scale multiple ecommerce stores from a single unified dashboard',
+  icons: {
+    icon: '/icon.svg',
+    apple: '/apple-icon',
+  },
 };
 
 export default function RootLayout({
