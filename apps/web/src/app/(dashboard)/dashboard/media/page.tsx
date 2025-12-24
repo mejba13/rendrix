@@ -19,11 +19,16 @@ import {
   FileImage,
   FileVideo,
   File,
+  HardDrive,
+  TrendingUp,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  FolderOpen,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -85,6 +90,129 @@ function getFileIcon(mimeType: string) {
   return File;
 }
 
+// Stat Card Component - Dark Theme
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  subValue,
+  trend,
+  trendUp,
+  iconGradient,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string | number;
+  subValue?: string;
+  trend?: string;
+  trendUp?: boolean;
+  iconGradient: string;
+}) {
+  return (
+    <div className="group relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300">
+      <div className="flex items-start justify-between">
+        <div className={`w-12 h-12 rounded-xl ${iconGradient} flex items-center justify-center`}>
+          <Icon className="w-6 h-6 text-white" />
+        </div>
+        {trend && (
+          <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
+            trendUp ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+          }`}>
+            <TrendingUp className={`w-3 h-3 ${!trendUp ? 'rotate-180' : ''}`} />
+            {trend}
+          </div>
+        )}
+      </div>
+      <div className="mt-4">
+        <h3 className="text-3xl font-semibold text-white tracking-tight">{value}</h3>
+        <p className="text-sm text-white/50 mt-1">{label}</p>
+        {subValue && (
+          <p className="text-xs text-white/40 mt-0.5">{subValue}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Empty State Component
+function EmptyState({ onUpload }: { onUpload: () => void }) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.06]">
+      <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-transparent" />
+      <div className="relative flex flex-col items-center justify-center py-20 px-6">
+        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-pink-500/20 to-rose-500/10 flex items-center justify-center mb-6">
+          <ImageIcon className="w-10 h-10 text-pink-400" />
+        </div>
+        <h3 className="text-xl font-semibold text-white mb-2">No files yet</h3>
+        <p className="text-white/50 text-center max-w-md mb-6">
+          Upload images, videos, and documents to use across your store.
+        </p>
+        <Button
+          onClick={onUpload}
+          className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium shadow-md gap-2"
+        >
+          <Upload className="w-4 h-4" />
+          Upload your first file
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Error State Component
+function ErrorState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="rounded-2xl bg-white/[0.02] border border-red-500/20">
+      <div className="flex flex-col items-center justify-center py-16 px-6">
+        <div className="w-14 h-14 rounded-xl bg-red-500/10 flex items-center justify-center mb-4">
+          <ImageIcon className="w-7 h-7 text-red-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-white mb-1">Error loading media</h3>
+        <p className="text-white/50 text-center max-w-sm mb-4">
+          Something went wrong while fetching your files. Please try again.
+        </p>
+        <Button
+          onClick={onRetry}
+          className="gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Try again
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Grid Skeleton
+function GridSkeleton() {
+  return (
+    <div className="grid gap-4 grid-cols-2 sm:grid-cols-4 md:grid-cols-6">
+      {Array.from({ length: 12 }).map((_, i) => (
+        <Skeleton key={i} className="aspect-square rounded-xl bg-white/[0.06]" />
+      ))}
+    </div>
+  );
+}
+
+// List Skeleton
+function ListSkeleton() {
+  return (
+    <div className="space-y-2">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+          <Skeleton className="h-4 w-4 bg-white/[0.06]" />
+          <Skeleton className="h-12 w-12 rounded-lg bg-white/[0.06]" />
+          <div className="flex-1 space-y-1.5">
+            <Skeleton className="h-4 w-32 bg-white/[0.06]" />
+            <Skeleton className="h-3 w-24 bg-white/[0.06]" />
+          </div>
+          <Skeleton className="h-8 w-8 rounded-lg bg-white/[0.06]" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function MediaPage() {
   const { toast } = useToast();
   const { currentStore } = useStoreStore();
@@ -127,7 +255,7 @@ export default function MediaPage() {
           title: 'File uploaded',
           description: `${file.name} has been uploaded.`,
         });
-      } catch (error) {
+      } catch {
         toast({
           title: 'Upload failed',
           description: `Failed to upload ${file.name}.`,
@@ -152,7 +280,7 @@ export default function MediaPage() {
       });
       setDeleteConfirmId(null);
       setDetailsItem(null);
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to delete file.',
@@ -170,7 +298,7 @@ export default function MediaPage() {
       });
       setSelectedItems(new Set());
       setBulkDeleteConfirm(false);
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to delete files.',
@@ -201,19 +329,30 @@ export default function MediaPage() {
     });
   };
 
+  // Calculate stats
+  const stats = React.useMemo(() => {
+    if (!data?.data) return { total: 0, images: 0, videos: 0, totalSize: 0 };
+    return {
+      total: data.meta.total,
+      images: data.data.filter((m) => m.mimeType.startsWith('image/')).length,
+      videos: data.data.filter((m) => m.mimeType.startsWith('video/')).length,
+      totalSize: data.data.reduce((sum, m) => sum + m.size, 0),
+    };
+  }, [data]);
+
   if (!currentStore) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-          <ImageIcon className="h-8 w-8 text-muted-foreground" />
+        <div className="w-16 h-16 rounded-2xl bg-white/[0.06] flex items-center justify-center">
+          <ImageIcon className="w-8 h-8 text-white/40" />
         </div>
         <div className="text-center space-y-2">
-          <h3 className="text-lg font-semibold">No store selected</h3>
-          <p className="text-muted-foreground max-w-sm">
+          <h3 className="text-lg font-semibold text-white">No store selected</h3>
+          <p className="text-white/50 max-w-sm">
             Please select a store from the sidebar to view media.
           </p>
         </div>
-        <Button asChild>
+        <Button asChild className="mt-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium">
           <Link href="/dashboard/stores/new">Create a store</Link>
         </Button>
       </div>
@@ -221,133 +360,160 @@ export default function MediaPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in duration-500">
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Media Library</h1>
-          <p className="text-muted-foreground mt-1">
-            Upload and manage your images and files.
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500/20 to-rose-500/10 flex items-center justify-center">
+            <ImageIcon className="w-6 h-6 text-pink-400" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold text-white tracking-tight">Media Library</h1>
+            <p className="text-white/50 text-sm mt-0.5">
+              Upload and manage your images, videos, and files
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => refetch()}>
-            <RefreshCw className="mr-2 h-4 w-4" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            className="gap-2 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06]"
+          >
+            <RefreshCw className="w-4 h-4" />
             Refresh
           </Button>
-          <Button onClick={() => setUploadDialogOpen(true)}>
-            <Upload className="mr-2 h-4 w-4" />
+          <Button
+            size="sm"
+            onClick={() => setUploadDialogOpen(true)}
+            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium shadow-md gap-2"
+          >
+            <Upload className="w-4 h-4" />
             Upload
           </Button>
         </div>
       </div>
 
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          icon={FolderOpen}
+          label="Total Files"
+          value={stats.total}
+          trend={stats.total > 0 ? '+8' : undefined}
+          trendUp={true}
+          iconGradient="bg-gradient-to-br from-pink-500/20 to-rose-500/10"
+        />
+        <StatCard
+          icon={FileImage}
+          label="Images"
+          value={stats.images}
+          iconGradient="bg-gradient-to-br from-blue-500/20 to-cyan-500/10"
+        />
+        <StatCard
+          icon={FileVideo}
+          label="Videos"
+          value={stats.videos}
+          iconGradient="bg-gradient-to-br from-purple-500/20 to-violet-500/10"
+        />
+        <StatCard
+          icon={HardDrive}
+          label="Storage Used"
+          value={formatFileSize(stats.totalSize)}
+          subValue="From visible files"
+          iconGradient="bg-gradient-to-br from-emerald-500/20 to-green-500/10"
+        />
+      </div>
+
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search files..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
-        </div>
+      <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+            <Input
+              placeholder="Search files..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10 h-10 bg-white/[0.02] border-white/[0.06] text-white placeholder:text-white/40"
+            />
+          </div>
 
-        <Select
-          value={filters.mimeType || 'all'}
-          onValueChange={(value) =>
-            setFilters((f) => ({
-              ...f,
-              mimeType: value === 'all' ? undefined : value,
-              page: 1,
-            }))
-          }
-        >
-          <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All files</SelectItem>
-            <SelectItem value="image">Images</SelectItem>
-            <SelectItem value="video">Videos</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <div className="flex items-center gap-1 border rounded-md p-1">
-          <Button
-            variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => setViewMode('grid')}
+          <Select
+            value={filters.mimeType || 'all'}
+            onValueChange={(value) =>
+              setFilters((f) => ({
+                ...f,
+                mimeType: value === 'all' ? undefined : value,
+                page: 1,
+              }))
+            }
           >
-            <Grid className="h-4 w-4" />
-          </Button>
-          <Button
-            variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => setViewMode('list')}
-          >
-            <List className="h-4 w-4" />
-          </Button>
-        </div>
+            <SelectTrigger className="w-[140px] h-10 bg-white/[0.02] border-white/[0.06] text-white/70">
+              <Filter className="mr-2 h-4 w-4 text-white/40" />
+              <SelectValue placeholder="Type" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#1a1a1a] border-white/[0.06]">
+              <SelectItem value="all" className="text-white/70 focus:bg-white/[0.06] focus:text-white">All files</SelectItem>
+              <SelectItem value="image" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Images</SelectItem>
+              <SelectItem value="video" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Videos</SelectItem>
+            </SelectContent>
+          </Select>
 
-        {selectedItems.size > 0 && (
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary">{selectedItems.size} selected</Badge>
-            <Button variant="outline" size="sm" onClick={deselectAll}>
-              <X className="mr-1 h-3 w-3" />
-              Clear
+          <div className="flex items-center gap-1 bg-white/[0.02] border border-white/[0.06] rounded-lg p-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`h-8 w-8 ${viewMode === 'grid' ? 'bg-white/[0.06] text-white' : 'text-white/50 hover:text-white'}`}
+              onClick={() => setViewMode('grid')}
+            >
+              <Grid className="h-4 w-4" />
             </Button>
             <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setBulkDeleteConfirm(true)}
+              variant="ghost"
+              size="icon"
+              className={`h-8 w-8 ${viewMode === 'list' ? 'bg-white/[0.06] text-white' : 'text-white/50 hover:text-white'}`}
+              onClick={() => setViewMode('list')}
             >
-              <Trash2 className="mr-1 h-3 w-3" />
-              Delete
+              <List className="h-4 w-4" />
             </Button>
           </div>
-        )}
+
+          {selectedItems.size > 0 && (
+            <div className="flex items-center gap-2 ml-auto">
+              <Badge className="bg-amber-500/20 text-amber-400 border-0">
+                {selectedItems.size} selected
+              </Badge>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={deselectAll}
+                className="bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06]"
+              >
+                <X className="mr-1 h-3 w-3" />
+                Clear
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setBulkDeleteConfirm(true)}
+                className="bg-transparent border-red-500/30 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+              >
+                <Trash2 className="mr-1 h-3 w-3" />
+                Delete
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Media Grid/List */}
       {isLoading ? (
-        <div className={`grid gap-4 ${viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-4 md:grid-cols-6' : ''}`}>
-          {Array.from({ length: 12 }).map((_, i) => (
-            <Skeleton key={i} className={viewMode === 'grid' ? 'aspect-square' : 'h-16'} />
-          ))}
-        </div>
+        viewMode === 'grid' ? <GridSkeleton /> : <ListSkeleton />
       ) : error ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
-              <ImageIcon className="h-6 w-6 text-destructive" />
-            </div>
-            <h3 className="text-lg font-semibold">Error loading media</h3>
-            <p className="text-muted-foreground mt-1">Please try again.</p>
-            <Button variant="outline" className="mt-4" onClick={() => refetch()}>
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <ErrorState onRetry={() => refetch()} />
       ) : data?.data.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <ImageIcon className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="text-xl font-semibold">No files yet</h3>
-            <p className="text-muted-foreground mt-2">
-              Upload your first file to get started.
-            </p>
-            <Button className="mt-6" onClick={() => setUploadDialogOpen(true)}>
-              <Upload className="mr-2 h-4 w-4" />
-              Upload files
-            </Button>
-          </CardContent>
-        </Card>
+        <EmptyState onUpload={() => setUploadDialogOpen(true)} />
       ) : viewMode === 'grid' ? (
         <div className="grid gap-4 grid-cols-2 sm:grid-cols-4 md:grid-cols-6">
           {data?.data.map((item) => {
@@ -358,8 +524,10 @@ export default function MediaPage() {
             return (
               <div
                 key={item.id}
-                className={`group relative aspect-square rounded-lg border overflow-hidden cursor-pointer transition-all ${
-                  isSelected ? 'ring-2 ring-primary' : 'hover:ring-2 hover:ring-primary/50'
+                className={`group relative aspect-square rounded-xl border overflow-hidden cursor-pointer transition-all ${
+                  isSelected
+                    ? 'ring-2 ring-amber-500 border-amber-500/50'
+                    : 'border-white/[0.06] hover:border-white/[0.15]'
                 }`}
                 onClick={() => setDetailsItem(item)}
               >
@@ -370,8 +538,8 @@ export default function MediaPage() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center bg-muted">
-                    <FileIcon className="h-12 w-12 text-muted-foreground" />
+                  <div className="h-full w-full flex items-center justify-center bg-white/[0.02]">
+                    <FileIcon className="h-12 w-12 text-white/30" />
                   </div>
                 )}
 
@@ -384,10 +552,10 @@ export default function MediaPage() {
                   }}
                 >
                   <div
-                    className={`h-5 w-5 rounded border-2 flex items-center justify-center ${
+                    className={`h-5 w-5 rounded border-2 flex items-center justify-center transition-colors ${
                       isSelected
-                        ? 'bg-primary border-primary text-primary-foreground'
-                        : 'bg-white border-gray-300'
+                        ? 'bg-amber-500 border-amber-500 text-black'
+                        : 'bg-black/50 border-white/40 hover:border-white'
                     }`}
                   >
                     {isSelected && <Check className="h-3 w-3" />}
@@ -395,8 +563,9 @@ export default function MediaPage() {
                 </div>
 
                 {/* Filename */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                  <p className="text-white text-xs truncate">{item.filename}</p>
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 pt-8">
+                  <p className="text-white text-xs font-medium truncate">{item.filename}</p>
+                  <p className="text-white/50 text-xs">{formatFileSize(item.size)}</p>
                 </div>
               </div>
             );
@@ -412,8 +581,10 @@ export default function MediaPage() {
             return (
               <div
                 key={item.id}
-                className={`flex items-center gap-4 p-3 rounded-lg border cursor-pointer transition-all ${
-                  isSelected ? 'ring-2 ring-primary bg-primary/5' : 'hover:bg-muted/50'
+                className={`flex items-center gap-4 p-3 rounded-xl border cursor-pointer transition-all ${
+                  isSelected
+                    ? 'ring-2 ring-amber-500 border-amber-500/50 bg-amber-500/5'
+                    : 'border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]'
                 }`}
                 onClick={() => setDetailsItem(item)}
               >
@@ -421,8 +592,9 @@ export default function MediaPage() {
                   checked={isSelected}
                   onCheckedChange={() => toggleSelect(item.id)}
                   onClick={(e) => e.stopPropagation()}
+                  className="border-white/20"
                 />
-                <div className="h-12 w-12 rounded border overflow-hidden bg-muted flex items-center justify-center">
+                <div className="h-12 w-12 rounded-lg border border-white/[0.06] overflow-hidden bg-white/[0.02] flex items-center justify-center">
                   {isImage ? (
                     <img
                       src={item.url}
@@ -430,36 +602,39 @@ export default function MediaPage() {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <FileIcon className="h-6 w-6 text-muted-foreground" />
+                    <FileIcon className="h-6 w-6 text-white/40" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{item.filename}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium text-white truncate">{item.filename}</p>
+                  <p className="text-sm text-white/50">
                     {formatFileSize(item.size)} • {item.mimeType}
                   </p>
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white hover:bg-white/[0.06]">
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => copyUrl(item.url)}>
+                  <DropdownMenuContent align="end" className="bg-[#1a1a1a] border-white/[0.06]">
+                    <DropdownMenuItem
+                      onClick={() => copyUrl(item.url)}
+                      className="text-white/70 hover:text-white focus:text-white focus:bg-white/[0.06]"
+                    >
                       <Copy className="mr-2 h-4 w-4" />
                       Copy URL
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild className="text-white/70 hover:text-white focus:text-white focus:bg-white/[0.06]">
                       <a href={item.url} download={item.filename}>
                         <Download className="mr-2 h-4 w-4" />
                         Download
                       </a>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
+                    <DropdownMenuSeparator className="bg-white/[0.06]" />
                     <DropdownMenuItem
                       onClick={() => setDeleteConfirmId(item.id)}
-                      className="text-destructive focus:text-destructive"
+                      className="text-red-400 hover:text-red-300 focus:text-red-300 focus:bg-red-500/10"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
                       Delete
@@ -474,9 +649,10 @@ export default function MediaPage() {
 
       {/* Pagination */}
       {data && data.meta.totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Page {data.meta.page} of {data.meta.totalPages} ({data.meta.total} files)
+        <div className="flex items-center justify-between py-2">
+          <p className="text-sm text-white/50">
+            Page <span className="text-white/70 font-medium">{data.meta.page}</span> of{' '}
+            <span className="text-white/70 font-medium">{data.meta.totalPages}</span> ({data.meta.total} files)
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -484,16 +660,42 @@ export default function MediaPage() {
               size="sm"
               disabled={data.meta.page <= 1}
               onClick={() => setFilters((f) => ({ ...f, page: (f.page || 1) - 1 }))}
+              className="gap-1 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06] disabled:opacity-50"
             >
+              <ChevronLeft className="w-4 h-4" />
               Previous
             </Button>
+
+            {/* Page numbers */}
+            <div className="hidden sm:flex items-center gap-1">
+              {Array.from({ length: Math.min(5, data.meta.totalPages) }, (_, i) => {
+                const pageNum = i + 1;
+                const isActive = pageNum === data.meta.page;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setFilters((f) => ({ ...f, page: pageNum }))}
+                    className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-amber-500/20 text-amber-400'
+                        : 'text-white/50 hover:text-white hover:bg-white/[0.06]'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+
             <Button
               variant="outline"
               size="sm"
               disabled={!data.meta.hasMore}
               onClick={() => setFilters((f) => ({ ...f, page: (f.page || 1) + 1 }))}
+              className="gap-1 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06] disabled:opacity-50"
             >
               Next
+              <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
         </div>
@@ -501,29 +703,36 @@ export default function MediaPage() {
 
       {/* Upload Dialog */}
       <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-[#1a1a1a] border-white/[0.06]">
           <DialogHeader>
-            <DialogTitle>Upload Files</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-white">Upload Files</DialogTitle>
+            <DialogDescription className="text-white/50">
               Select files to upload to your media library.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div
-              className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
+              className="border-2 border-dashed border-white/[0.1] rounded-xl p-8 text-center cursor-pointer hover:border-amber-500/50 hover:bg-amber-500/5 transition-all"
               onClick={() => fileInputRef.current?.click()}
             >
               {uploadMedia.isPending ? (
-                <div className="flex flex-col items-center gap-2">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                  <p className="text-muted-foreground">Uploading...</p>
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="h-10 w-10 animate-spin text-amber-500" />
+                  <p className="text-white/70 font-medium">Uploading...</p>
                 </div>
               ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <Upload className="h-8 w-8 text-muted-foreground" />
-                  <p className="font-medium">Click to upload</p>
-                  <p className="text-sm text-muted-foreground">
-                    or drag and drop files here
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 flex items-center justify-center">
+                    <Upload className="h-7 w-7 text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-white">Click to upload</p>
+                    <p className="text-sm text-white/50 mt-1">
+                      or drag and drop files here
+                    </p>
+                  </div>
+                  <p className="text-xs text-white/40">
+                    Supports images, videos, and PDF files
                   </p>
                 </div>
               )}
@@ -542,14 +751,14 @@ export default function MediaPage() {
 
       {/* File Details Dialog */}
       <Dialog open={!!detailsItem} onOpenChange={() => setDetailsItem(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl bg-[#1a1a1a] border-white/[0.06]">
           {detailsItem && (
             <>
               <DialogHeader>
-                <DialogTitle className="truncate">{detailsItem.filename}</DialogTitle>
+                <DialogTitle className="text-white truncate">{detailsItem.filename}</DialogTitle>
               </DialogHeader>
               <div className="grid gap-6 md:grid-cols-2">
-                <div className="aspect-square rounded-lg border overflow-hidden bg-muted flex items-center justify-center">
+                <div className="aspect-square rounded-xl border border-white/[0.06] overflow-hidden bg-white/[0.02] flex items-center justify-center">
                   {detailsItem.mimeType.startsWith('image/') ? (
                     <img
                       src={detailsItem.url}
@@ -557,30 +766,35 @@ export default function MediaPage() {
                       className="h-full w-full object-contain"
                     />
                   ) : (
-                    <File className="h-16 w-16 text-muted-foreground" />
+                    <File className="h-16 w-16 text-white/30" />
                   )}
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <Label className="text-muted-foreground">File name</Label>
-                    <p className="font-medium break-all">{detailsItem.filename}</p>
+                    <Label className="text-white/50 text-xs uppercase tracking-wider">File name</Label>
+                    <p className="font-medium text-white break-all mt-1">{detailsItem.filename}</p>
                   </div>
                   <div>
-                    <Label className="text-muted-foreground">Type</Label>
-                    <p className="font-medium">{detailsItem.mimeType}</p>
+                    <Label className="text-white/50 text-xs uppercase tracking-wider">Type</Label>
+                    <p className="font-medium text-white mt-1">{detailsItem.mimeType}</p>
                   </div>
                   <div>
-                    <Label className="text-muted-foreground">Size</Label>
-                    <p className="font-medium">{formatFileSize(detailsItem.size)}</p>
+                    <Label className="text-white/50 text-xs uppercase tracking-wider">Size</Label>
+                    <p className="font-medium text-white mt-1">{formatFileSize(detailsItem.size)}</p>
                   </div>
                   <div>
-                    <Label className="text-muted-foreground">URL</Label>
+                    <Label className="text-white/50 text-xs uppercase tracking-wider">URL</Label>
                     <div className="flex gap-2 mt-1">
-                      <Input value={detailsItem.url} readOnly className="text-xs" />
+                      <Input
+                        value={detailsItem.url}
+                        readOnly
+                        className="text-xs bg-white/[0.02] border-white/[0.06] text-white/70"
+                      />
                       <Button
                         variant="outline"
                         size="icon"
                         onClick={() => copyUrl(detailsItem.url)}
+                        className="shrink-0 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06]"
                       >
                         <Copy className="h-4 w-4" />
                       </Button>
@@ -588,16 +802,16 @@ export default function MediaPage() {
                   </div>
                 </div>
               </div>
-              <DialogFooter>
-                <Button variant="outline" asChild>
+              <DialogFooter className="gap-2">
+                <Button variant="outline" asChild className="bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06]">
                   <a href={detailsItem.url} download={detailsItem.filename}>
                     <Download className="mr-2 h-4 w-4" />
                     Download
                   </a>
                 </Button>
                 <Button
-                  variant="destructive"
                   onClick={() => setDeleteConfirmId(detailsItem.id)}
+                  className="bg-red-500 hover:bg-red-600 text-white"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete
@@ -610,18 +824,20 @@ export default function MediaPage() {
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-[#1a1a1a] border-white/[0.06]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete file?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-white">Delete file?</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/50">
               This will permanently delete this file. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06]">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-red-500 hover:bg-red-600 text-white"
             >
               Delete
             </AlertDialogAction>
@@ -631,18 +847,20 @@ export default function MediaPage() {
 
       {/* Bulk Delete Confirmation */}
       <AlertDialog open={bulkDeleteConfirm} onOpenChange={setBulkDeleteConfirm}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-[#1a1a1a] border-white/[0.06]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete {selectedItems.size} files?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-white">Delete {selectedItems.size} files?</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/50">
               This will permanently delete the selected files. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06]">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleBulkDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-red-500 hover:bg-red-600 text-white"
             >
               {bulkDelete.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Delete {selectedItems.size} files
