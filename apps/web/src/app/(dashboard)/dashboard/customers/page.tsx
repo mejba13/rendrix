@@ -8,12 +8,15 @@ import {
   Users,
   Download,
   RefreshCw,
-  UserCheck,
   DollarSign,
   ShoppingBag,
+  Search,
+  TrendingUp,
+  Mail,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -49,6 +52,155 @@ interface CustomersParams {
   acceptsMarketing?: boolean;
 }
 
+// Stat Card Component - Dark Theme
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  trend,
+  trendUp,
+  iconBg,
+  iconColor,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string | number;
+  trend?: string;
+  trendUp?: boolean;
+  iconBg: string;
+  iconColor: string;
+}) {
+  return (
+    <div className="group relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300">
+      <div className="flex items-start justify-between">
+        <div className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center`}>
+          <Icon className={`w-6 h-6 ${iconColor}`} />
+        </div>
+        {trend && (
+          <div className={`flex items-center gap-1 text-xs font-medium ${
+            trendUp ? 'text-emerald-400' : 'text-red-400'
+          }`}>
+            <TrendingUp className={`w-3 h-3 ${!trendUp ? 'rotate-180' : ''}`} />
+            {trend}
+          </div>
+        )}
+      </div>
+      <div className="mt-4">
+        <h3 className="text-3xl font-semibold text-white tracking-tight">{value}</h3>
+        <p className="text-sm text-white/50 mt-1">{label}</p>
+      </div>
+    </div>
+  );
+}
+
+// Stat Card Skeleton
+function StatCardSkeleton() {
+  return (
+    <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6">
+      <div className="flex items-start justify-between">
+        <Skeleton className="w-12 h-12 rounded-xl bg-white/[0.06]" />
+        <Skeleton className="w-14 h-5 rounded-full bg-white/[0.06]" />
+      </div>
+      <div className="mt-4 space-y-2">
+        <Skeleton className="h-9 w-20 bg-white/[0.06]" />
+        <Skeleton className="h-4 w-28 bg-white/[0.06]" />
+      </div>
+    </div>
+  );
+}
+
+// Empty State Component
+function EmptyState() {
+  return (
+    <div className="relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.06]">
+      <div className="flex flex-col items-center justify-center py-20 px-6">
+        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 flex items-center justify-center mb-6">
+          <Users className="w-10 h-10 text-amber-500" />
+        </div>
+        <h3 className="text-xl font-semibold text-white mb-2">No customers yet</h3>
+        <p className="text-white/50 text-center max-w-md mb-6">
+          Start adding customers to manage their orders, track their preferences, and build lasting relationships.
+        </p>
+        <Button asChild className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium gap-2">
+          <Link href="/dashboard/customers/new">
+            <Plus className="w-4 h-4" />
+            Add your first customer
+          </Link>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// No Results Component
+function NoResults({ onClear }: { onClear: () => void }) {
+  return (
+    <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06]">
+      <div className="flex flex-col items-center justify-center py-16 px-6">
+        <div className="w-14 h-14 rounded-xl bg-white/[0.04] flex items-center justify-center mb-4">
+          <Search className="w-7 h-7 text-white/40" />
+        </div>
+        <h3 className="text-lg font-semibold text-white mb-1">No customers found</h3>
+        <p className="text-white/50 text-center max-w-sm mb-4">
+          No customers match your current filters. Try adjusting your search criteria.
+        </p>
+        <Button variant="outline" onClick={onClear} className="gap-2 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06]">
+          Clear filters
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Error State Component
+function ErrorState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="rounded-2xl bg-white/[0.02] border border-red-500/20">
+      <div className="flex flex-col items-center justify-center py-16 px-6">
+        <div className="w-14 h-14 rounded-xl bg-red-500/10 flex items-center justify-center mb-4">
+          <Users className="w-7 h-7 text-red-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-white mb-1">Error loading customers</h3>
+        <p className="text-white/50 text-center max-w-sm mb-4">
+          Something went wrong while fetching your customers. Please try again.
+        </p>
+        <Button onClick={onRetry} className="gap-2">
+          <RefreshCw className="w-4 h-4" />
+          Try again
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Table Skeleton
+function TableSkeleton() {
+  return (
+    <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] overflow-hidden">
+      <div className="flex items-center gap-4 p-4 border-b border-white/[0.06]">
+        <Skeleton className="h-4 w-24 bg-white/[0.06]" />
+        <Skeleton className="h-4 w-32 bg-white/[0.06]" />
+        <Skeleton className="h-4 w-20 bg-white/[0.06]" />
+        <Skeleton className="h-4 w-24 bg-white/[0.06]" />
+        <Skeleton className="h-4 w-16 bg-white/[0.06]" />
+      </div>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-4 p-4 border-b border-white/[0.04] last:border-0">
+          <Skeleton className="h-10 w-10 rounded-full bg-white/[0.06]" />
+          <div className="space-y-1.5 flex-1">
+            <Skeleton className="h-4 w-32 bg-white/[0.06]" />
+            <Skeleton className="h-3 w-40 bg-white/[0.06]" />
+          </div>
+          <Skeleton className="h-6 w-16 rounded-full bg-white/[0.06]" />
+          <Skeleton className="h-4 w-20 bg-white/[0.06]" />
+          <Skeleton className="h-4 w-16 bg-white/[0.06]" />
+          <Skeleton className="h-8 w-8 rounded-lg bg-white/[0.06]" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function CustomersPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -82,7 +234,7 @@ export default function CustomersPage() {
         title: 'Customer deleted',
         description: 'The customer has been deleted successfully.',
       });
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to delete customer. Please try again.',
@@ -91,6 +243,18 @@ export default function CustomersPage() {
     }
     setDeleteCustomerId(null);
   };
+
+  const clearFilters = () => {
+    setSearch('');
+    setFilters({
+      page: 1,
+      limit: 20,
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+    });
+  };
+
+  const hasActiveFilters = search || filters.acceptsMarketing !== undefined;
 
   const columns = React.useMemo(
     () =>
@@ -103,8 +267,7 @@ export default function CustomersPage() {
 
   // Calculate stats
   const stats = React.useMemo(() => {
-    if (!data?.data)
-      return { total: 0, marketing: 0, avgSpent: 0, avgOrders: 0 };
+    if (!data?.data) return { total: 0, marketing: 0, avgSpent: 0, avgOrders: 0 };
     const customers = data.data;
     const marketing = customers.filter((c) => c.acceptsMarketing).length;
     const totalSpent = customers.reduce((sum, c) => sum + c.totalSpent, 0);
@@ -120,16 +283,16 @@ export default function CustomersPage() {
   if (!currentStore) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-          <Users className="h-8 w-8 text-muted-foreground" />
+        <div className="w-16 h-16 rounded-2xl bg-white/[0.04] flex items-center justify-center">
+          <Users className="w-8 h-8 text-white/40" />
         </div>
         <div className="text-center space-y-2">
-          <h3 className="text-lg font-semibold">No store selected</h3>
-          <p className="text-muted-foreground max-w-sm">
+          <h3 className="text-lg font-semibold text-white">No store selected</h3>
+          <p className="text-white/50 max-w-sm">
             Please select a store from the sidebar to view customers.
           </p>
         </div>
-        <Button asChild>
+        <Button asChild className="mt-2">
           <Link href="/dashboard/stores/new">Create a store</Link>
         </Button>
       </div>
@@ -140,24 +303,43 @@ export default function CustomersPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Customers</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your customers and their information.
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 flex items-center justify-center">
+            <Users className="w-6 h-6 text-amber-500" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold text-white tracking-tight">Customers</h1>
+            <p className="text-white/50 text-sm mt-0.5">
+              Manage your customers and their information
+            </p>
+          </div>
         </div>
+
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => refetch()}>
-            <RefreshCw className="mr-2 h-4 w-4" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            className="gap-2 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06]"
+          >
+            <RefreshCw className="w-4 h-4" />
             Refresh
           </Button>
-          <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06]"
+          >
+            <Download className="w-4 h-4" />
             Export
           </Button>
-          <Button asChild className="shadow-sm">
+          <Button
+            asChild
+            size="sm"
+            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium gap-2"
+          >
             <Link href="/dashboard/customers/new">
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="w-4 h-4" />
               Add customer
             </Link>
           </Button>
@@ -165,182 +347,150 @@ export default function CustomersPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-orange-500/10 flex items-center justify-center">
-                <Users className="h-5 w-5 text-primary" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-2xl font-semibold text-white">{stats.total}</h3>
-              <p className="text-sm text-white/40">Total Customers</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/10 flex items-center justify-center">
-                <UserCheck className="h-5 w-5 text-emerald-500" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-2xl font-semibold text-emerald-500">{stats.marketing}</h3>
-              <p className="text-sm text-white/40">Marketing Subscribers</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/10 flex items-center justify-center">
-                <DollarSign className="h-5 w-5 text-green-500" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-2xl font-semibold text-white">{formatCurrency(stats.avgSpent, 'USD')}</h3>
-              <p className="text-sm text-white/40">Avg. Spent per Customer</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/[0.02] border-white/[0.08] hover:border-white/[0.12] transition-all duration-300">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/10 flex items-center justify-center">
-                <ShoppingBag className="h-5 w-5 text-blue-500" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-2xl font-semibold text-white">{stats.avgOrders.toFixed(1)}</h3>
-              <p className="text-sm text-white/40">Avg. Orders per Customer</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {isLoading ? (
+          <>
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </>
+        ) : (
+          <>
+            <StatCard
+              icon={Users}
+              label="Total Customers"
+              value={stats.total.toLocaleString()}
+              trend={stats.total > 0 ? '+0%' : undefined}
+              trendUp={true}
+              iconBg="bg-gradient-to-br from-blue-500/20 to-cyan-500/10"
+              iconColor="text-blue-400"
+            />
+            <StatCard
+              icon={Mail}
+              label="Marketing Subscribers"
+              value={stats.marketing}
+              trend={stats.marketing > 0 ? '+0%' : undefined}
+              trendUp={true}
+              iconBg="bg-gradient-to-br from-emerald-500/20 to-green-500/10"
+              iconColor="text-emerald-400"
+            />
+            <StatCard
+              icon={DollarSign}
+              label="Avg. Spent per Customer"
+              value={formatCurrency(stats.avgSpent, 'USD')}
+              iconBg="bg-gradient-to-br from-amber-500/20 to-yellow-500/10"
+              iconColor="text-amber-400"
+            />
+            <StatCard
+              icon={ShoppingBag}
+              label="Avg. Orders per Customer"
+              value={stats.avgOrders.toFixed(1)}
+              iconBg="bg-gradient-to-br from-purple-500/20 to-violet-500/10"
+              iconColor="text-purple-400"
+            />
+          </>
+        )}
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3">
-        <Input
-          placeholder="Search customers..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full sm:w-[280px]"
-        />
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <Input
+            placeholder="Search customers by name, email..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10 h-10 bg-white/[0.02] border-white/[0.06] text-white placeholder:text-white/40"
+          />
+        </div>
 
-        <Select
-          value={
-            filters.acceptsMarketing === undefined
-              ? 'all'
-              : filters.acceptsMarketing
-                ? 'true'
-                : 'false'
-          }
-          onValueChange={(value) =>
-            setFilters((f) => ({
-              ...f,
-              acceptsMarketing:
-                value === 'all' ? undefined : value === 'true',
-              page: 1,
-            }))
-          }
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Marketing status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All customers</SelectItem>
-            <SelectItem value="true">Subscribed</SelectItem>
-            <SelectItem value="false">Not subscribed</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex flex-wrap items-center gap-2">
+          <Select
+            value={
+              filters.acceptsMarketing === undefined
+                ? 'all'
+                : filters.acceptsMarketing
+                  ? 'true'
+                  : 'false'
+            }
+            onValueChange={(value) =>
+              setFilters((f) => ({
+                ...f,
+                acceptsMarketing: value === 'all' ? undefined : value === 'true',
+                page: 1,
+              }))
+            }
+          >
+            <SelectTrigger className="w-[160px] h-10 bg-white/[0.02] border-white/[0.06] text-white">
+              <SelectValue placeholder="Marketing" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All customers</SelectItem>
+              <SelectItem value="true">Subscribed</SelectItem>
+              <SelectItem value="false">Not subscribed</SelectItem>
+            </SelectContent>
+          </Select>
 
-        <Select
-          value={filters.sortBy || 'createdAt'}
-          onValueChange={(value) =>
-            setFilters((f) => ({ ...f, sortBy: value, page: 1 }))
-          }
-        >
-          <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="createdAt">Date joined</SelectItem>
-            <SelectItem value="totalSpent">Total spent</SelectItem>
-            <SelectItem value="totalOrders">Order count</SelectItem>
-            <SelectItem value="email">Email</SelectItem>
-          </SelectContent>
-        </Select>
+          <Select
+            value={filters.sortBy || 'createdAt'}
+            onValueChange={(value) =>
+              setFilters((f) => ({ ...f, sortBy: value, page: 1 }))
+            }
+          >
+            <SelectTrigger className="w-[150px] h-10 bg-white/[0.02] border-white/[0.06] text-white">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="createdAt">Date joined</SelectItem>
+              <SelectItem value="totalSpent">Total spent</SelectItem>
+              <SelectItem value="totalOrders">Order count</SelectItem>
+              <SelectItem value="email">Email</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className="text-white/50 hover:text-white"
+            >
+              Clear
+            </Button>
+          )}
+        </div>
       </div>
 
-      {/* Customers Table */}
+      {/* Customers Table / States */}
       {isLoading ? (
-        <Card>
-          <div className="p-6 space-y-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-4">
-                <Skeleton className="h-10 w-10 rounded-full" />
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-[180px]" />
-                  <Skeleton className="h-3 w-[120px]" />
-                </div>
-                <Skeleton className="h-6 w-20" />
-                <Skeleton className="h-6 w-16" />
-                <Skeleton className="h-6 w-24" />
-              </div>
-            ))}
-          </div>
-        </Card>
+        <TableSkeleton />
       ) : error ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
-              <Users className="h-6 w-6 text-destructive" />
-            </div>
-            <h3 className="text-lg font-semibold">Error loading customers</h3>
-            <p className="text-muted-foreground mt-1">
-              Something went wrong. Please try again.
-            </p>
-            <Button variant="outline" className="mt-4" onClick={() => refetch()}>
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
-      ) : data?.data.length === 0 && !filters.search ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <Users className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="text-xl font-semibold">No customers yet</h3>
-            <p className="text-muted-foreground mt-2 text-center max-w-sm">
-              Start adding customers to manage their orders and information.
-            </p>
-            <Button asChild className="mt-6">
-              <Link href="/dashboard/customers/new">
-                <Plus className="mr-2 h-4 w-4" />
-                Add your first customer
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <ErrorState onRetry={() => refetch()} />
+      ) : data?.data.length === 0 && !hasActiveFilters ? (
+        <EmptyState />
+      ) : data?.data.length === 0 && hasActiveFilters ? (
+        <NoResults onClear={clearFilters} />
       ) : (
-        <DataTable
-          columns={columns}
-          data={data?.data || []}
-          searchKey="email"
-          searchPlaceholder="Search in results..."
-          pageSize={filters.limit}
-          onRowClick={(row) => router.push(`/dashboard/customers/${row.id}`)}
-        />
+        <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] overflow-hidden">
+          <DataTable
+            columns={columns}
+            data={data?.data || []}
+            searchKey="email"
+            searchPlaceholder="Search in results..."
+            pageSize={filters.limit}
+            onRowClick={(row) => router.push(`/dashboard/customers/${row.id}`)}
+          />
+        </div>
       )}
 
       {/* Pagination */}
       {data && data.meta.totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Page {data.meta.page} of {data.meta.totalPages} ({data.meta.total} customers)
+        <div className="flex items-center justify-between py-2">
+          <p className="text-sm text-white/50">
+            Showing <span className="text-white font-medium">{((data.meta.page - 1) * filters.limit!) + 1}</span> to{' '}
+            <span className="text-white font-medium">{Math.min(data.meta.page * filters.limit!, data.meta.total)}</span> of{' '}
+            <span className="text-white font-medium">{data.meta.total}</span> customers
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -348,16 +498,53 @@ export default function CustomersPage() {
               size="sm"
               disabled={data.meta.page <= 1}
               onClick={() => setFilters((f) => ({ ...f, page: (f.page || 1) - 1 }))}
+              className="gap-1 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06] disabled:opacity-30"
             >
+              <ChevronLeft className="w-4 h-4" />
               Previous
             </Button>
+
+            {/* Page numbers */}
+            <div className="hidden sm:flex items-center gap-1">
+              {Array.from({ length: Math.min(5, data.meta.totalPages) }, (_, i) => {
+                const pageNum = i + 1;
+                const isActive = pageNum === data.meta.page;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setFilters((f) => ({ ...f, page: pageNum }))}
+                    className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-amber-500/20 text-amber-400'
+                        : 'text-white/50 hover:text-white hover:bg-white/[0.06]'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              {data.meta.totalPages > 5 && (
+                <>
+                  <span className="text-white/30 px-1">...</span>
+                  <button
+                    onClick={() => setFilters((f) => ({ ...f, page: data.meta.totalPages }))}
+                    className="w-8 h-8 rounded-lg text-sm font-medium text-white/50 hover:text-white hover:bg-white/[0.06] transition-colors"
+                  >
+                    {data.meta.totalPages}
+                  </button>
+                </>
+              )}
+            </div>
+
             <Button
               variant="outline"
               size="sm"
               disabled={!data.meta.hasMore}
               onClick={() => setFilters((f) => ({ ...f, page: (f.page || 1) + 1 }))}
+              className="gap-1 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06] disabled:opacity-30"
             >
               Next
+              <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
         </div>
@@ -374,10 +561,12 @@ export default function CustomersPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06]">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-red-500 hover:bg-red-600 text-white"
             >
               Delete customer
             </AlertDialogAction>
