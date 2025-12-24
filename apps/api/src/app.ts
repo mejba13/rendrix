@@ -27,6 +27,7 @@ import { subscriptionRoutes } from './routes/subscriptions';
 import { healthRoutes } from './routes/health';
 import { blogRoutes } from './routes/blogs';
 import { pageRoutes } from './routes/pages';
+import { themeRoutes } from './routes/themes';
 
 // Storefront routes (public)
 import { storefrontProductRoutes } from './routes/storefront/products';
@@ -93,6 +94,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(subscriptionRoutes, { prefix: '/api/v1/subscriptions' });
   await app.register(blogRoutes, { prefix: '/api/v1/stores/:storeId/blogs' });
   await app.register(pageRoutes, { prefix: '/api/v1/stores/:storeId/pages' });
+  await app.register(themeRoutes, { prefix: '/api/v1/themes' });
 
   // Public storefront routes (no auth required)
   await app.register(storefrontStoreRoutes, { prefix: '/api/v1/storefront' });
