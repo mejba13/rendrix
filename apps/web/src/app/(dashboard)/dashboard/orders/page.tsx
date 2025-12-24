@@ -45,7 +45,7 @@ import { useStoreStore } from '@/store/store';
 import { createOrderColumns } from '@/components/orders/order-columns';
 import { formatCurrency } from '@rendrix/utils';
 
-// Stat Card Component
+// Stat Card Component - Dark Theme
 function StatCard({
   icon: Icon,
   label,
@@ -53,8 +53,7 @@ function StatCard({
   subValue,
   trend,
   trendUp,
-  iconColor,
-  iconBg,
+  iconGradient,
   valueColor,
 }: {
   icon: React.ElementType;
@@ -63,37 +62,32 @@ function StatCard({
   subValue?: string;
   trend?: string;
   trendUp?: boolean;
-  iconColor: string;
-  iconBg: string;
+  iconGradient: string;
   valueColor?: string;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.06] p-5 transition-all duration-300 hover:bg-white/[0.04] hover:border-white/[0.1]">
-      {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-      <div className="relative">
-        <div className="flex items-center justify-between mb-4">
-          <div className={`w-11 h-11 rounded-xl ${iconBg} flex items-center justify-center`}>
-            <Icon className={`w-5 h-5 ${iconColor}`} />
+    <div className="group relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300">
+      <div className="flex items-start justify-between">
+        <div className={`w-12 h-12 rounded-xl ${iconGradient} flex items-center justify-center`}>
+          <Icon className="w-6 h-6 text-white" />
+        </div>
+        {trend && (
+          <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
+            trendUp ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+          }`}>
+            <TrendingUp className={`w-3 h-3 ${!trendUp ? 'rotate-180' : ''}`} />
+            {trend}
           </div>
-          {trend && (
-            <div className={`flex items-center gap-1 text-xs font-medium ${trendUp ? 'text-emerald-400' : 'text-red-400'}`}>
-              <TrendingUp className={`w-3 h-3 ${!trendUp ? 'rotate-180' : ''}`} />
-              {trend}
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-1">
-          <h3 className={`text-2xl font-semibold tracking-tight ${valueColor || 'text-white'}`}>
-            {value}
-          </h3>
-          <p className="text-sm text-white/40">{label}</p>
-          {subValue && (
-            <p className="text-xs text-white/30">{subValue}</p>
-          )}
-        </div>
+        )}
+      </div>
+      <div className="mt-4">
+        <h3 className={`text-3xl font-semibold tracking-tight ${valueColor || 'text-white'}`}>
+          {value}
+        </h3>
+        <p className="text-sm text-white/50 mt-1">{label}</p>
+        {subValue && (
+          <p className="text-xs text-white/40 mt-0.5">{subValue}</p>
+        )}
       </div>
     </div>
   );
@@ -102,14 +96,14 @@ function StatCard({
 // Stat Card Skeleton
 function StatCardSkeleton() {
   return (
-    <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-5">
-      <div className="flex items-center justify-between mb-4">
-        <Skeleton className="w-11 h-11 rounded-xl" />
-        <Skeleton className="w-12 h-4" />
+    <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6">
+      <div className="flex items-start justify-between">
+        <Skeleton className="w-12 h-12 rounded-xl bg-white/[0.06]" />
+        <Skeleton className="w-14 h-6 rounded-full bg-white/[0.06]" />
       </div>
-      <div className="space-y-2">
-        <Skeleton className="h-8 w-20" />
-        <Skeleton className="h-4 w-24" />
+      <div className="mt-4 space-y-2">
+        <Skeleton className="h-9 w-24 bg-white/[0.06]" />
+        <Skeleton className="h-4 w-28 bg-white/[0.06]" />
       </div>
     </div>
   );
@@ -119,33 +113,27 @@ function StatCardSkeleton() {
 function EmptyState() {
   return (
     <div className="relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.08),transparent_50%)]" />
-      </div>
-
+      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent" />
       <div className="relative flex flex-col items-center justify-center py-20 px-6">
-        {/* Animated icon */}
         <div className="relative mb-6">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 flex items-center justify-center">
-            <ShoppingCart className="w-10 h-10 text-amber-400/70" />
+            <ShoppingCart className="w-10 h-10 text-amber-400" />
           </div>
-          {/* Floating elements */}
-          <div className="absolute -top-2 -right-2 w-6 h-6 rounded-lg bg-emerald-500/20 flex items-center justify-center animate-float" style={{ animationDelay: '0s' }}>
+          <div className="absolute -top-2 -right-2 w-6 h-6 rounded-lg bg-emerald-500/20 flex items-center justify-center">
             <CheckCircle2 className="w-3 h-3 text-emerald-400" />
           </div>
-          <div className="absolute -bottom-1 -left-3 w-5 h-5 rounded-md bg-blue-500/20 flex items-center justify-center animate-float" style={{ animationDelay: '0.5s' }}>
+          <div className="absolute -bottom-1 -left-3 w-5 h-5 rounded-md bg-blue-500/20 flex items-center justify-center">
             <Package className="w-2.5 h-2.5 text-blue-400" />
           </div>
         </div>
 
         <h3 className="text-xl font-semibold text-white mb-2">No orders yet</h3>
-        <p className="text-white/40 text-center max-w-md mb-6">
+        <p className="text-white/50 text-center max-w-md mb-6">
           Orders will appear here once customers make purchases from your store. You can also create manual orders for phone or in-person sales.
         </p>
 
         <div className="flex items-center gap-3">
-          <Button asChild className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black font-semibold gap-2">
+          <Button asChild className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium shadow-md gap-2">
             <Link href="/dashboard/orders/new">
               <Plus className="w-4 h-4" />
               Create manual order
@@ -166,11 +154,11 @@ function NoResults({ onClear }: { onClear: () => void }) {
   return (
     <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06]">
       <div className="flex flex-col items-center justify-center py-16 px-6">
-        <div className="w-14 h-14 rounded-xl bg-white/[0.04] flex items-center justify-center mb-4">
-          <Search className="w-7 h-7 text-white/30" />
+        <div className="w-14 h-14 rounded-xl bg-white/[0.06] flex items-center justify-center mb-4">
+          <Search className="w-7 h-7 text-white/40" />
         </div>
         <h3 className="text-lg font-semibold text-white mb-1">No orders found</h3>
-        <p className="text-white/40 text-center max-w-sm mb-4">
+        <p className="text-white/50 text-center max-w-sm mb-4">
           No orders match your current filters. Try adjusting your search or filters.
         </p>
         <Button
@@ -194,10 +182,10 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
           <ShoppingCart className="w-7 h-7 text-red-400" />
         </div>
         <h3 className="text-lg font-semibold text-white mb-1">Error loading orders</h3>
-        <p className="text-white/40 text-center max-w-sm mb-4">
+        <p className="text-white/50 text-center max-w-sm mb-4">
           Something went wrong while fetching your orders. Please try again.
         </p>
-        <Button onClick={onRetry} className="gap-2">
+        <Button onClick={onRetry} className="gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium">
           <RefreshCw className="w-4 h-4" />
           Try again
         </Button>
@@ -210,37 +198,31 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
 function TableSkeleton() {
   return (
     <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center gap-4 p-4 border-b border-white/[0.06] bg-white/[0.01]">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-4 w-16" />
-        <Skeleton className="h-4 w-16" />
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-4 w-12" />
-        <Skeleton className="h-4 w-16" />
+      <div className="flex items-center gap-4 p-4 border-b border-white/[0.06] bg-white/[0.02]">
+        <Skeleton className="h-4 w-20 bg-white/[0.06]" />
+        <Skeleton className="h-4 w-24 bg-white/[0.06]" />
+        <Skeleton className="h-4 w-16 bg-white/[0.06]" />
+        <Skeleton className="h-4 w-16 bg-white/[0.06]" />
+        <Skeleton className="h-4 w-20 bg-white/[0.06]" />
+        <Skeleton className="h-4 w-12 bg-white/[0.06]" />
+        <Skeleton className="h-4 w-16 bg-white/[0.06]" />
       </div>
-      {/* Rows */}
       {Array.from({ length: 5 }).map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-4 p-4 border-b border-white/[0.04] last:border-0"
-          style={{ animationDelay: `${i * 50}ms` }}
-        >
+        <div key={i} className="flex items-center gap-4 p-4 border-b border-white/[0.04] last:border-0">
           <div className="space-y-1.5 w-24">
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-4 w-20 bg-white/[0.06]" />
+            <Skeleton className="h-3 w-16 bg-white/[0.06]" />
           </div>
           <div className="space-y-1.5 flex-1 min-w-[150px]">
-            <Skeleton className="h-4 w-28" />
-            <Skeleton className="h-3 w-36" />
+            <Skeleton className="h-4 w-28 bg-white/[0.06]" />
+            <Skeleton className="h-3 w-36 bg-white/[0.06]" />
           </div>
-          <Skeleton className="h-6 w-20 rounded-full" />
-          <Skeleton className="h-6 w-16 rounded-full" />
-          <Skeleton className="h-6 w-20 rounded-full" />
-          <Skeleton className="h-4 w-14" />
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-8 w-8 rounded-lg" />
+          <Skeleton className="h-6 w-20 rounded-full bg-white/[0.06]" />
+          <Skeleton className="h-6 w-16 rounded-full bg-white/[0.06]" />
+          <Skeleton className="h-6 w-20 rounded-full bg-white/[0.06]" />
+          <Skeleton className="h-4 w-14 bg-white/[0.06]" />
+          <Skeleton className="h-4 w-16 bg-white/[0.06]" />
+          <Skeleton className="h-8 w-8 rounded-lg bg-white/[0.06]" />
         </div>
       ))}
     </div>
@@ -280,7 +262,7 @@ export default function OrdersPage() {
         title: 'Order cancelled',
         description: 'The order has been cancelled and inventory restored.',
       });
-    } catch (err) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to cancel order. Please try again.',
@@ -330,16 +312,16 @@ export default function OrdersPage() {
   if (!currentStore) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <div className="w-16 h-16 rounded-2xl bg-white/[0.04] flex items-center justify-center">
-          <ShoppingCart className="w-8 h-8 text-white/30" />
+        <div className="w-16 h-16 rounded-2xl bg-white/[0.06] flex items-center justify-center">
+          <ShoppingCart className="w-8 h-8 text-white/40" />
         </div>
         <div className="text-center space-y-2">
           <h3 className="text-lg font-semibold text-white">No store selected</h3>
-          <p className="text-white/40 max-w-sm">
+          <p className="text-white/50 max-w-sm">
             Please select a store from the sidebar to view orders.
           </p>
         </div>
-        <Button asChild className="mt-2">
+        <Button asChild className="mt-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium">
           <Link href="/dashboard/stores/new">Create a store</Link>
         </Button>
       </div>
@@ -356,7 +338,7 @@ export default function OrdersPage() {
           </div>
           <div>
             <h1 className="text-2xl font-semibold text-white tracking-tight">Orders</h1>
-            <p className="text-white/40 text-sm mt-0.5">
+            <p className="text-white/50 text-sm mt-0.5">
               Manage orders, track fulfillment, and process refunds
             </p>
           </div>
@@ -383,7 +365,7 @@ export default function OrdersPage() {
           <Button
             asChild
             size="sm"
-            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black font-semibold gap-2"
+            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium shadow-md gap-2"
           >
             <Link href="/dashboard/orders/new">
               <Plus className="w-4 h-4" />
@@ -410,8 +392,7 @@ export default function OrdersPage() {
               value={stats.total.toLocaleString()}
               trend={stats.total > 0 ? '+12.5%' : undefined}
               trendUp={true}
-              iconColor="text-blue-400"
-              iconBg="bg-gradient-to-br from-blue-500/20 to-cyan-500/10"
+              iconGradient="bg-gradient-to-br from-blue-500/20 to-cyan-500/10"
             />
             <StatCard
               icon={DollarSign}
@@ -420,16 +401,14 @@ export default function OrdersPage() {
               subValue="From visible orders"
               trend={stats.revenue > 0 ? '+8.2%' : undefined}
               trendUp={true}
-              iconColor="text-emerald-400"
-              iconBg="bg-gradient-to-br from-emerald-500/20 to-green-500/10"
+              iconGradient="bg-gradient-to-br from-emerald-500/20 to-green-500/10"
             />
             <StatCard
               icon={Clock}
               label="Pending"
               value={stats.pending}
               subValue="Awaiting action"
-              iconColor="text-amber-400"
-              iconBg="bg-gradient-to-br from-amber-500/20 to-yellow-500/10"
+              iconGradient="bg-gradient-to-br from-amber-500/20 to-yellow-500/10"
               valueColor={stats.pending > 0 ? 'text-amber-400' : 'text-white'}
             />
             <StatCard
@@ -437,8 +416,7 @@ export default function OrdersPage() {
               label="Fulfilled"
               value={stats.fulfilled}
               subValue="Successfully delivered"
-              iconColor="text-emerald-400"
-              iconBg="bg-gradient-to-br from-emerald-500/20 to-green-500/10"
+              iconGradient="bg-gradient-to-br from-emerald-500/20 to-green-500/10"
               valueColor={stats.fulfilled > 0 ? 'text-emerald-400' : 'text-white'}
             />
           </>
@@ -448,12 +426,12 @@ export default function OrdersPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
           <Input
             placeholder="Search orders by number, email, or customer..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 h-10"
+            className="pl-10 h-10 bg-white/[0.02] border-white/[0.06] text-white placeholder:text-white/40"
           />
         </div>
 
@@ -468,17 +446,17 @@ export default function OrdersPage() {
               }))
             }
           >
-            <SelectTrigger className="w-[130px] h-10">
+            <SelectTrigger className="w-[130px] h-10 bg-white/[0.02] border-white/[0.06] text-white/70">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All status</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="confirmed">Confirmed</SelectItem>
-              <SelectItem value="processing">Processing</SelectItem>
-              <SelectItem value="shipped">Shipped</SelectItem>
-              <SelectItem value="delivered">Delivered</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectContent className="bg-[#1a1a1a] border-white/[0.06]">
+              <SelectItem value="all" className="text-white/70 focus:bg-white/[0.06] focus:text-white">All status</SelectItem>
+              <SelectItem value="pending" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Pending</SelectItem>
+              <SelectItem value="confirmed" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Confirmed</SelectItem>
+              <SelectItem value="processing" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Processing</SelectItem>
+              <SelectItem value="shipped" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Shipped</SelectItem>
+              <SelectItem value="delivered" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Delivered</SelectItem>
+              <SelectItem value="cancelled" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Cancelled</SelectItem>
             </SelectContent>
           </Select>
 
@@ -492,15 +470,15 @@ export default function OrdersPage() {
               }))
             }
           >
-            <SelectTrigger className="w-[130px] h-10">
+            <SelectTrigger className="w-[130px] h-10 bg-white/[0.02] border-white/[0.06] text-white/70">
               <SelectValue placeholder="Payment" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All payments</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="failed">Failed</SelectItem>
-              <SelectItem value="refunded">Refunded</SelectItem>
+            <SelectContent className="bg-[#1a1a1a] border-white/[0.06]">
+              <SelectItem value="all" className="text-white/70 focus:bg-white/[0.06] focus:text-white">All payments</SelectItem>
+              <SelectItem value="pending" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Pending</SelectItem>
+              <SelectItem value="paid" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Paid</SelectItem>
+              <SelectItem value="failed" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Failed</SelectItem>
+              <SelectItem value="refunded" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Refunded</SelectItem>
             </SelectContent>
           </Select>
 
@@ -514,14 +492,14 @@ export default function OrdersPage() {
               }))
             }
           >
-            <SelectTrigger className="w-[140px] h-10">
+            <SelectTrigger className="w-[140px] h-10 bg-white/[0.02] border-white/[0.06] text-white/70">
               <SelectValue placeholder="Fulfillment" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All fulfillment</SelectItem>
-              <SelectItem value="unfulfilled">Unfulfilled</SelectItem>
-              <SelectItem value="partially_fulfilled">Partial</SelectItem>
-              <SelectItem value="fulfilled">Fulfilled</SelectItem>
+            <SelectContent className="bg-[#1a1a1a] border-white/[0.06]">
+              <SelectItem value="all" className="text-white/70 focus:bg-white/[0.06] focus:text-white">All fulfillment</SelectItem>
+              <SelectItem value="unfulfilled" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Unfulfilled</SelectItem>
+              <SelectItem value="partially_fulfilled" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Partial</SelectItem>
+              <SelectItem value="fulfilled" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Fulfilled</SelectItem>
             </SelectContent>
           </Select>
 
@@ -530,7 +508,7 @@ export default function OrdersPage() {
               variant="ghost"
               size="sm"
               onClick={clearFilters}
-              className="text-white/50 hover:text-white"
+              className="text-white/50 hover:text-white hover:bg-white/[0.06]"
             >
               Clear
             </Button>
@@ -563,7 +541,7 @@ export default function OrdersPage() {
       {/* Pagination */}
       {data && data.meta.totalPages > 1 && (
         <div className="flex items-center justify-between py-2">
-          <p className="text-sm text-white/40">
+          <p className="text-sm text-white/50">
             Showing <span className="text-white/70 font-medium">{((data.meta.page - 1) * filters.limit!) + 1}</span> to{' '}
             <span className="text-white/70 font-medium">{Math.min(data.meta.page * filters.limit!, data.meta.total)}</span> of{' '}
             <span className="text-white/70 font-medium">{data.meta.total}</span> orders
@@ -574,7 +552,7 @@ export default function OrdersPage() {
               size="sm"
               disabled={data.meta.page <= 1}
               onClick={() => setFilters((f) => ({ ...f, page: (f.page || 1) - 1 }))}
-              className="gap-1 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06] disabled:opacity-30"
+              className="gap-1 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06] disabled:opacity-50"
             >
               <ChevronLeft className="w-4 h-4" />
               Previous
@@ -592,7 +570,7 @@ export default function OrdersPage() {
                     className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
                       isActive
                         ? 'bg-amber-500/20 text-amber-400'
-                        : 'text-white/40 hover:text-white hover:bg-white/[0.06]'
+                        : 'text-white/50 hover:text-white hover:bg-white/[0.06]'
                     }`}
                   >
                     {pageNum}
@@ -601,10 +579,10 @@ export default function OrdersPage() {
               })}
               {data.meta.totalPages > 5 && (
                 <>
-                  <span className="text-white/30 px-1">...</span>
+                  <span className="text-white/40 px-1">...</span>
                   <button
                     onClick={() => setFilters((f) => ({ ...f, page: data.meta.totalPages }))}
-                    className="w-8 h-8 rounded-lg text-sm font-medium text-white/40 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    className="w-8 h-8 rounded-lg text-sm font-medium text-white/50 hover:text-white hover:bg-white/[0.06] transition-colors"
                   >
                     {data.meta.totalPages}
                   </button>
@@ -617,7 +595,7 @@ export default function OrdersPage() {
               size="sm"
               disabled={!data.meta.hasMore}
               onClick={() => setFilters((f) => ({ ...f, page: (f.page || 1) + 1 }))}
-              className="gap-1 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06] disabled:opacity-30"
+              className="gap-1 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06] disabled:opacity-50"
             >
               Next
               <ChevronRight className="w-4 h-4" />
@@ -628,10 +606,10 @@ export default function OrdersPage() {
 
       {/* Cancel Confirmation Dialog */}
       <AlertDialog open={!!cancelOrderId} onOpenChange={() => setCancelOrderId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-[#1a1a1a] border-white/[0.06]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Cancel this order?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-white">Cancel this order?</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/50">
               This will cancel the order and restore all inventory. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
