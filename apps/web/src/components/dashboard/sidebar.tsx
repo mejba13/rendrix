@@ -36,6 +36,7 @@ import {
   Lightbulb,
   Award,
   FileBarChart,
+  Bot,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StoreSelector } from './store-selector';
@@ -74,6 +75,7 @@ const navigation: NavItem[] = [
     ],
   },
   { name: 'Theme', href: '/dashboard/theme', icon: Paintbrush },
+  { name: 'AI Agents', href: '/dashboard/ai-agents', icon: Bot },
   {
     name: 'Marketing',
     href: '/dashboard/marketing',
