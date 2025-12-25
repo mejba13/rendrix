@@ -9,7 +9,6 @@ import {
   Store,
   Shield,
   Globe,
-  Users,
   Package,
   ChevronRight,
   CheckCircle2,
@@ -21,7 +20,6 @@ import {
   Truck,
   Languages,
   DollarSign,
-  LineChart,
   Settings,
   Palette,
   Smartphone,
@@ -33,52 +31,17 @@ import {
   X,
   Zap,
   BarChart3,
-  ShoppingBag,
   CreditCard,
   Mail,
-  Search,
-  Activity,
-  Database,
   Lock,
   Clock,
   Star,
-  Award,
 } from 'lucide-react';
 import { GlobalInfrastructureSection } from '@/components/landing/global-infrastructure-section';
 
 // ============================================================================
 // HOOKS
 // ============================================================================
-
-function useCountUp(end: number, duration: number = 2000, start: number = 0, shouldStart: boolean = false) {
-  const [count, setCount] = useState(start);
-  const countRef = useRef(start);
-  const frameRef = useRef<number>();
-
-  useEffect(() => {
-    if (!shouldStart) return;
-
-    const startTime = performance.now();
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      countRef.current = Math.floor(start + (end - start) * easeOut);
-      setCount(countRef.current);
-
-      if (progress < 1) {
-        frameRef.current = requestAnimationFrame(animate);
-      }
-    };
-
-    frameRef.current = requestAnimationFrame(animate);
-    return () => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-    };
-  }, [end, duration, start, shouldStart]);
-
-  return count;
-}
 
 function useMounted() {
   const [mounted, setMounted] = useState(false);
@@ -249,281 +212,309 @@ function Header() {
 
 function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
-  const { ref, isInView } = useInView();
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const mounted = useMounted();
 
   useEffect(() => {
-    setIsVisible(true);
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
-    <section ref={ref} className="relative min-h-screen flex items-center pt-24 pb-32 overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0">
-        {/* Primary gradient orb */}
-        <div
-          className={`absolute -top-40 right-0 w-[900px] h-[900px] rounded-full transition-all duration-[2000ms] ${
-            isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+    <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
+      {/* ===== CINEMATIC BACKGROUND VIDEO ===== */}
+      <div className="absolute inset-0 z-0">
+        {/* Video Element - Full immersive background */}
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          onLoadedData={() => setIsVideoLoaded(true)}
+          onCanPlay={() => setIsVideoLoaded(true)}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[2000ms] ${
+            isVideoLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           style={{
-            background: 'radial-gradient(circle, rgba(255,145,0,0.15) 0%, rgba(255,145,0,0.03) 50%, transparent 70%)',
+            filter: 'brightness(0.6) saturate(1.3)',
           }}
-        />
+        >
+          <source src="/videos/hero-bg.mp4" type="video/mp4" />
+        </video>
+
+        {/* Fallback gradient background while video loads */}
         <div
-          className={`absolute top-1/3 -left-40 w-[700px] h-[700px] rounded-full transition-all duration-[2500ms] delay-300 ${
-            isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+          className={`absolute inset-0 transition-opacity duration-1000 ${
+            isVideoLoaded ? 'opacity-0' : 'opacity-100'
           }`}
           style={{
-            background: 'radial-gradient(circle, rgba(255,107,0,0.1) 0%, transparent 60%)',
+            background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)',
           }}
         />
 
-        {/* Grid pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '60px 60px',
-          }}
-        />
-
-        {/* Radial fade */}
+        {/* Cinematic overlay gradients */}
         <div
           className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse 80% 50% at 50% 0%, transparent 0%, black 100%)',
+            background: 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.85) 100%)',
+          }}
+        />
+
+        {/* Side vignette for depth */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at 50% 50%, transparent 0%, rgba(0,0,0,0.5) 100%)',
+          }}
+        />
+
+        {/* Premium orange ambient glow from bottom */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse 80% 50% at 50% 100%, rgba(255,145,0,0.15) 0%, transparent 60%)',
+          }}
+        />
+
+        {/* Subtle top glow */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse 60% 30% at 50% 0%, rgba(255,145,0,0.08) 0%, transparent 50%)',
+          }}
+        />
+
+        {/* Noise texture overlay for cinematic feel */}
+        <div
+          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")',
           }}
         />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Left Content */}
-          <div className="text-center lg:text-left">
+      {/* ===== FLOATING PARTICLES ===== */}
+      {mounted && (
+        <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none">
+          {[...Array(15)].map((_, i) => (
             <div
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm mb-8 transition-all duration-700 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+              key={i}
+              className="absolute w-1 h-1 rounded-full"
+              style={{
+                left: `${10 + (i * 6)}%`,
+                top: `${20 + (i * 5) % 60}%`,
+                background: i % 3 === 0 ? 'rgba(255,145,0,0.6)' : 'rgba(255,255,255,0.4)',
+                animation: `floatParticle ${10 + (i * 2)}s ease-in-out infinite`,
+                animationDelay: `${i * 0.5}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* ===== HERO CONTENT ===== */}
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 lg:px-8 pt-28 pb-20">
+        <div className="text-center">
+          {/* Announcement Badge */}
+          <div
+            className={`inline-flex items-center gap-3 px-6 py-3 rounded-full mb-10 transition-all duration-1000 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'
+            }`}
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,145,0,0.15) 0%, rgba(255,145,0,0.05) 100%)',
+              border: '1px solid rgba(255,145,0,0.3)',
+              backdropFilter: 'blur(20px)',
+              boxShadow: '0 8px 32px rgba(255,145,0,0.1)',
+            }}
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+            </span>
+            <span className="text-sm text-white/90 font-medium tracking-wide">Introducing AI-Powered Commerce</span>
+            <ChevronRight className="w-4 h-4 text-primary" />
+          </div>
+
+          {/* Main Headline - Larger and more impactful */}
+          <h1 className="mb-8">
+            <span
+              className={`block text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[6.5rem] font-bold tracking-tight text-white leading-[1.02] transition-all duration-1000 delay-150 ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+              }`}
+              style={{
+                textShadow: '0 4px 30px rgba(0,0,0,0.5)',
+              }}
+            >
+              Build your
+            </span>
+            <span
+              className={`block text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[6.5rem] font-bold tracking-tight leading-[1.02] transition-all duration-1000 delay-300 ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
               }`}
             >
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm text-white/60 font-medium">Now with AI-powered insights</span>
-              <ChevronRight className="w-4 h-4 text-white/30" />
-            </div>
-
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.05] mb-6">
               <span
-                className={`block transition-all duration-700 delay-100 ${
-                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
+                className="bg-clip-text text-transparent relative"
+                style={{
+                  background: 'linear-gradient(135deg, #FF9100 0%, #FFD700 30%, #FF6B00 70%, #FF4500 100%)',
+                  WebkitBackgroundClip: 'text',
+                  filter: 'drop-shadow(0 4px 30px rgba(255,145,0,0.4))',
+                }}
               >
-                Build your
+                commerce empire
               </span>
-              <span
-                className={`block transition-all duration-700 delay-200 ${
-                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
+            </span>
+          </h1>
+
+          {/* Subheadline */}
+          <p
+            className={`max-w-3xl mx-auto text-xl sm:text-2xl md:text-2xl text-white/70 leading-relaxed mb-14 font-light transition-all duration-1000 delay-450 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+            style={{
+              textShadow: '0 2px 20px rgba(0,0,0,0.5)',
+            }}
+          >
+            The modern commerce platform for ambitious brands. Launch stunning stores,
+            reach customers globally, and scale without limits.
+          </p>
+
+          {/* CTA Section */}
+          <div
+            className={`flex flex-col sm:flex-row items-center justify-center gap-5 mb-20 transition-all duration-1000 delay-600 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            {/* Primary CTA - Enhanced */}
+            <Link href="/register">
+              <Button
+                size="lg"
+                className="relative text-black font-bold px-12 h-16 text-lg rounded-full overflow-hidden group shadow-2xl"
+                style={{
+                  background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                  boxShadow: '0 10px 40px rgba(255,145,0,0.4), 0 0 80px rgba(255,145,0,0.2)',
+                }}
               >
-                <span
-                  className="bg-clip-text text-transparent"
-                  style={{
-                    background: 'linear-gradient(135deg, #FF9100 0%, #FFB84D 50%, #FF6B00 100%)',
-                    WebkitBackgroundClip: 'text',
-                  }}
-                >
-                  commerce empire
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="relative flex items-center gap-3">
+                  Start Free Trial
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
-              </span>
-            </h1>
+              </Button>
+            </Link>
 
-            <p
-              className={`text-lg sm:text-xl text-white/50 leading-relaxed max-w-xl mx-auto lg:mx-0 mb-10 transition-all duration-700 delay-300 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
-            >
-              The complete commerce platform for ambitious brands. Create stunning stores,
-              reach customers everywhere, and scale without limits.
-            </p>
+            {/* Secondary CTA - Enhanced */}
+            <Link href="/demo">
+              <Button
+                size="lg"
+                variant="outline"
+                className="bg-transparent border-white/30 hover:bg-white/10 hover:border-white/50 text-white font-semibold h-16 px-10 rounded-full transition-all duration-300"
+                style={{
+                  backdropFilter: 'blur(10px)',
+                }}
+              >
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mr-3">
+                  <Play className="w-4 h-4 ml-0.5" />
+                </div>
+                Watch Demo
+              </Button>
+            </Link>
+          </div>
 
-            <div
-              className={`flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-12 transition-all duration-700 delay-400 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
-            >
-              <Link href="/register">
-                <Button
-                  size="lg"
-                  className="relative text-black font-semibold px-8 h-14 text-base rounded-xl overflow-hidden group"
-                  style={{
-                    background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
-                    boxShadow: '0 4px 30px rgba(255,145,0,0.3)',
-                  }}
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <span className="relative flex items-center gap-2">
-                    Start Free Trial
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </Button>
-              </Link>
-              <Link href="#demo">
-                <Button
-                  variant="ghost"
-                  size="lg"
-                  className="text-white/60 hover:text-white hover:bg-white/5 h-14 px-6 rounded-xl group"
-                >
-                  <span className="flex items-center gap-3">
-                    <span className="w-11 h-11 rounded-full border border-white/20 flex items-center justify-center group-hover:border-primary/50 group-hover:bg-primary/10 transition-all">
-                      <Play className="w-4 h-4 ml-0.5" />
-                    </span>
-                    Watch Demo
-                  </span>
-                </Button>
-              </Link>
-            </div>
-
-            {/* Stats Row */}
-            <div
-              className={`flex items-center justify-center lg:justify-start gap-8 pt-8 border-t border-white/[0.06] transition-all duration-700 delay-500 ${
-                isVisible ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              {[
-                { value: '50K+', label: 'Active stores' },
-                { value: '10M+', label: 'Orders/month' },
-                { value: '99.99%', label: 'Uptime' },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center lg:text-left">
-                  <div className="text-2xl font-semibold text-white">{stat.value}</div>
-                  <div className="text-sm text-white/40">{stat.label}</div>
+          {/* Trust Indicators - Enhanced */}
+          <div
+            className={`transition-all duration-1000 delay-700 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            {/* Stats Row - Larger and more prominent */}
+            <div className="flex flex-wrap items-center justify-center gap-10 sm:gap-14 lg:gap-20 mb-10">
+              {mounted && [
+                { value: '50,000+', label: 'Active stores' },
+                { value: '$2B+', label: 'GMV processed' },
+                { value: '99.99%', label: 'Uptime SLA' },
+                { value: '150+', label: 'Countries' },
+              ].map((stat, i) => (
+                <div key={stat.label} className="text-center group">
+                  <div
+                    className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 transition-transform duration-300 group-hover:scale-105"
+                    style={{
+                      background: i === 0
+                        ? 'linear-gradient(135deg, #FF9100 0%, #FFD700 100%)'
+                        : 'linear-gradient(135deg, #FFFFFF 0%, #CCCCCC 100%)',
+                      WebkitBackgroundClip: 'text',
+                      backgroundClip: 'text',
+                      color: 'transparent',
+                      textShadow: i === 0 ? '0 0 40px rgba(255,145,0,0.3)' : 'none',
+                    }}
+                  >
+                    {stat.value}
+                  </div>
+                  <div className="text-sm text-white/50 font-medium uppercase tracking-wider">{stat.label}</div>
                 </div>
               ))}
             </div>
-          </div>
 
-          {/* Right Content - Dashboard Preview */}
-          <div
-            className={`relative transition-all duration-1000 delay-300 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-            }`}
-          >
-            {/* Main Dashboard Card */}
+            {/* Trust Badges - Enhanced with glass effect */}
             <div
-              className="relative rounded-2xl overflow-hidden"
+              className="inline-flex items-center justify-center gap-8 px-8 py-4 rounded-full"
               style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+                background: 'rgba(255,255,255,0.03)',
                 border: '1px solid rgba(255,255,255,0.08)',
-                boxShadow: '0 40px 80px rgba(0,0,0,0.5)',
+                backdropFilter: 'blur(10px)',
               }}
             >
-              {/* Browser Chrome */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-white/[0.02]">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-white/10" />
-                  <div className="w-3 h-3 rounded-full bg-white/10" />
-                  <div className="w-3 h-3 rounded-full bg-white/10" />
-                </div>
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-1.5">
-                    <div className="w-3 h-3 rounded-full bg-green-500/60" />
-                    <span className="text-xs text-white/40">dashboard.rendrix.com</span>
-                  </div>
-                </div>
+              <div className="flex items-center gap-2 text-white/50 text-sm">
+                <Shield className="w-4 h-4 text-green-400/70" />
+                <span>SOC 2 Certified</span>
               </div>
-
-              {/* Dashboard Content */}
-              <div className="p-6 space-y-4">
-                {/* Revenue Card */}
-                <div
-                  className="p-4 rounded-xl"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(255,145,0,0.1) 0%, rgba(255,145,0,0.02) 100%)',
-                    border: '1px solid rgba(255,145,0,0.15)',
-                  }}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                        <TrendingUp className="w-4 h-4 text-primary" />
-                      </div>
-                      <span className="text-sm text-white/60">REVENUE</span>
-                    </div>
-                    <span className="text-sm font-medium text-green-400">+24.5%</span>
-                  </div>
-                  <div className="text-3xl font-bold mb-3">$128,430</div>
-                  {/* Mini Chart */}
-                  <div className="flex items-end gap-1 h-12">
-                    {[40, 55, 45, 70, 60, 80, 65, 90, 75, 95, 85, 100].map((h, i) => (
-                      <div
-                        key={i}
-                        className="flex-1 rounded-sm"
-                        style={{
-                          height: `${h}%`,
-                          background: `linear-gradient(180deg, rgba(255,145,0,0.8) 0%, rgba(255,145,0,0.3) 100%)`,
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Stats Grid */}
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { label: 'Orders', value: '1,247', change: '+12%' },
-                    { label: 'Visitors', value: '8,492', change: '+8%' },
-                    { label: 'Conversion', value: '3.2%', change: '+0.5%' },
-                  ].map((stat) => (
-                    <div
-                      key={stat.label}
-                      className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06]"
-                    >
-                      <div className="text-xs text-white/40 mb-1">{stat.label}</div>
-                      <div className="text-lg font-semibold">{stat.value}</div>
-                      <div className="text-xs text-green-400">{stat.change}</div>
-                    </div>
-                  ))}
-                </div>
+              <div className="w-px h-4 bg-white/10" />
+              <div className="flex items-center gap-2 text-white/50 text-sm">
+                <Lock className="w-4 h-4 text-blue-400/70" />
+                <span>PCI Compliant</span>
               </div>
-            </div>
-
-            {/* Floating Cards */}
-            <div
-              className="absolute -top-4 -right-4 p-3 rounded-xl hidden lg:flex items-center gap-3"
-              style={{
-                background: 'linear-gradient(135deg, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.05) 100%)',
-                border: '1px solid rgba(34,197,94,0.25)',
-                animation: 'float 5s ease-in-out infinite',
-              }}
-            >
-              <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
-                <ShoppingBag className="w-4 h-4 text-green-400" />
-              </div>
-              <div>
-                <div className="text-xs text-white/50">ORDERS</div>
-                <div className="text-lg font-semibold text-green-400">+892</div>
-              </div>
-            </div>
-
-            <div
-              className="absolute -bottom-4 -left-4 p-3 rounded-xl hidden lg:flex items-center gap-3"
-              style={{
-                background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0.05) 100%)',
-                border: '1px solid rgba(59,130,246,0.25)',
-                animation: 'float 6s ease-in-out infinite reverse',
-              }}
-            >
-              <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                <Users className="w-4 h-4 text-blue-400" />
-              </div>
-              <div>
-                <div className="text-xs text-white/50">VISITORS</div>
-                <div className="text-lg font-semibold text-blue-400">12.4K</div>
+              <div className="hidden sm:block w-px h-4 bg-white/10" />
+              <div className="hidden sm:flex items-center gap-2 text-white/50 text-sm">
+                <Globe className="w-4 h-4 text-purple-400/70" />
+                <span>GDPR Ready</span>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* ===== SCROLL INDICATOR - Enhanced ===== */}
+      <div
+        className={`absolute bottom-10 left-1/2 -translate-x-1/2 z-10 transition-all duration-1000 delay-1000 ${
+          isVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <div className="flex flex-col items-center gap-3">
+          <span className="text-xs uppercase tracking-[0.2em] text-white/40 font-medium">Discover More</span>
+          <div
+            className="w-7 h-12 rounded-full flex items-start justify-center p-2"
+            style={{
+              border: '2px solid rgba(255,145,0,0.3)',
+              background: 'rgba(255,145,0,0.05)',
+            }}
+          >
+            <div
+              className="w-1.5 h-3 rounded-full bg-gradient-to-b from-primary to-primary/50 animate-bounce"
+              style={{ animationDuration: '2s' }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ===== BOTTOM GRADIENT TRANSITION ===== */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-48 z-[5] pointer-events-none"
+        style={{
+          background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.5) 50%, black 100%)',
+        }}
+      />
     </section>
   );
 }
