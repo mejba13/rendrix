@@ -97,6 +97,7 @@ const trustedBrands = ['Allbirds', 'Gymshark', 'MVMT', 'Bombas', 'Warby Parker',
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -106,107 +107,412 @@ function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close mobile menu on resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Navigation with dropdowns
+  const navigation = [
+    {
+      label: 'Platform',
+      href: '#platform',
+      hasDropdown: true,
+      items: [
+        { icon: Store, label: 'Storefront', description: 'Beautiful, customizable themes', href: '/platform/storefront' },
+        { icon: Package, label: 'Products', description: 'Inventory & catalog management', href: '/platform/products' },
+        { icon: CreditCard, label: 'Payments', description: 'Accept payments globally', href: '/platform/payments' },
+        { icon: Truck, label: 'Shipping', description: 'Automated fulfillment', href: '/platform/shipping' },
+      ],
+    },
+    {
+      label: 'Solutions',
+      href: '#solutions',
+      hasDropdown: true,
+      items: [
+        { icon: Sparkles, label: 'Enterprise', description: 'For large-scale operations', href: '/solutions/enterprise' },
+        { icon: Target, label: 'Startups', description: 'Launch and scale fast', href: '/solutions/startups' },
+        { icon: Globe, label: 'International', description: 'Sell across borders', href: '/solutions/international' },
+      ],
+    },
+    { label: 'Pricing', href: '/pricing', hasDropdown: false },
+    {
+      label: 'Resources',
+      href: '#resources',
+      hasDropdown: true,
+      items: [
+        { icon: BookOpen, label: 'Documentation', description: 'Guides and references', href: '/docs' },
+        { icon: Code2, label: 'API Reference', description: 'Build custom integrations', href: '/api' },
+        { icon: MessageSquare, label: 'Community', description: 'Join the discussion', href: '/community' },
+        { icon: Play, label: 'Tutorials', description: 'Learn by watching', href: '/tutorials' },
+      ],
+    },
+  ];
+
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled ? 'py-3' : 'py-5'
-      }`}
-    >
-      <div
-        className={`absolute inset-0 transition-all duration-500 ${
-          isScrolled
-            ? 'bg-black/90 backdrop-blur-2xl border-b border-white/[0.06]'
-            : 'bg-transparent'
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          isScrolled ? 'py-2' : 'py-4'
         }`}
-      />
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 group-hover:shadow-primary/30"
-            style={{
-              background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
-              boxShadow: '0 4px 20px rgba(255,145,0,0.25)',
-            }}
-          >
-            <Store className="w-5 h-5 text-black" />
-          </div>
-          <span className="text-2xl font-semibold tracking-tight">Rendrix</span>
-        </Link>
+      >
+        {/* Background with glass effect */}
+        <div
+          className={`absolute inset-0 transition-all duration-500 ${
+            isScrolled
+              ? 'bg-black/80 backdrop-blur-2xl'
+              : 'bg-gradient-to-b from-black/50 to-transparent'
+          }`}
+        />
 
-        <nav className="hidden lg:flex items-center gap-1">
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="px-4 py-2 text-[15px] text-white/60 hover:text-white transition-colors font-medium rounded-lg hover:bg-white/5"
-            >
-              {link.label}
+        {/* Bottom border - gradient on scroll */}
+        <div
+          className={`absolute bottom-0 left-0 right-0 h-[1px] transition-opacity duration-500 ${
+            isScrolled ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{
+            background: 'linear-gradient(90deg, transparent 0%, rgba(255,145,0,0.3) 50%, transparent 100%)',
+          }}
+        />
+
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="relative">
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-105"
+                  style={{
+                    background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                    boxShadow: '0 4px 20px rgba(255,145,0,0.35)',
+                  }}
+                >
+                  <Store className="w-5 h-5 text-black" />
+                </div>
+                {/* Glow effect on hover */}
+                <div
+                  className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(255,145,0,0.4) 0%, transparent 70%)',
+                    filter: 'blur(10px)',
+                    transform: 'scale(1.5)',
+                  }}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold tracking-tight">Rendrix</span>
+              </div>
             </Link>
-          ))}
-        </nav>
 
-        <div className="hidden lg:flex items-center gap-3">
-          <Link href="/login">
-            <Button
-              variant="ghost"
-              className="text-white/70 hover:text-white hover:bg-white/5 font-medium h-11 px-5"
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-1">
+              {navigation.map((item) => (
+                <div
+                  key={item.label}
+                  className="relative"
+                  onMouseEnter={() => item.hasDropdown && setActiveDropdown(item.label)}
+                  onMouseLeave={() => setActiveDropdown(null)}
+                >
+                  <Link
+                    href={item.href}
+                    className="group flex items-center gap-1.5 px-4 py-2.5 text-[15px] text-white/60 hover:text-white transition-all duration-300 font-medium rounded-lg"
+                  >
+                    <span className="relative">
+                      {item.label}
+                      {/* Animated underline */}
+                      <span
+                        className="absolute left-0 -bottom-1 h-[2px] w-0 group-hover:w-full transition-all duration-300 rounded-full"
+                        style={{
+                          background: 'linear-gradient(90deg, #FF9100, #FF6B00)',
+                        }}
+                      />
+                    </span>
+                    {item.hasDropdown && (
+                      <ChevronRight
+                        className={`w-3.5 h-3.5 rotate-90 transition-transform duration-300 ${
+                          activeDropdown === item.label ? 'rotate-[270deg]' : ''
+                        }`}
+                      />
+                    )}
+                  </Link>
+
+                  {/* Dropdown Menu */}
+                  {item.hasDropdown && item.items && (
+                    <div
+                      className={`absolute top-full left-0 pt-2 transition-all duration-300 ${
+                        activeDropdown === item.label
+                          ? 'opacity-100 translate-y-0 pointer-events-auto'
+                          : 'opacity-0 -translate-y-2 pointer-events-none'
+                      }`}
+                    >
+                      <div
+                        className="w-72 p-2 rounded-2xl"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.98) 100%)',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          backdropFilter: 'blur(20px)',
+                          boxShadow: '0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,145,0,0.05)',
+                        }}
+                      >
+                        {item.items.map((subItem, idx) => (
+                          <Link
+                            key={subItem.label}
+                            href={subItem.href}
+                            className="group/item flex items-start gap-3 p-3 rounded-xl transition-all duration-200 hover:bg-white/5"
+                            style={{
+                              animationDelay: `${idx * 50}ms`,
+                            }}
+                          >
+                            <div
+                              className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover/item:scale-110"
+                              style={{
+                                background: 'linear-gradient(135deg, rgba(255,145,0,0.15) 0%, rgba(255,145,0,0.05) 100%)',
+                                border: '1px solid rgba(255,145,0,0.2)',
+                              }}
+                            >
+                              <subItem.icon className="w-5 h-5 text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium text-white group-hover/item:text-primary transition-colors">
+                                {subItem.label}
+                              </div>
+                              <div className="text-xs text-white/40 mt-0.5">
+                                {subItem.description}
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </nav>
+
+            {/* Right Side Actions */}
+            <div className="hidden lg:flex items-center gap-2">
+              {/* Search Button */}
+              <button
+                className="w-10 h-10 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/5 transition-all duration-300"
+                aria-label="Search"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+
+              {/* Login */}
+              <Link href="/login" className="group">
+                <Button
+                  variant="ghost"
+                  className="relative text-white/70 hover:text-white hover:bg-transparent font-medium h-10 px-4"
+                >
+                  <span className="relative">
+                    Log in
+                    <span
+                      className="absolute left-0 -bottom-0.5 h-[1px] w-0 group-hover:w-full transition-all duration-300"
+                      style={{ background: 'rgba(255,255,255,0.5)' }}
+                    />
+                  </span>
+                </Button>
+              </Link>
+
+              {/* Start Free Trial */}
+              <Link href="/register" className="group">
+                <Button
+                  className="relative text-black font-semibold h-11 px-6 rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.03]"
+                  style={{
+                    background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                    boxShadow: '0 4px 20px rgba(255,145,0,0.35)',
+                  }}
+                >
+                  {/* Shine effect */}
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{
+                      background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%)',
+                      animation: 'shine 2s ease-in-out infinite',
+                    }}
+                  />
+                  <span className="relative flex items-center gap-2">
+                    Start Free Trial
+                    <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                </Button>
+              </Link>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="lg:hidden relative w-10 h-10 flex items-center justify-center text-white/70 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-300"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
             >
-              Log in
-            </Button>
-          </Link>
-          <Link href="/register">
-            <Button
-              className="text-black font-semibold h-11 px-6 rounded-lg transition-all duration-300 hover:scale-[1.02]"
-              style={{
-                background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
-                boxShadow: '0 4px 20px rgba(255,145,0,0.3)',
-              }}
-            >
-              Start Free Trial
-            </Button>
-          </Link>
+              <div className="w-5 h-4 relative flex flex-col justify-between">
+                <span
+                  className={`w-full h-0.5 bg-current rounded-full transition-all duration-300 origin-center ${
+                    isMobileMenuOpen ? 'rotate-45 translate-y-[7px]' : ''
+                  }`}
+                />
+                <span
+                  className={`w-full h-0.5 bg-current rounded-full transition-all duration-300 ${
+                    isMobileMenuOpen ? 'opacity-0 scale-0' : ''
+                  }`}
+                />
+                <span
+                  className={`w-full h-0.5 bg-current rounded-full transition-all duration-300 origin-center ${
+                    isMobileMenuOpen ? '-rotate-45 -translate-y-[7px]' : ''
+                  }`}
+                />
+              </div>
+            </button>
+          </div>
         </div>
+      </header>
 
-        <button
-          className="lg:hidden p-2 text-white/70 hover:text-white"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      {/* Mobile Menu Overlay */}
+      <div
+        className={`fixed inset-0 z-40 lg:hidden transition-all duration-500 ${
+          isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black/80 backdrop-blur-xl"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+
+        {/* Menu Panel */}
+        <div
+          className={`absolute top-0 right-0 w-full max-w-sm h-full transition-transform duration-500 ease-out ${
+            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+          style={{
+            background: 'linear-gradient(180deg, #0a0a0a 0%, #000000 100%)',
+            borderLeft: '1px solid rgba(255,255,255,0.06)',
+          }}
         >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-      </div>
+          {/* Close button */}
+          <div className="flex items-center justify-between p-6 border-b border-white/[0.06]">
+            <Link href="/" className="flex items-center gap-3" onClick={() => setIsMobileMenuOpen(false)}>
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                }}
+              >
+                <Store className="w-5 h-5 text-black" />
+              </div>
+              <span className="text-xl font-bold">Rendrix</span>
+            </Link>
+            <button
+              className="w-10 h-10 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 transition-all"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-      {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-2xl border-b border-white/[0.06] py-6 px-6">
-          <nav className="flex flex-col gap-2 mb-6">
-            {navLinks.map((link) => (
+          {/* Navigation Links */}
+          <nav className="p-6 space-y-2">
+            {navigation.map((item, idx) => (
               <Link
-                key={link.label}
-                href={link.href}
-                className="px-4 py-3 text-white/70 hover:text-white font-medium rounded-lg hover:bg-white/5"
+                key={item.label}
+                href={item.href}
+                className="group flex items-center justify-between p-4 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300"
+                style={{
+                  animationDelay: `${idx * 100}ms`,
+                  animation: isMobileMenuOpen ? 'slideInRight 0.5s ease forwards' : '',
+                  opacity: isMobileMenuOpen ? 1 : 0,
+                  transform: isMobileMenuOpen ? 'translateX(0)' : 'translateX(20px)',
+                }}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                {link.label}
+                <span className="text-lg font-medium">{item.label}</span>
+                <ChevronRight className="w-5 h-5 text-white/30 group-hover:text-primary group-hover:translate-x-1 transition-all" />
               </Link>
             ))}
           </nav>
-          <div className="flex flex-col gap-3">
-            <Link href="/login">
-              <Button variant="outline" className="w-full border-white/20 bg-transparent text-white h-12">
+
+          {/* CTA Buttons */}
+          <div className="absolute bottom-0 left-0 right-0 p-6 space-y-3 border-t border-white/[0.06]">
+            <Link href="/login" className="block" onClick={() => setIsMobileMenuOpen(false)}>
+              <Button
+                variant="outline"
+                className="w-full h-12 border-white/20 bg-transparent text-white font-medium rounded-xl hover:bg-white/5"
+              >
                 Log in
               </Button>
             </Link>
-            <Link href="/register">
+            <Link href="/register" className="block" onClick={() => setIsMobileMenuOpen(false)}>
               <Button
-                className="w-full text-black font-semibold h-12"
-                style={{ background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)' }}
+                className="w-full h-12 text-black font-semibold rounded-xl"
+                style={{
+                  background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                  boxShadow: '0 4px 20px rgba(255,145,0,0.3)',
+                }}
               >
-                Start Free Trial
+                <span className="flex items-center justify-center gap-2">
+                  Start Free Trial
+                  <ArrowRight className="w-4 h-4" />
+                </span>
               </Button>
             </Link>
+
+            {/* Social Links */}
+            <div className="flex items-center justify-center gap-4 pt-4">
+              {['X', 'GitHub', 'LinkedIn'].map((social) => (
+                <Link
+                  key={social}
+                  href={`https://${social.toLowerCase()}.com/rendrix`}
+                  className="w-10 h-10 rounded-lg flex items-center justify-center text-white/30 hover:text-white hover:bg-white/5 transition-all"
+                >
+                  {social === 'X' && (
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                  )}
+                  {social === 'GitHub' && (
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                  {social === 'LinkedIn' && (
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                    </svg>
+                  )}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
-      )}
-    </header>
+      </div>
+
+      {/* CSS for shine animation */}
+      <style jsx>{`
+        @keyframes shine {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+      `}</style>
+    </>
   );
 }
 
@@ -516,100 +822,366 @@ function HeroSection() {
 
 function SocialProofSection() {
   const { ref, isInView } = useInView();
+  const mounted = useMounted();
 
+  // Stats data with unique colors and visualizations
   const stats = [
-    { value: '50K+', label: 'Active Stores', sublabel: 'Worldwide merchants', icon: Store },
-    { value: '$2B+', label: 'GMV Processed', sublabel: 'Annual transaction volume', icon: TrendingUp },
-    { value: '99.99%', label: 'Uptime SLA', sublabel: 'Enterprise guarantee', icon: Shield },
-    { value: '150+', label: 'Countries', sublabel: 'Global coverage', icon: Globe },
+    {
+      value: '50K',
+      suffix: '+',
+      label: 'Active Stores',
+      sublabel: 'Worldwide merchants',
+      icon: Store,
+      color: '#FF9100',
+      bgGradient: 'rgba(255,145,0,0.15)',
+    },
+    {
+      value: '$2B',
+      suffix: '+',
+      label: 'GMV Processed',
+      sublabel: 'Annual transaction volume',
+      icon: DollarSign,
+      color: '#FFD700',
+      bgGradient: 'rgba(255,215,0,0.15)',
+    },
+    {
+      value: '99.99',
+      suffix: '%',
+      label: 'Uptime SLA',
+      sublabel: 'Enterprise guarantee',
+      icon: Shield,
+      color: '#22C55E',
+      bgGradient: 'rgba(34,197,94,0.15)',
+    },
+    {
+      value: '150',
+      suffix: '+',
+      label: 'Countries',
+      sublabel: 'Global coverage',
+      icon: Globe,
+      color: '#3B82F6',
+      bgGradient: 'rgba(59,130,246,0.15)',
+    },
+  ];
+
+  // Extended brand list for marquee
+  const brands = [
+    'Allbirds', 'Gymshark', 'MVMT', 'Bombas', 'Warby Parker',
+    'Casper', 'Away', 'Glossier', 'Brooklinen', 'Outdoor Voices',
+    'Rothy\'s', 'Everlane', 'Mejuri', 'Parachute', 'Koio',
   ];
 
   return (
-    <section ref={ref} className="py-24 relative overflow-hidden">
-      {/* Background gradient line */}
-      <div
-        className="absolute top-0 left-0 right-0 h-px"
-        style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255,145,0,0.4) 50%, transparent 100%)',
-        }}
-      />
+    <section ref={ref} className="py-28 lg:py-36 relative overflow-hidden">
+      {/* ===== BACKGROUND EFFECTS ===== */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Top gradient line */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[1px]"
+          style={{
+            background: 'linear-gradient(90deg, transparent 0%, rgba(255,145,0,0.5) 50%, transparent 100%)',
+          }}
+        />
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-20">
+        {/* Central glow */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(255,145,0,0.06) 0%, transparent 50%)',
+            filter: 'blur(60px)',
+          }}
+        />
+
+        {/* Floating particles */}
+        {mounted && [...Array(12)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 rounded-full"
+            style={{
+              left: `${10 + (i * 7)}%`,
+              top: `${20 + (i * 5) % 60}%`,
+              background: i % 4 === 0 ? '#FF9100' : i % 4 === 1 ? '#FFD700' : i % 4 === 2 ? '#22C55E' : '#3B82F6',
+              opacity: 0.4,
+              animation: `floatParticle ${8 + (i * 1.5)}s ease-in-out infinite`,
+              animationDelay: `${i * 0.4}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
+        {/* ===== HEADER ===== */}
+        <div className="text-center mb-16">
+          <div
+            className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-full mb-6 transition-all duration-700 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+            }`}
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,145,0,0.15) 0%, rgba(255,145,0,0.05) 100%)',
+              border: '1px solid rgba(255,145,0,0.25)',
+            }}
+          >
+            <div className="flex items-center gap-1.5">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3.5 h-3.5 fill-primary text-primary" />
+              ))}
+            </div>
+            <span className="text-sm font-medium text-white/80">Trusted by 50,000+ businesses worldwide</span>
+          </div>
+          <h2
+            className={`text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight transition-all duration-700 delay-100 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            Powering{' '}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{
+                background: 'linear-gradient(135deg, #FF9100 0%, #FFD700 50%, #FF6B00 100%)',
+                WebkitBackgroundClip: 'text',
+              }}
+            >
+              commerce
+            </span>
+            {' '}at scale
+          </h2>
+        </div>
+
+        {/* ===== STATS BENTO GRID ===== */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 mb-20">
           {stats.map((stat, i) => (
             <div
               key={stat.label}
-              className={`group relative p-6 lg:p-8 rounded-2xl transition-all duration-700 hover:-translate-y-1 ${
-                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              className={`group relative rounded-3xl p-6 lg:p-8 overflow-hidden transition-all duration-700 hover:-translate-y-2 hover:scale-[1.02] ${
+                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
               }`}
               style={{
                 transitionDelay: `${i * 100}ms`,
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
-                border: '1px solid rgba(255,255,255,0.06)',
+                background: `linear-gradient(135deg, ${stat.bgGradient} 0%, rgba(0,0,0,0.4) 100%)`,
+                border: `1px solid ${stat.color}25`,
               }}
             >
-              {/* Hover glow */}
+              {/* Hover glow effect */}
               <div
-                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                 style={{
-                  background: 'radial-gradient(circle at 50% 50%, rgba(255,145,0,0.08) 0%, transparent 70%)',
+                  background: `radial-gradient(circle at 50% 0%, ${stat.color}20 0%, transparent 60%)`,
+                }}
+              />
+
+              {/* Top accent line */}
+              <div
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[2px] rounded-full"
+                style={{
+                  background: `linear-gradient(90deg, transparent, ${stat.color}, transparent)`,
                 }}
               />
 
               <div className="relative">
+                {/* Icon */}
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110"
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(255,145,0,0.15) 0%, rgba(255,145,0,0.05) 100%)',
-                    border: '1px solid rgba(255,145,0,0.2)',
+                    background: `linear-gradient(135deg, ${stat.color}30 0%, ${stat.color}10 100%)`,
+                    border: `1px solid ${stat.color}40`,
+                    boxShadow: `0 8px 24px ${stat.color}20`,
                   }}
                 >
-                  <stat.icon className="w-5 h-5 text-primary" />
+                  <stat.icon className="w-7 h-7" style={{ color: stat.color }} />
                 </div>
-                <div className="text-3xl lg:text-4xl font-bold text-white mb-1">{stat.value}</div>
-                <div className="text-sm font-medium text-white/70 mb-1">{stat.label}</div>
-                <div className="text-xs text-white/40">{stat.sublabel}</div>
+
+                {/* Value with animated effect */}
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span
+                    className="text-4xl lg:text-5xl font-black tracking-tight"
+                    style={{
+                      color: stat.color,
+                      textShadow: `0 0 40px ${stat.color}40`,
+                    }}
+                  >
+                    {stat.value}
+                  </span>
+                  <span
+                    className="text-2xl lg:text-3xl font-bold"
+                    style={{ color: stat.color }}
+                  >
+                    {stat.suffix}
+                  </span>
+                </div>
+
+                {/* Labels */}
+                <div className="text-base font-semibold text-white mb-1">{stat.label}</div>
+                <div className="text-sm text-white/40">{stat.sublabel}</div>
+
+                {/* Mini visualization based on stat type */}
+                <div className="absolute bottom-6 right-6 opacity-20 group-hover:opacity-40 transition-opacity">
+                  {i === 0 && (
+                    // Store growth chart
+                    <div className="flex items-end gap-1 h-10">
+                      {[40, 55, 45, 70, 60, 85, 75, 95].map((h, idx) => (
+                        <div
+                          key={idx}
+                          className="w-1.5 rounded-full transition-all duration-500"
+                          style={{
+                            height: `${h}%`,
+                            background: stat.color,
+                            transitionDelay: `${idx * 50}ms`,
+                            transform: isInView ? 'scaleY(1)' : 'scaleY(0)',
+                            transformOrigin: 'bottom',
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {i === 1 && (
+                    // Transaction flow
+                    <div className="relative w-12 h-12">
+                      <DollarSign className="w-12 h-12" style={{ color: stat.color }} />
+                    </div>
+                  )}
+                  {i === 2 && (
+                    // Uptime indicator
+                    <div className="relative">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ border: `2px solid ${stat.color}` }}
+                      >
+                        <div
+                          className="w-4 h-4 rounded-full animate-pulse"
+                          style={{ background: stat.color }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {i === 3 && (
+                    // Globe dots
+                    <div className="relative w-12 h-12">
+                      <Globe className="w-12 h-12" style={{ color: stat.color }} />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Trusted By */}
-        <div className="relative">
-          <p
-            className={`text-center text-sm text-white/30 uppercase tracking-[0.2em] mb-8 transition-all duration-700 delay-400 ${
-              isInView ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
+        {/* ===== TRUST BADGES ===== */}
+        <div
+          className={`flex flex-wrap items-center justify-center gap-4 lg:gap-6 mb-16 transition-all duration-700 delay-500 ${
+            isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}
+        >
+          {[
+            { label: 'Enterprise Ready', icon: Shield },
+            { label: 'SOC 2 Certified', icon: Lock },
+            { label: 'GDPR Compliant', icon: CheckCircle2 },
+            { label: '24/7 Support', icon: Clock },
+          ].map((badge) => (
+            <div
+              key={badge.label}
+              className="flex items-center gap-2 px-4 py-2 rounded-full"
+              style={{
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
+            >
+              <badge.icon className="w-4 h-4 text-primary" />
+              <span className="text-sm text-white/50">{badge.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* ===== BRAND LOGOS MARQUEE ===== */}
+        <div
+          className={`relative transition-all duration-1000 delay-600 ${
+            isInView ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <p className="text-center text-xs text-white/30 uppercase tracking-[0.25em] mb-10">
             Powering the world&apos;s fastest-growing brands
           </p>
 
-          {/* Logo Scroll */}
-          <div className="relative overflow-hidden">
-            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-black via-black/80 to-transparent z-10" />
-            <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-black via-black/80 to-transparent z-10" />
+          {/* Fade edges */}
+          <div className="absolute left-0 top-0 bottom-0 w-40 bg-gradient-to-r from-black via-black/80 to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-40 bg-gradient-to-l from-black via-black/80 to-transparent z-10 pointer-events-none" />
 
+          {/* First row - scroll left */}
+          <div className="overflow-hidden mb-6">
             <div
-              className={`flex items-center gap-16 transition-opacity duration-1000 ${
-                isInView ? 'opacity-100' : 'opacity-0'
-              }`}
+              className="flex items-center gap-12"
               style={{
-                animation: 'scroll 40s linear infinite',
+                animation: 'marqueeLeft 35s linear infinite',
               }}
             >
-              {[...trustedBrands, ...trustedBrands, ...trustedBrands].map((brand, i) => (
+              {[...brands, ...brands, ...brands].map((brand, i) => (
                 <div
-                  key={`${brand}-${i}`}
-                  className="text-xl lg:text-2xl font-semibold text-white/20 hover:text-white/40 transition-colors whitespace-nowrap"
+                  key={`row1-${brand}-${i}`}
+                  className="group flex items-center gap-3 px-6 py-3 rounded-xl whitespace-nowrap transition-all duration-300 hover:bg-white/5"
                 >
-                  {brand}
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                    }}
+                  >
+                    {brand[0]}
+                  </div>
+                  <span className="text-lg font-semibold text-white/25 group-hover:text-white/60 transition-colors">
+                    {brand}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Second row - scroll right */}
+          <div className="overflow-hidden">
+            <div
+              className="flex items-center gap-12"
+              style={{
+                animation: 'marqueeRight 40s linear infinite',
+              }}
+            >
+              {[...brands.slice().reverse(), ...brands.slice().reverse(), ...brands.slice().reverse()].map((brand, i) => (
+                <div
+                  key={`row2-${brand}-${i}`}
+                  className="group flex items-center gap-3 px-6 py-3 rounded-xl whitespace-nowrap transition-all duration-300 hover:bg-white/5"
+                >
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                    }}
+                  >
+                    {brand[0]}
+                  </div>
+                  <span className="text-lg font-semibold text-white/25 group-hover:text-white/60 transition-colors">
+                    {brand}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
+
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes marqueeLeft {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-33.33%); }
+        }
+        @keyframes marqueeRight {
+          0% { transform: translateX(-33.33%); }
+          100% { transform: translateX(0); }
+        }
+        @keyframes floatParticle {
+          0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
+          50% { transform: translateY(-30px) scale(1.5); opacity: 0.8; }
+        }
+      `}</style>
     </section>
   );
 }
