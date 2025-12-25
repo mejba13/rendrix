@@ -212,8 +212,6 @@ function Header() {
 
 function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const mounted = useMounted();
 
   useEffect(() => {
@@ -224,20 +222,23 @@ function HeroSection() {
   return (
     <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
       {/* ===== CINEMATIC BACKGROUND VIDEO ===== */}
-      <div className="absolute inset-0 z-0">
-        {/* Video Element - Full immersive background */}
+      <div className="absolute inset-0">
+        {/* Layer 1: Fallback gradient background - ALWAYS visible, lowest layer */}
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)',
+          }}
+        />
+
+        {/* Layer 2: Video Element - Full immersive background, ALWAYS visible */}
         <video
-          ref={videoRef}
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
-          onLoadedData={() => setIsVideoLoaded(true)}
-          onCanPlay={() => setIsVideoLoaded(true)}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[2000ms] ${
-            isVideoLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
+          className="absolute inset-0 w-full h-full object-cover z-[1]"
           style={{
             filter: 'brightness(0.6) saturate(1.3)',
           }}
@@ -245,51 +246,41 @@ function HeroSection() {
           <source src="/videos/hero-bg.mp4" type="video/mp4" />
         </video>
 
-        {/* Fallback gradient background while video loads */}
+        {/* Layer 3: Cinematic overlay gradients */}
         <div
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            isVideoLoaded ? 'opacity-0' : 'opacity-100'
-          }`}
-          style={{
-            background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)',
-          }}
-        />
-
-        {/* Cinematic overlay gradients */}
-        <div
-          className="absolute inset-0"
+          className="absolute inset-0 z-[2]"
           style={{
             background: 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.85) 100%)',
           }}
         />
 
-        {/* Side vignette for depth */}
+        {/* Layer 4: Side vignette for depth */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 z-[3]"
           style={{
             background: 'radial-gradient(ellipse at 50% 50%, transparent 0%, rgba(0,0,0,0.5) 100%)',
           }}
         />
 
-        {/* Premium orange ambient glow from bottom */}
+        {/* Layer 5: Premium orange ambient glow from bottom */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 z-[4]"
           style={{
             background: 'radial-gradient(ellipse 80% 50% at 50% 100%, rgba(255,145,0,0.15) 0%, transparent 60%)',
           }}
         />
 
-        {/* Subtle top glow */}
+        {/* Layer 6: Subtle top glow */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 z-[5]"
           style={{
             background: 'radial-gradient(ellipse 60% 30% at 50% 0%, rgba(255,145,0,0.08) 0%, transparent 50%)',
           }}
         />
 
-        {/* Noise texture overlay for cinematic feel */}
+        {/* Layer 7: Noise texture overlay for cinematic feel */}
         <div
-          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          className="absolute inset-0 z-[6] opacity-[0.03] pointer-events-none"
           style={{
             backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")',
           }}
@@ -298,7 +289,7 @@ function HeroSection() {
 
       {/* ===== FLOATING PARTICLES ===== */}
       {mounted && (
-        <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 z-[7] overflow-hidden pointer-events-none">
           {[...Array(15)].map((_, i) => (
             <div
               key={i}
