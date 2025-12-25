@@ -1201,137 +1201,651 @@ function TestimonialsSection() {
 
 function IntegrationsSection() {
   const { ref, isInView } = useInView();
+  const mounted = useMounted();
 
-  const categories = [
-    { name: 'Payments', items: ['Stripe', 'PayPal', 'Square', 'Klarna'], icon: CreditCard, color: 'emerald' },
-    { name: 'Marketing', items: ['Mailchimp', 'Klaviyo', 'HubSpot', 'Meta'], icon: Mail, color: 'pink' },
-    { name: 'Shipping', items: ['ShipStation', 'FedEx', 'UPS', 'DHL'], icon: Truck, color: 'blue' },
-    { name: 'Analytics', items: ['Google', 'Segment', 'Mixpanel', 'Amplitude'], icon: BarChart3, color: 'purple' },
+  // Integration data with brand colors
+  const integrations = {
+    payments: [
+      { name: 'Stripe', letter: 'S', color: '#635BFF' },
+      { name: 'PayPal', letter: 'P', color: '#00457C' },
+      { name: 'Square', letter: 'S', color: '#3E4348' },
+      { name: 'Klarna', letter: 'K', color: '#FFB3C7' },
+      { name: 'Apple Pay', letter: 'A', color: '#000000' },
+      { name: 'Google Pay', letter: 'G', color: '#4285F4' },
+    ],
+    marketing: [
+      { name: 'Mailchimp', letter: 'M', color: '#FFE01B' },
+      { name: 'Klaviyo', letter: 'K', color: '#2DD4BF' },
+      { name: 'HubSpot', letter: 'H', color: '#FF7A59' },
+      { name: 'Meta', letter: 'M', color: '#0668E1' },
+    ],
+    shipping: [
+      { name: 'ShipStation', letter: 'S', color: '#84CC16' },
+      { name: 'FedEx', letter: 'F', color: '#4D148C' },
+      { name: 'UPS', letter: 'U', color: '#351C15' },
+      { name: 'DHL', letter: 'D', color: '#FFCC00' },
+    ],
+    analytics: [
+      { name: 'Google Analytics', letter: 'G', color: '#E37400' },
+      { name: 'Segment', letter: 'S', color: '#52BD95' },
+      { name: 'Mixpanel', letter: 'M', color: '#7856FF' },
+      { name: 'Amplitude', letter: 'A', color: '#1E61F0' },
+    ],
+  };
+
+  // Floating icons for hero area
+  const floatingIcons = [
+    { icon: CreditCard, x: 15, y: 20, delay: 0, color: '#635BFF' },
+    { icon: Mail, x: 85, y: 25, delay: 0.5, color: '#FFE01B' },
+    { icon: Truck, x: 10, y: 70, delay: 1, color: '#84CC16' },
+    { icon: BarChart3, x: 90, y: 65, delay: 1.5, color: '#E37400' },
+    { icon: Globe, x: 25, y: 45, delay: 2, color: '#FF9100' },
+    { icon: Zap, x: 75, y: 50, delay: 2.5, color: '#2DD4BF' },
   ];
 
   return (
     <section ref={ref} className="py-32 relative overflow-hidden">
-      {/* Background */}
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-30"
-        style={{
-          background: 'radial-gradient(circle, rgba(255,145,0,0.1) 0%, transparent 60%)',
-          filter: 'blur(100px)',
-        }}
-      />
+      {/* ===== ANIMATED BACKGROUND ===== */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Central glow */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(255,145,0,0.08) 0%, transparent 50%)',
+            filter: 'blur(80px)',
+          }}
+        />
+        {/* Grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,145,0,0.3) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,145,0,0.3) 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px',
+          }}
+        />
+        {/* Animated connection lines */}
+        {mounted && (
+          <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.1 }}>
+            <defs>
+              <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#FF9100" stopOpacity="0" />
+                <stop offset="50%" stopColor="#FF9100" stopOpacity="1" />
+                <stop offset="100%" stopColor="#FF9100" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            {[...Array(6)].map((_, i) => (
+              <line
+                key={i}
+                x1={`${10 + i * 15}%`}
+                y1="0%"
+                x2={`${40 + i * 10}%`}
+                y2="100%"
+                stroke="url(#lineGradient)"
+                strokeWidth="1"
+                style={{
+                  animation: `pulseOpacity ${3 + i * 0.5}s ease-in-out infinite`,
+                  animationDelay: `${i * 0.3}s`,
+                }}
+              />
+            ))}
+          </svg>
+        )}
+      </div>
 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-16">
+        {/* ===== HERO AREA WITH ANIMATED COUNTER ===== */}
+        <div className="text-center mb-20 relative">
+          {/* Floating integration icons */}
+          {mounted && floatingIcons.map((item, i) => (
+            <div
+              key={i}
+              className="absolute hidden lg:flex items-center justify-center w-14 h-14 rounded-2xl"
+              style={{
+                left: `${item.x}%`,
+                top: `${item.y}%`,
+                transform: 'translate(-50%, -50%)',
+                background: `linear-gradient(135deg, ${item.color}20 0%, ${item.color}05 100%)`,
+                border: `1px solid ${item.color}30`,
+                animation: `floatIcon 6s ease-in-out infinite`,
+                animationDelay: `${item.delay}s`,
+                boxShadow: `0 8px 32px ${item.color}20`,
+              }}
+            >
+              <item.icon className="w-6 h-6" style={{ color: item.color }} />
+            </div>
+          ))}
+
+          {/* Animated 200+ counter */}
           <div
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.06] mb-6 transition-all duration-700 ${
-              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            className={`relative inline-block mb-8 transition-all duration-1000 ${
+              isInView ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
             }`}
           >
-            <Palette className="w-4 h-4 text-primary" />
-            <span className="text-sm text-white/60">200+ Integrations</span>
+            <div
+              className="text-[140px] sm:text-[180px] lg:text-[220px] font-black leading-none tracking-tighter"
+              style={{
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.02) 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                filter: 'drop-shadow(0 0 80px rgba(255,145,0,0.15))',
+              }}
+            >
+              200+
+            </div>
+            {/* Glowing accent */}
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{
+                background: 'radial-gradient(circle at 50% 50%, rgba(255,145,0,0.15) 0%, transparent 60%)',
+                filter: 'blur(40px)',
+              }}
+            />
           </div>
+
           <h2
-            className={`text-4xl sm:text-5xl font-medium tracking-tight mb-4 transition-all duration-700 delay-100 ${
+            className={`text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 transition-all duration-700 delay-200 ${
               isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
-            Connect your{' '}
-            <span className="text-white/50">favorite tools</span>
-          </h2>
-        </div>
-
-        {/* Categories Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-12">
-          {categories.map((cat, i) => (
-            <div
-              key={cat.name}
-              className={`rounded-2xl p-6 transition-all duration-700 hover:-translate-y-1 ${
-                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
+            One platform.{' '}
+            <span
+              className="bg-clip-text text-transparent"
               style={{
-                transitionDelay: `${i * 100}ms`,
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
-                border: '1px solid rgba(255,255,255,0.06)',
+                background: 'linear-gradient(135deg, #FF9100 0%, #FFD700 50%, #FF6B00 100%)',
+                WebkitBackgroundClip: 'text',
               }}
             >
-              <div className="flex items-center gap-3 mb-4">
+              Endless possibilities.
+            </span>
+          </h2>
+          <p
+            className={`text-lg sm:text-xl text-white/50 max-w-2xl mx-auto transition-all duration-700 delay-300 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
+            Connect your favorite tools and automate your entire workflow with our powerful integration ecosystem
+          </p>
+        </div>
+
+        {/* ===== BENTO GRID LAYOUT ===== */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 mb-8">
+
+          {/* PAYMENTS CARD - Large spanning 2 cols */}
+          <div
+            className={`lg:col-span-2 lg:row-span-2 group relative rounded-3xl p-8 overflow-hidden transition-all duration-700 hover:scale-[1.01] ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+            }`}
+            style={{
+              background: 'linear-gradient(135deg, rgba(99,91,255,0.08) 0%, rgba(0,0,0,0.4) 100%)',
+              border: '1px solid rgba(99,91,255,0.2)',
+              transitionDelay: '100ms',
+            }}
+          >
+            {/* Hover glow effect */}
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                background: 'radial-gradient(circle at 50% 50%, rgba(99,91,255,0.15) 0%, transparent 60%)',
+              }}
+            />
+
+            {/* Card header */}
+            <div className="relative flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
                 <div
-                  className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    cat.color === 'emerald' ? 'bg-emerald-500/15' :
-                    cat.color === 'pink' ? 'bg-pink-500/15' :
-                    cat.color === 'blue' ? 'bg-blue-500/15' :
-                    'bg-purple-500/15'
-                  }`}
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, #635BFF 0%, #8B7DFF 100%)',
+                    boxShadow: '0 8px 24px rgba(99,91,255,0.3)',
+                  }}
                 >
-                  <cat.icon
-                    className={`w-5 h-5 ${
-                      cat.color === 'emerald' ? 'text-emerald-400' :
-                      cat.color === 'pink' ? 'text-pink-400' :
-                      cat.color === 'blue' ? 'text-blue-400' :
-                      'text-purple-400'
-                    }`}
-                  />
+                  <CreditCard className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">{cat.name}</h3>
-                  <p className="text-xs text-white/40">{cat.items.length}+ apps</p>
+                  <h3 className="text-2xl font-bold">Payments</h3>
+                  <p className="text-white/40">Accept payments globally</p>
+                </div>
+              </div>
+              <div
+                className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                style={{
+                  background: 'linear-gradient(135deg, #635BFF20 0%, #635BFF05 100%)',
+                  border: '1px solid #635BFF40',
+                  color: '#A5A0FF',
+                }}
+              >
+                20+ providers
+              </div>
+            </div>
+
+            {/* Animated payment flow visualization */}
+            <div className="relative h-48 mb-8 rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)' }}>
+              {/* Card mockup */}
+              <div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-36 rounded-xl"
+                style={{
+                  background: 'linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+                }}
+              >
+                <div className="p-4">
+                  <div className="w-10 h-8 rounded bg-gradient-to-br from-yellow-400 to-yellow-600 mb-4" />
+                  <div className="h-2 w-32 rounded bg-white/10 mb-2" />
+                  <div className="h-2 w-20 rounded bg-white/10" />
+                </div>
+                <div className="absolute bottom-3 right-4 text-white/30 text-sm font-mono">**** 4242</div>
+              </div>
+
+              {/* Animated glow lines */}
+              {mounted && [...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute h-[2px] rounded-full"
+                  style={{
+                    width: '100px',
+                    left: '-100px',
+                    top: `${30 + i * 25}%`,
+                    background: 'linear-gradient(90deg, transparent, #635BFF, transparent)',
+                    animation: `slideRight 3s ease-in-out infinite`,
+                    animationDelay: `${i * 0.8}s`,
+                  }}
+                />
+              ))}
+
+              {/* Success checkmark */}
+              <div
+                className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)',
+                  boxShadow: '0 4px 12px rgba(34,197,94,0.4)',
+                  animation: 'pulse 2s ease-in-out infinite',
+                }}
+              >
+                <Check className="w-4 h-4 text-white" />
+              </div>
+            </div>
+
+            {/* Integration logos */}
+            <div className="relative grid grid-cols-3 gap-3">
+              {integrations.payments.map((item, i) => (
+                <div
+                  key={item.name}
+                  className="group/item flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105"
+                  style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                >
+                  <div
+                    className="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold transition-all duration-300 group-hover/item:scale-110"
+                    style={{
+                      background: `${item.color}20`,
+                      color: item.color,
+                      boxShadow: `0 4px 12px ${item.color}20`,
+                    }}
+                  >
+                    {item.letter}
+                  </div>
+                  <span className="text-sm text-white/70 group-hover/item:text-white transition-colors">{item.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* MARKETING CARD */}
+          <div
+            className={`group relative rounded-3xl p-6 overflow-hidden transition-all duration-700 hover:scale-[1.02] ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+            }`}
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,225,27,0.06) 0%, rgba(0,0,0,0.4) 100%)',
+              border: '1px solid rgba(255,225,27,0.15)',
+              transitionDelay: '200ms',
+            }}
+          >
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                background: 'radial-gradient(circle at 50% 50%, rgba(255,225,27,0.1) 0%, transparent 60%)',
+              }}
+            />
+
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-4">
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, #FFE01B 0%, #FFC700 100%)',
+                    boxShadow: '0 6px 20px rgba(255,224,27,0.25)',
+                  }}
+                >
+                  <Mail className="w-5 h-5 text-black" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold">Marketing</h3>
+                  <p className="text-xs text-white/40">Grow your audience</p>
                 </div>
               </div>
 
+              {/* Mini notification badges */}
+              <div className="flex gap-2 mb-4">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/20">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[10px] text-emerald-400 font-medium">+2.4k subs</span>
+                </div>
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/15 border border-blue-500/20">
+                  <TrendingUp className="w-3 h-3 text-blue-400" />
+                  <span className="text-[10px] text-blue-400 font-medium">32% open</span>
+                </div>
+              </div>
+
+              {/* Integration list */}
               <div className="space-y-2">
-                {cat.items.map((item) => (
+                {integrations.marketing.map((item) => (
                   <div
-                    key={item}
-                    className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group"
+                    key={item.name}
+                    className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-white/5 transition-all cursor-pointer group/item"
                   >
                     <div
-                      className={`w-6 h-6 rounded flex items-center justify-center text-xs font-bold ${
-                        cat.color === 'emerald' ? 'bg-emerald-500/10 text-emerald-400' :
-                        cat.color === 'pink' ? 'bg-pink-500/10 text-pink-400' :
-                        cat.color === 'blue' ? 'bg-blue-500/10 text-blue-400' :
-                        'bg-purple-500/10 text-purple-400'
-                      }`}
+                      className="w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold"
+                      style={{ background: `${item.color}20`, color: item.color }}
                     >
-                      {item[0]}
+                      {item.letter}
                     </div>
-                    <span className="text-sm text-white/60 group-hover:text-white transition-colors">{item}</span>
+                    <span className="text-sm text-white/60 group-hover/item:text-white transition-colors">{item.name}</span>
                   </div>
                 ))}
               </div>
             </div>
-          ))}
+          </div>
+
+          {/* SHIPPING CARD */}
+          <div
+            className={`group relative rounded-3xl p-6 overflow-hidden transition-all duration-700 hover:scale-[1.02] ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+            }`}
+            style={{
+              background: 'linear-gradient(135deg, rgba(132,204,22,0.06) 0%, rgba(0,0,0,0.4) 100%)',
+              border: '1px solid rgba(132,204,22,0.15)',
+              transitionDelay: '300ms',
+            }}
+          >
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                background: 'radial-gradient(circle at 50% 50%, rgba(132,204,22,0.1) 0%, transparent 60%)',
+              }}
+            />
+
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-4">
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, #84CC16 0%, #65A30D 100%)',
+                    boxShadow: '0 6px 20px rgba(132,204,22,0.25)',
+                  }}
+                >
+                  <Truck className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold">Shipping</h3>
+                  <p className="text-xs text-white/40">Deliver worldwide</p>
+                </div>
+              </div>
+
+              {/* Mini world map with tracking dots */}
+              <div
+                className="relative h-20 mb-4 rounded-xl overflow-hidden"
+                style={{ background: 'rgba(132,204,22,0.05)' }}
+              >
+                {/* Simplified map lines */}
+                <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 100 50">
+                  <path
+                    d="M10,25 Q25,10 40,25 T70,25 T95,20"
+                    fill="none"
+                    stroke="#84CC16"
+                    strokeWidth="0.5"
+                    strokeDasharray="2,2"
+                  />
+                </svg>
+                {/* Animated tracking dots */}
+                {mounted && [...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-2 h-2 rounded-full bg-lime-400"
+                    style={{
+                      left: `${20 + i * 30}%`,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      boxShadow: '0 0 8px rgba(132,204,22,0.8)',
+                      animation: 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
+                      animationDelay: `${i * 0.6}s`,
+                    }}
+                  />
+                ))}
+              </div>
+
+              {/* Integration list */}
+              <div className="space-y-2">
+                {integrations.shipping.map((item) => (
+                  <div
+                    key={item.name}
+                    className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-white/5 transition-all cursor-pointer group/item"
+                  >
+                    <div
+                      className="w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold"
+                      style={{ background: `${item.color}30`, color: item.color === '#351C15' ? '#8B5A2B' : item.color }}
+                    >
+                      {item.letter}
+                    </div>
+                    <span className="text-sm text-white/60 group-hover/item:text-white transition-colors">{item.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ANALYTICS CARD */}
+          <div
+            className={`lg:col-span-2 group relative rounded-3xl p-6 overflow-hidden transition-all duration-700 hover:scale-[1.01] ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+            }`}
+            style={{
+              background: 'linear-gradient(135deg, rgba(227,116,0,0.06) 0%, rgba(0,0,0,0.4) 100%)',
+              border: '1px solid rgba(227,116,0,0.15)',
+              transitionDelay: '400ms',
+            }}
+          >
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                background: 'radial-gradient(circle at 50% 50%, rgba(227,116,0,0.1) 0%, transparent 60%)',
+              }}
+            />
+
+            <div className="relative">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-11 h-11 rounded-xl flex items-center justify-center"
+                    style={{
+                      background: 'linear-gradient(135deg, #E37400 0%, #FF9100 100%)',
+                      boxShadow: '0 6px 20px rgba(227,116,0,0.25)',
+                    }}
+                  >
+                    <BarChart3 className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold">Analytics</h3>
+                    <p className="text-xs text-white/40">Data-driven decisions</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-primary">98.7%</div>
+                    <div className="text-[10px] text-white/40">accuracy</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mini dashboard with animated chart */}
+              <div className="flex gap-4 mb-4">
+                <div
+                  className="flex-1 h-24 rounded-xl p-3 overflow-hidden"
+                  style={{ background: 'rgba(0,0,0,0.3)' }}
+                >
+                  {/* Animated bar chart */}
+                  <div className="flex items-end gap-1 h-full">
+                    {[65, 45, 80, 55, 90, 70, 85, 60, 95, 75].map((height, i) => (
+                      <div
+                        key={i}
+                        className="flex-1 rounded-t transition-all duration-500"
+                        style={{
+                          height: isInView ? `${height}%` : '10%',
+                          background: i === 8 ? 'linear-gradient(180deg, #FF9100, #FF6B00)' : 'rgba(255,255,255,0.1)',
+                          transitionDelay: `${500 + i * 50}ms`,
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Integration logos - vertical stack */}
+                <div className="flex flex-col gap-2">
+                  {integrations.analytics.map((item) => (
+                    <div
+                      key={item.name}
+                      className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-all cursor-pointer group/item"
+                    >
+                      <div
+                        className="w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold"
+                        style={{ background: `${item.color}20`, color: item.color }}
+                      >
+                        {item.letter}
+                      </div>
+                      <span className="text-sm text-white/60 group-hover/item:text-white transition-colors whitespace-nowrap">{item.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* CTA Banner */}
+        {/* ===== CTA SECTION ===== */}
         <div
-          className={`rounded-3xl p-8 lg:p-12 text-center transition-all duration-700 delay-500 ${
+          className={`relative rounded-3xl p-10 lg:p-14 text-center overflow-hidden transition-all duration-700 delay-500 ${
             isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
           style={{
-            background: 'linear-gradient(135deg, rgba(255,145,0,0.1) 0%, rgba(255,145,0,0.02) 100%)',
-            border: '1px solid rgba(255,145,0,0.2)',
+            background: 'linear-gradient(135deg, rgba(255,145,0,0.12) 0%, rgba(255,107,0,0.04) 100%)',
+            border: '1px solid rgba(255,145,0,0.25)',
           }}
         >
-          <h3 className="text-2xl font-semibold mb-3">Build your perfect stack</h3>
-          <p className="text-white/50 mb-6 max-w-md mx-auto">
-            Connect all your tools and automate your workflow with our powerful integrations.
-          </p>
-          <Link href="/integrations">
-            <Button
-              className="text-black font-semibold h-12 px-6 rounded-xl"
-              style={{
-                background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
-              }}
-            >
-              <span className="flex items-center gap-2">
-                Explore Marketplace
-                <ArrowRight className="w-4 h-4" />
+          {/* Background glow */}
+          <div
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px]"
+            style={{
+              background: 'radial-gradient(ellipse at 50% 0%, rgba(255,145,0,0.2) 0%, transparent 70%)',
+              filter: 'blur(60px)',
+            }}
+          />
+
+          {/* Floating app icons */}
+          {mounted && (
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              {[
+                { x: 5, y: 30, size: 40 },
+                { x: 12, y: 70, size: 32 },
+                { x: 88, y: 25, size: 36 },
+                { x: 92, y: 65, size: 28 },
+              ].map((pos, i) => (
+                <div
+                  key={i}
+                  className="absolute rounded-xl opacity-30"
+                  style={{
+                    left: `${pos.x}%`,
+                    top: `${pos.y}%`,
+                    width: pos.size,
+                    height: pos.size,
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    animation: `floatIcon ${5 + i}s ease-in-out infinite`,
+                    animationDelay: `${i * 0.5}s`,
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
+          <div className="relative">
+            <h3 className="text-3xl lg:text-4xl font-bold mb-4">
+              Build your{' '}
+              <span
+                className="bg-clip-text text-transparent"
+                style={{
+                  background: 'linear-gradient(135deg, #FF9100 0%, #FFD700 100%)',
+                  WebkitBackgroundClip: 'text',
+                }}
+              >
+                perfect stack
               </span>
-            </Button>
-          </Link>
+            </h3>
+            <p className="text-white/50 mb-8 max-w-lg mx-auto text-lg">
+              Connect all your tools and automate your workflow with our powerful integration ecosystem
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/integrations">
+                <Button
+                  className="text-black font-semibold h-14 px-8 rounded-xl text-base transition-all duration-300 hover:scale-105"
+                  style={{
+                    background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                    boxShadow: '0 8px 30px rgba(255,145,0,0.35)',
+                  }}
+                >
+                  <span className="flex items-center gap-2">
+                    Explore All Integrations
+                    <ArrowRight className="w-5 h-5" />
+                  </span>
+                </Button>
+              </Link>
+              <Link href="/docs/api">
+                <Button
+                  variant="outline"
+                  className="h-14 px-8 rounded-xl text-base bg-transparent border-white/20 text-white/80 hover:bg-white/5 hover:text-white hover:border-white/30 transition-all"
+                >
+                  <span className="flex items-center gap-2">
+                    <Code2 className="w-5 h-5" />
+                    Build Custom
+                  </span>
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes slideRight {
+          0%, 100% { transform: translateX(0); opacity: 0; }
+          50% { transform: translateX(400px); opacity: 1; }
+        }
+        @keyframes floatIcon {
+          0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+          50% { transform: translate(-50%, -50%) translateY(-15px); }
+        }
+        @keyframes pulseOpacity {
+          0%, 100% { opacity: 0.05; }
+          50% { opacity: 0.15; }
+        }
+      `}</style>
     </section>
   );
 }
@@ -1711,137 +2225,402 @@ function PricingSection() {
 
 function CTASection() {
   const { ref, isInView } = useInView();
+  const mounted = useMounted();
+
+  // Journey steps data
+  const steps = [
+    {
+      step: '01',
+      title: 'Sign up free',
+      description: 'Create your account in seconds',
+      icon: Store,
+      color: '#FF9100'
+    },
+    {
+      step: '02',
+      title: 'Customize',
+      description: 'Design your perfect storefront',
+      icon: Palette,
+      color: '#FFD700'
+    },
+    {
+      step: '03',
+      title: 'Start selling',
+      description: 'Launch and grow your business',
+      icon: TrendingUp,
+      color: '#FF6B00'
+    },
+  ];
 
   return (
-    <section ref={ref} className="py-32 relative overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0">
+    <section ref={ref} className="py-32 lg:py-40 relative overflow-hidden">
+      {/* ===== DRAMATIC BACKGROUND ===== */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Base dark gradient */}
         <div
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[600px]"
+          className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse 80% 100% at 50% 100%, rgba(255,145,0,0.2) 0%, rgba(255,145,0,0.05) 50%, transparent 80%)',
+            background: 'linear-gradient(180deg, #000000 0%, #0a0a0a 50%, #000000 100%)',
           }}
         />
-        {/* Grid */}
+
+        {/* Dramatic orange glow rising from bottom */}
         <div
-          className="absolute inset-0 opacity-10"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[200%] h-[800px]"
+          style={{
+            background: 'radial-gradient(ellipse 50% 80% at 50% 100%, rgba(255,145,0,0.35) 0%, rgba(255,107,0,0.15) 30%, transparent 70%)',
+            filter: 'blur(40px)',
+          }}
+        />
+
+        {/* Secondary glow orbs */}
+        <div
+          className="absolute bottom-20 left-1/4 w-[400px] h-[400px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 60%)',
+            filter: 'blur(60px)',
+          }}
+        />
+        <div
+          className="absolute bottom-40 right-1/4 w-[300px] h-[300px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(255,107,0,0.2) 0%, transparent 60%)',
+            filter: 'blur(50px)',
+          }}
+        />
+
+        {/* Perspective grid */}
+        <div
+          className="absolute inset-0"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(255,145,0,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,145,0,0.1) 1px, transparent 1px)
+              linear-gradient(rgba(255,145,0,0.08) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,145,0,0.08) 1px, transparent 1px)
             `,
-            backgroundSize: '60px 60px',
-            maskImage: 'linear-gradient(to top, black 0%, transparent 70%)',
-            WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 70%)',
+            backgroundSize: '80px 80px',
+            maskImage: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 30%, transparent 60%)',
+            WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 30%, transparent 60%)',
+            transform: 'perspective(500px) rotateX(30deg)',
+            transformOrigin: 'bottom center',
           }}
         />
+
+        {/* Animated light rays */}
+        {mounted && (
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[600px] overflow-hidden">
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute bottom-0 w-[2px] h-full origin-bottom"
+                style={{
+                  left: `${30 + i * 10}%`,
+                  background: `linear-gradient(to top, rgba(255,145,0,0.4) 0%, transparent 60%)`,
+                  transform: `rotate(${-20 + i * 10}deg)`,
+                  animation: `rayPulse ${3 + i * 0.5}s ease-in-out infinite`,
+                  animationDelay: `${i * 0.3}s`,
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Floating particles */}
+        {mounted && (
+          <div className="absolute inset-0 overflow-hidden">
+            {[...Array(20)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full"
+                style={{
+                  left: `${5 + (i * 4.5)}%`,
+                  bottom: `${10 + (i * 3) % 40}%`,
+                  width: `${3 + (i % 4)}px`,
+                  height: `${3 + (i % 4)}px`,
+                  background: i % 3 === 0
+                    ? 'rgba(255,145,0,0.8)'
+                    : i % 3 === 1
+                      ? 'rgba(255,215,0,0.6)'
+                      : 'rgba(255,255,255,0.4)',
+                  boxShadow: i % 3 === 0 ? '0 0 10px rgba(255,145,0,0.5)' : 'none',
+                  animation: `floatUp ${8 + (i % 5) * 2}s ease-in-out infinite`,
+                  animationDelay: `${i * 0.3}s`,
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="relative max-w-4xl mx-auto px-6 lg:px-8">
-        {/* Card */}
+      <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
+        {/* ===== BADGE ===== */}
         <div
-          className={`rounded-[2rem] p-8 lg:p-16 text-center transition-all duration-1000 ${
-            isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          className={`flex justify-center mb-10 transition-all duration-700 ${
+            isInView ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
           }`}
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,145,0,0.1) 0%, rgba(255,145,0,0.02) 100%)',
-            border: '1px solid rgba(255,145,0,0.2)',
-            boxShadow: '0 20px 80px rgba(255,145,0,0.1)',
-          }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/30 border border-white/10 mb-6">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm text-white/60">Free 14-day trial</span>
+          <div
+            className="inline-flex items-center gap-3 px-6 py-3 rounded-full"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,145,0,0.2) 0%, rgba(255,145,0,0.05) 100%)',
+              border: '1px solid rgba(255,145,0,0.3)',
+              backdropFilter: 'blur(20px)',
+              boxShadow: '0 8px 32px rgba(255,145,0,0.15)',
+            }}
+          >
+            <div className="relative">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <div
+                className="absolute inset-0 animate-ping"
+                style={{ animationDuration: '2s' }}
+              >
+                <Sparkles className="w-5 h-5 text-primary opacity-50" />
+              </div>
+            </div>
+            <span className="text-sm font-medium text-white/90">Free 14-day trial • No credit card required</span>
           </div>
+        </div>
 
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight mb-6">
-            Ready to build your
-            <br />
+        {/* ===== HEADLINE ===== */}
+        <div className="text-center mb-16">
+          <h2
+            className={`text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-8 transition-all duration-1000 delay-100 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            <span className="block text-white" style={{ textShadow: '0 4px 30px rgba(0,0,0,0.5)' }}>
+              Ready to build your
+            </span>
             <span
-              className="bg-clip-text text-transparent"
+              className="block bg-clip-text text-transparent relative"
               style={{
-                background: 'linear-gradient(135deg, #FF9100 0%, #FFB84D 50%, #FF6B00 100%)',
+                background: 'linear-gradient(135deg, #FF9100 0%, #FFD700 25%, #FF6B00 50%, #FFD700 75%, #FF9100 100%)',
+                backgroundSize: '200% 100%',
                 WebkitBackgroundClip: 'text',
+                animation: 'shimmerText 4s ease-in-out infinite',
+                filter: 'drop-shadow(0 4px 30px rgba(255,145,0,0.4))',
               }}
             >
               commerce empire?
             </span>
           </h2>
-
-          <p className="text-lg text-white/50 mb-10 max-w-xl mx-auto">
-            Join 50,000+ businesses using Rendrix to sell online.
-            Get started in minutes with no credit card required.
+          <p
+            className={`text-xl lg:text-2xl text-white/50 max-w-2xl mx-auto transition-all duration-700 delay-200 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
+            Join <span className="text-primary font-semibold">50,000+</span> businesses using Rendrix to sell online
           </p>
+        </div>
 
-          {/* Steps */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-10">
-            {[
-              { step: '1', label: 'Sign up free', icon: Store },
-              { step: '2', label: 'Customize', icon: Palette },
-              { step: '3', label: 'Start selling', icon: TrendingUp },
-            ].map((item, i) => (
-              <div key={item.step} className="flex items-center">
-                <div className="flex flex-col items-center gap-2">
+        {/* ===== JOURNEY STEPS ===== */}
+        <div
+          className={`grid md:grid-cols-3 gap-6 lg:gap-8 mb-16 transition-all duration-700 delay-300 ${
+            isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
+          {steps.map((item, i) => (
+            <div key={item.step} className="relative group">
+              {/* Connecting line */}
+              {i < 2 && (
+                <div className="hidden md:block absolute top-1/2 -right-4 lg:-right-5 w-8 lg:w-10 h-[2px] z-10">
                   <div
-                    className="w-12 h-12 rounded-xl bg-black/30 border border-primary/30 flex items-center justify-center"
-                    style={{ boxShadow: '0 0 20px rgba(255,145,0,0.2)' }}
-                  >
-                    <item.icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <span className="text-sm text-white/60">{item.label}</span>
+                    className="w-full h-full rounded-full"
+                    style={{
+                      background: `linear-gradient(90deg, ${item.color}40, ${steps[i + 1].color}40)`,
+                    }}
+                  />
+                  <div
+                    className="absolute top-1/2 right-0 -translate-y-1/2 w-2 h-2 rounded-full"
+                    style={{
+                      background: steps[i + 1].color,
+                      boxShadow: `0 0 10px ${steps[i + 1].color}60`,
+                      animation: 'pulse 2s ease-in-out infinite',
+                      animationDelay: `${i * 0.3}s`,
+                    }}
+                  />
                 </div>
-                {i < 2 && (
-                  <ChevronRight className="w-5 h-5 text-white/20 mx-4 hidden sm:block" />
-                )}
-              </div>
-            ))}
-          </div>
+              )}
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/register">
-              <Button
-                size="lg"
-                className="text-black font-semibold h-14 px-10 text-base rounded-xl"
+              {/* Step card */}
+              <div
+                className="relative rounded-3xl p-8 h-full transition-all duration-500 hover:-translate-y-2"
                 style={{
-                  background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
-                  boxShadow: '0 4px 40px rgba(255,145,0,0.4)',
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  transitionDelay: `${i * 100}ms`,
                 }}
               >
-                <span className="flex items-center gap-2">
-                  Start Free Trial
-                  <ArrowRight className="w-5 h-5" />
-                </span>
-              </Button>
-            </Link>
-            <Link href="/contact">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white/20 bg-transparent hover:bg-white/5 text-white h-14 px-10 text-base rounded-xl"
-              >
-                Talk to Sales
-              </Button>
-            </Link>
-          </div>
+                {/* Hover glow */}
+                <div
+                  className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `radial-gradient(circle at 50% 0%, ${item.color}15 0%, transparent 60%)`,
+                  }}
+                />
 
-          {/* Trust indicators */}
-          <div className="flex items-center justify-center gap-6 mt-8 text-sm text-white/40">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4" />
-              <span>Secure</span>
+                {/* Step number */}
+                <div
+                  className="absolute -top-3 -right-3 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%)',
+                    border: `1px solid ${item.color}40`,
+                    color: item.color,
+                    boxShadow: `0 4px 20px ${item.color}20`,
+                  }}
+                >
+                  {item.step}
+                </div>
+
+                {/* Icon */}
+                <div
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110"
+                  style={{
+                    background: `linear-gradient(135deg, ${item.color}25 0%, ${item.color}10 100%)`,
+                    border: `1px solid ${item.color}30`,
+                    boxShadow: `0 8px 32px ${item.color}20`,
+                  }}
+                >
+                  <item.icon className="w-8 h-8" style={{ color: item.color }} />
+                </div>
+
+                {/* Content */}
+                <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-white/50">{item.description}</p>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4" />
-              <span>No credit card</span>
+          ))}
+        </div>
+
+        {/* ===== CTA BUTTONS ===== */}
+        <div
+          className={`flex flex-col sm:flex-row items-center justify-center gap-5 mb-12 transition-all duration-700 delay-400 ${
+            isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
+          <Link href="/register" className="group">
+            <Button
+              size="lg"
+              className="relative text-black font-bold h-16 px-12 text-lg rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                boxShadow: '0 8px 40px rgba(255,145,0,0.4), 0 0 0 1px rgba(255,255,255,0.1) inset',
+              }}
+            >
+              {/* Shine effect */}
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{
+                  background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%)',
+                  animation: 'shine 2s ease-in-out infinite',
+                }}
+              />
+              <span className="relative flex items-center gap-3">
+                Start Free Trial
+                <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+              </span>
+            </Button>
+          </Link>
+          <Link href="/contact" className="group">
+            <Button
+              size="lg"
+              variant="outline"
+              className="relative h-16 px-12 text-lg rounded-2xl bg-transparent border-white/20 text-white overflow-hidden transition-all duration-300 hover:bg-white/5 hover:border-white/30 hover:scale-105"
+            >
+              <span className="relative flex items-center gap-3">
+                <MessageSquare className="w-5 h-5" />
+                Talk to Sales
+              </span>
+            </Button>
+          </Link>
+        </div>
+
+        {/* ===== TRUST INDICATORS ===== */}
+        <div
+          className={`flex flex-wrap items-center justify-center gap-4 lg:gap-6 transition-all duration-700 delay-500 ${
+            isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}
+        >
+          {[
+            { icon: Shield, label: 'Bank-level security', color: '#22C55E' },
+            { icon: CreditCard, label: 'No credit card', color: '#3B82F6' },
+            { icon: Clock, label: 'Cancel anytime', color: '#A855F7' },
+            { icon: Zap, label: 'Setup in minutes', color: '#F59E0B' },
+          ].map((item, i) => (
+            <div
+              key={item.label}
+              className="group flex items-center gap-2.5 px-5 py-3 rounded-full transition-all duration-300 hover:scale-105 cursor-default"
+              style={{
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
+            >
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                style={{
+                  background: `${item.color}15`,
+                }}
+              >
+                <item.icon className="w-4 h-4" style={{ color: item.color }} />
+              </div>
+              <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">{item.label}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4" />
-              <span>Cancel anytime</span>
+          ))}
+        </div>
+
+        {/* ===== SOCIAL PROOF AVATARS ===== */}
+        <div
+          className={`flex flex-col items-center mt-12 transition-all duration-700 delay-600 ${
+            isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}
+        >
+          <div className="flex -space-x-3 mb-4">
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                className="w-10 h-10 rounded-full border-2 border-black"
+                style={{
+                  background: `linear-gradient(135deg, hsl(${30 + i * 20}, 80%, 50%) 0%, hsl(${30 + i * 20}, 80%, 40%) 100%)`,
+                }}
+              />
+            ))}
+            <div
+              className="w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-xs font-bold"
+              style={{
+                background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                color: 'black',
+              }}
+            >
+              +50K
             </div>
+          </div>
+          <div className="flex items-center gap-1">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+            ))}
+            <span className="text-sm text-white/50 ml-2">4.9/5 from 2,000+ reviews</span>
           </div>
         </div>
       </div>
+
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes shimmerText {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        @keyframes floatUp {
+          0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+          50% { transform: translateY(-100px) scale(1.2); opacity: 1; }
+        }
+        @keyframes rayPulse {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.8; }
+        }
+        @keyframes shine {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
     </section>
   );
 }
@@ -1851,22 +2630,27 @@ function CTASection() {
 // ============================================================================
 
 function Footer() {
+  const mounted = useMounted();
+  const [email, setEmail] = useState('');
+
   const columns = {
     Product: [
       { label: 'Features', href: '/features' },
       { label: 'Pricing', href: '/pricing' },
       { label: 'Integrations', href: '/integrations' },
       { label: 'Changelog', href: '/changelog' },
+      { label: 'Roadmap', href: '/roadmap', badge: 'New' },
     ],
     Resources: [
       { label: 'Documentation', href: '/docs' },
       { label: 'API Reference', href: '/api' },
       { label: 'Blog', href: '/blog' },
       { label: 'Help Center', href: '/help' },
+      { label: 'Community', href: '/community' },
     ],
     Company: [
       { label: 'About', href: '/about' },
-      { label: 'Careers', href: '/careers' },
+      { label: 'Careers', href: '/careers', badge: 'Hiring' },
       { label: 'Press', href: '/press' },
       { label: 'Contact', href: '/contact' },
     ],
@@ -1874,89 +2658,405 @@ function Footer() {
       { label: 'Privacy', href: '/privacy' },
       { label: 'Terms', href: '/terms' },
       { label: 'Security', href: '/security' },
+      { label: 'DPA', href: '/dpa' },
     ],
   };
 
+  const socialLinks = [
+    {
+      name: 'X',
+      href: 'https://twitter.com/rendrix',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg>
+      ),
+    },
+    {
+      name: 'GitHub',
+      href: 'https://github.com/rendrix',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+        </svg>
+      ),
+    },
+    {
+      name: 'LinkedIn',
+      href: 'https://linkedin.com/company/rendrix',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+        </svg>
+      ),
+    },
+    {
+      name: 'Discord',
+      href: 'https://discord.gg/rendrix',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+        </svg>
+      ),
+    },
+    {
+      name: 'YouTube',
+      href: 'https://youtube.com/@rendrix',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+        </svg>
+      ),
+    },
+  ];
+
+  const trustBadges = [
+    { label: 'G2 Leader 2024', icon: Star },
+    { label: 'SOC 2 Type II', icon: Shield },
+    { label: 'GDPR Compliant', icon: Lock },
+    { label: 'PCI DSS', icon: CreditCard },
+  ];
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <footer className="relative pt-20 pb-10 border-t border-white/[0.06]">
-      {/* Top glow */}
+    <footer className="relative overflow-hidden">
+      {/* ===== GRADIENT TOP BORDER ===== */}
       <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px]"
+        className="absolute top-0 left-0 right-0 h-[1px]"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(255,145,0,0.1) 0%, transparent 70%)',
-          filter: 'blur(60px)',
+          background: 'linear-gradient(90deg, transparent 0%, rgba(255,145,0,0.5) 50%, transparent 100%)',
         }}
       />
 
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-16">
-          {/* Logo & Description */}
-          <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)' }}
-              >
-                <Store className="w-4 h-4 text-black" />
+      {/* ===== BACKGROUND EFFECTS ===== */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Base gradient */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, #000000 0%, #050505 50%, #0a0a0a 100%)',
+          }}
+        />
+
+        {/* Grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,145,0,0.5) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,145,0,0.5) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px',
+          }}
+        />
+
+        {/* Corner glows */}
+        <div
+          className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(255,145,0,0.08) 0%, transparent 60%)',
+            filter: 'blur(80px)',
+          }}
+        />
+        <div
+          className="absolute -bottom-40 -right-40 w-[400px] h-[400px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(255,107,0,0.06) 0%, transparent 60%)',
+            filter: 'blur(60px)',
+          }}
+        />
+      </div>
+
+      <div className="relative">
+        {/* ===== NEWSLETTER SECTION ===== */}
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+          <div
+            className="relative rounded-3xl p-8 lg:p-12 overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,145,0,0.1) 0%, rgba(255,145,0,0.02) 100%)',
+              border: '1px solid rgba(255,145,0,0.2)',
+            }}
+          >
+            {/* Background glow */}
+            <div
+              className="absolute top-0 right-0 w-[400px] h-[400px]"
+              style={{
+                background: 'radial-gradient(circle at 100% 0%, rgba(255,145,0,0.15) 0%, transparent 60%)',
+                filter: 'blur(60px)',
+              }}
+            />
+
+            {/* Floating shapes */}
+            {mounted && (
+              <>
+                <div
+                  className="absolute top-10 right-20 w-20 h-20 rounded-2xl opacity-20"
+                  style={{
+                    background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                    animation: 'floatShape 6s ease-in-out infinite',
+                  }}
+                />
+                <div
+                  className="absolute bottom-10 right-40 w-12 h-12 rounded-full opacity-10"
+                  style={{
+                    background: '#FFD700',
+                    animation: 'floatShape 8s ease-in-out infinite',
+                    animationDelay: '1s',
+                  }}
+                />
+              </>
+            )}
+
+            <div className="relative grid lg:grid-cols-2 gap-8 items-center">
+              <div>
+                <h3 className="text-3xl lg:text-4xl font-bold mb-4">
+                  Stay ahead of{' '}
+                  <span
+                    className="bg-clip-text text-transparent"
+                    style={{
+                      background: 'linear-gradient(135deg, #FF9100 0%, #FFD700 100%)',
+                      WebkitBackgroundClip: 'text',
+                    }}
+                  >
+                    commerce
+                  </span>
+                </h3>
+                <p className="text-white/50 text-lg mb-2">
+                  Get the latest updates, tips, and insights delivered to your inbox.
+                </p>
+                <div className="flex items-center gap-2 text-sm text-white/40">
+                  <div className="flex -space-x-2">
+                    {[...Array(4)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-6 h-6 rounded-full border border-black"
+                        style={{
+                          background: `linear-gradient(135deg, hsl(${30 + i * 15}, 80%, 50%) 0%, hsl(${30 + i * 15}, 80%, 40%) 100%)`,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <span>Join 25,000+ subscribers</span>
+                </div>
               </div>
-              <span className="text-xl font-semibold">Rendrix</span>
-            </Link>
-            <p className="text-sm text-white/40 mb-4">
-              The complete commerce platform for ambitious brands.
-            </p>
-            <div className="flex items-center gap-2 text-sm">
-              <div className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="text-white/40">All systems operational</span>
+
+              <div className="flex gap-3">
+                <div className="flex-1 relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full h-14 pl-12 pr-4 rounded-xl bg-black/50 border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-primary/50 transition-colors"
+                  />
+                </div>
+                <Button
+                  className="h-14 px-8 rounded-xl text-black font-semibold whitespace-nowrap"
+                  style={{
+                    background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                    boxShadow: '0 4px 20px rgba(255,145,0,0.3)',
+                  }}
+                >
+                  Subscribe
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
             </div>
           </div>
-
-          {/* Links */}
-          {Object.entries(columns).map(([title, links]) => (
-            <div key={title}>
-              <h4 className="text-sm font-semibold text-white/70 mb-4">{title}</h4>
-              <ul className="space-y-3">
-                {links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-white/40 hover:text-white transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
         </div>
 
-        {/* Bottom */}
-        <div className="pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-white/30">
-            © {new Date().getFullYear()} Rendrix. All rights reserved.
-          </p>
-          <div className="flex items-center gap-6">
-            <Link href="https://twitter.com/rendrix" className="text-white/30 hover:text-white transition-colors">
-              <span className="sr-only">Twitter</span>
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-            </Link>
-            <Link href="https://github.com/rendrix" className="text-white/30 hover:text-white transition-colors">
-              <span className="sr-only">GitHub</span>
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
-              </svg>
-            </Link>
-            <Link href="https://linkedin.com/company/rendrix" className="text-white/30 hover:text-white transition-colors">
-              <span className="sr-only">LinkedIn</span>
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-              </svg>
-            </Link>
+        {/* ===== MAIN FOOTER CONTENT ===== */}
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 pb-12">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12">
+            {/* Brand Column */}
+            <div className="col-span-2">
+              <Link href="/" className="inline-flex items-center gap-3 mb-6 group">
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                  style={{
+                    background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                    boxShadow: '0 8px 30px rgba(255,145,0,0.3)',
+                  }}
+                >
+                  <Store className="w-6 h-6 text-black" />
+                </div>
+                <span className="text-2xl font-bold">Rendrix</span>
+              </Link>
+              <p className="text-white/50 mb-6 max-w-xs">
+                The complete commerce platform for ambitious brands building the future of retail.
+              </p>
+
+              {/* Status Badge */}
+              <Link
+                href="/status"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 transition-all duration-300 hover:scale-105"
+                style={{
+                  background: 'rgba(34,197,94,0.1)',
+                  border: '1px solid rgba(34,197,94,0.2)',
+                }}
+              >
+                <div className="relative">
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <div className="absolute inset-0 w-2 h-2 rounded-full bg-green-500 animate-ping" />
+                </div>
+                <span className="text-sm text-green-400">All systems operational</span>
+              </Link>
+
+              {/* Social Links */}
+              <div className="flex items-center gap-3">
+                {socialLinks.map((social) => (
+                  <Link
+                    key={social.name}
+                    href={social.href}
+                    className="group w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    style={{
+                      background: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                    }}
+                    aria-label={social.name}
+                  >
+                    <span className="text-white/40 group-hover:text-primary transition-colors">
+                      {social.icon}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Link Columns */}
+            {Object.entries(columns).map(([title, links]) => (
+              <div key={title}>
+                <h4 className="text-sm font-semibold text-white mb-5 flex items-center gap-2">
+                  <div
+                    className="w-1 h-4 rounded-full"
+                    style={{
+                      background: 'linear-gradient(180deg, #FF9100 0%, #FF6B00 100%)',
+                    }}
+                  />
+                  {title}
+                </h4>
+                <ul className="space-y-3">
+                  {links.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        href={link.href}
+                        className="group inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors"
+                      >
+                        <span className="relative">
+                          {link.label}
+                          <span
+                            className="absolute left-0 -bottom-0.5 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full"
+                          />
+                        </span>
+                        {link.badge && (
+                          <span
+                            className="px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                            style={{
+                              background: link.badge === 'Hiring'
+                                ? 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)'
+                                : 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                              color: 'black',
+                            }}
+                          >
+                            {link.badge}
+                          </span>
+                        )}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ===== TRUST BADGES ===== */}
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 pb-12">
+          <div className="flex flex-wrap items-center justify-center gap-4 lg:gap-6">
+            {trustBadges.map((badge) => (
+              <div
+                key={badge.label}
+                className="flex items-center gap-2 px-4 py-2 rounded-full"
+                style={{
+                  background: 'rgba(255,255,255,0.02)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <badge.icon className="w-4 h-4 text-white/40" />
+                <span className="text-sm text-white/40">{badge.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ===== BOTTOM BAR ===== */}
+        <div
+          className="border-t border-white/[0.06]"
+          style={{
+            background: 'linear-gradient(180deg, transparent 0%, rgba(255,145,0,0.02) 100%)',
+          }}
+        >
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+              {/* Left side */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-sm text-white/30">
+                <span>© {new Date().getFullYear()} Rendrix. All rights reserved.</span>
+                <span className="hidden lg:block">•</span>
+                <div
+                  className="px-2 py-1 rounded-md text-xs font-mono"
+                  style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                >
+                  v2.4.0
+                </div>
+              </div>
+
+              {/* Right side */}
+              <div className="flex items-center gap-4">
+                {/* Language Selector */}
+                <button
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/40 hover:text-white/60 transition-colors"
+                  style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                >
+                  <Globe className="w-4 h-4" />
+                  <span>English</span>
+                  <ChevronRight className="w-3 h-3 rotate-90" />
+                </button>
+
+                {/* Back to Top */}
+                <button
+                  onClick={scrollToTop}
+                  className="group flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white/40 hover:text-white transition-all duration-300"
+                  style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                >
+                  <span>Back to top</span>
+                  <ArrowRight className="w-4 h-4 -rotate-90 transition-transform duration-300 group-hover:-translate-y-1" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes floatShape {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(10deg); }
+        }
+      `}</style>
     </footer>
   );
 }
