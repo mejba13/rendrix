@@ -107,6 +107,13 @@ COPY packages/types/tsconfig.json ./packages/types/
 COPY packages/utils/tsconfig.json ./packages/utils/
 COPY packages/config/ ./packages/config/
 
+# Copy package source files for building
+COPY packages/types ./packages/types
+COPY packages/utils ./packages/utils
+
+# Build shared packages before starting dev server
+RUN pnpm turbo build --filter=@rendrix/types --filter=@rendrix/utils
+
 WORKDIR /app
 
 EXPOSE 3000
