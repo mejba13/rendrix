@@ -44,7 +44,7 @@ const couponTypeConfig: Record<
 };
 
 export function CouponTypeBadge({ type }: { type: CouponType }) {
-  const config = couponTypeConfig[type];
+  const config = couponTypeConfig[type] || { label: type || 'Unknown', variant: 'secondary' as const };
   return <Badge variant={config.variant}>{config.label}</Badge>;
 }
 

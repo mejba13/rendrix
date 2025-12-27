@@ -14,7 +14,8 @@ export function ProductStatusBadge({ status }: ProductStatusBadgeProps) {
     archived: { variant: 'ghost', label: 'Archived' },
   };
 
-  const { variant, label } = variants[status];
+  const statusConfig = variants[status] || { variant: 'secondary' as const, label: status || 'Unknown' };
+  const { variant, label } = statusConfig;
 
   return <Badge variant={variant}>{label}</Badge>;
 }
@@ -30,7 +31,8 @@ export function ProductVisibilityBadge({ visibility }: ProductVisibilityBadgePro
     featured: { variant: 'warning', label: 'Featured' },
   };
 
-  const { variant, label } = variants[visibility];
+  const visibilityConfig = variants[visibility] || { variant: 'secondary' as const, label: visibility || 'Unknown' };
+  const { variant, label } = visibilityConfig;
 
   return <Badge variant={variant}>{label}</Badge>;
 }

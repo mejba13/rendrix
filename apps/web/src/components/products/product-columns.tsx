@@ -146,7 +146,7 @@ export function createProductColumns({
       header: 'Categories',
       cell: ({ row }) => {
         const categories = row.original.categories;
-        if (!categories || categories.length === 0) {
+        if (!categories || !Array.isArray(categories) || categories.length === 0) {
           return <span className="text-muted-foreground">-</span>;
         }
         return (

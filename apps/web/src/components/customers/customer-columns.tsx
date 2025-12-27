@@ -118,7 +118,8 @@ export function createCustomerColumns({
       header: 'Tags',
       cell: ({ row }) => {
         const tags = row.original.tags;
-        if (!tags || tags.length === 0) {
+        // Ensure tags is an array before using array methods
+        if (!tags || !Array.isArray(tags) || tags.length === 0) {
           return <span className="text-muted-foreground">-</span>;
         }
         return (

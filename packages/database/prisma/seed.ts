@@ -1,5 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 import { hash } from 'bcryptjs';
+import {
+  seedStores,
+  seedProducts,
+  seedCustomers,
+  seedOrders,
+  seedCoupons,
+  seedBlog,
+  seedPages,
+  seedMedia,
+} from './seeds';
 
 const prisma = new PrismaClient();
 
@@ -899,413 +909,64 @@ async function main() {
       },
     });
 
+    // Add demo user to Admin Organization so they can also see all stores
+    await prisma.organizationMember.upsert({
+      where: {
+        organizationId_userId: {
+          organizationId: adminOrg.id,
+          userId: demoUser.id,
+        },
+      },
+      update: {},
+      create: {
+        organizationId: adminOrg.id,
+        userId: demoUser.id,
+        role: 'member',
+        permissions: [],
+      },
+    });
+
     // ========================================
-    // Create Demo Store
+    // Create Three Store Contexts with Comprehensive Seed Data
     // ========================================
+    console.log('\n📦 Seeding comprehensive store data...');
+
     const defaultTheme = themes.find((t) => t.slug === 'minimal-store')!;
 
-    const demoStore = await prisma.store.upsert({
-      where: { subdomain: 'demo' },
-      update: {},
-      create: {
-        organizationId: demoOrg.id,
-        name: 'Demo Store',
-        slug: 'demo',
-        subdomain: 'demo',
-        industry: 'general',
-        description: 'A demo store showcasing our platform',
-        themeId: defaultTheme.id,
-        settings: {
-          currency: 'USD',
-          timezone: 'America/New_York',
-          weightUnit: 'lb',
-          dimensionUnit: 'in',
-          taxesIncluded: false,
-          enableReviews: true,
-          enableWishlist: true,
-          maintenanceMode: false,
-        },
-        seoSettings: {
-          metaTitle: 'Demo Store - Your One Stop Shop',
-          metaDescription: 'Welcome to Demo Store. Find amazing products at great prices.',
-        },
-      },
-    });
+    // Create the three stores under Admin Organization: Ramlit Limited, ColorPark, xCyberSecurity
+    const stores = await seedStores(prisma, adminOrg.id, defaultTheme.id);
+    console.log('✅ Created 3 stores: Ramlit Limited, ColorPark, xCyberSecurity');
 
-    console.log('✅ Created demo store');
+    // Seed products with store-specific catalogs
+    await seedProducts(prisma, stores);
+    console.log('✅ Created products for all stores');
 
-    // ========================================
-    // Create Categories
-    // ========================================
-    const categories = await Promise.all([
-      prisma.category.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'electronics' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Electronics',
-          slug: 'electronics',
-          description: 'Latest gadgets and electronic devices',
-          sortOrder: 1,
-        },
-      }),
-      prisma.category.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'clothing' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Clothing',
-          slug: 'clothing',
-          description: 'Fashionable apparel for everyone',
-          sortOrder: 2,
-        },
-      }),
-      prisma.category.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'accessories' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Accessories',
-          slug: 'accessories',
-          description: 'Complete your look with our accessories',
-          sortOrder: 3,
-        },
-      }),
-      prisma.category.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'home-decor' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Home & Decor',
-          slug: 'home-decor',
-          description: 'Beautiful items for your home',
-          sortOrder: 4,
-        },
-      }),
-    ]);
+    // Seed customers with segments
+    const customersByStore = await seedCustomers(prisma, stores);
+    console.log('✅ Created customers with segments for all stores');
 
-    console.log(`✅ Created ${categories.length} categories`);
+    // Seed orders with realistic histories
+    await seedOrders(prisma, stores, customersByStore);
+    console.log('✅ Created order histories for all stores');
+
+    // Seed coupons with various types
+    await seedCoupons(prisma, stores);
+    console.log('✅ Created coupons for all stores');
+
+    // Seed blog posts and categories
+    await seedBlog(prisma, stores);
+    console.log('✅ Created blog posts and categories for all stores');
+
+    // Seed static pages
+    await seedPages(prisma, stores);
+    console.log('✅ Created static pages for all stores');
+
+    // Seed media assets
+    await seedMedia(prisma, stores);
+    console.log('✅ Created media assets for all stores');
 
     // ========================================
-    // Create Sample Products
-    // ========================================
-    const products = await Promise.all([
-      // Electronics
-      prisma.product.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'wireless-headphones' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Wireless Bluetooth Headphones',
-          slug: 'wireless-headphones',
-          description: 'Premium wireless headphones with active noise cancellation, 30-hour battery life, and crystal-clear sound quality.',
-          shortDescription: 'Premium wireless headphones with ANC',
-          sku: 'ELEC-WH-001',
-          price: 199.99,
-          compareAtPrice: 249.99,
-          quantity: 50,
-          status: 'active',
-          trackInventory: true,
-          categories: {
-            create: { categoryId: categories[0].id },
-          },
-          images: {
-            create: [
-              { url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800', position: 0 },
-            ],
-          },
-        },
-      }),
-      prisma.product.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'smart-watch' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Smart Watch Pro',
-          slug: 'smart-watch',
-          description: 'Advanced smartwatch with health monitoring, GPS, and 7-day battery life. Water resistant up to 50 meters.',
-          shortDescription: 'Advanced smartwatch with health features',
-          sku: 'ELEC-SW-001',
-          price: 299.99,
-          compareAtPrice: 349.99,
-          quantity: 35,
-          status: 'active',
-          trackInventory: true,
-          categories: {
-            create: { categoryId: categories[0].id },
-          },
-          images: {
-            create: [
-              { url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800', position: 0 },
-            ],
-          },
-        },
-      }),
-      prisma.product.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'portable-speaker' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Portable Bluetooth Speaker',
-          slug: 'portable-speaker',
-          description: 'Compact yet powerful portable speaker with 360-degree sound, waterproof design, and 20-hour playtime.',
-          shortDescription: 'Waterproof portable speaker',
-          sku: 'ELEC-SP-001',
-          price: 79.99,
-          compareAtPrice: 99.99,
-          quantity: 100,
-          status: 'active',
-          trackInventory: true,
-          categories: {
-            create: { categoryId: categories[0].id },
-          },
-          images: {
-            create: [
-              { url: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=800', position: 0 },
-            ],
-          },
-        },
-      }),
-      // Clothing
-      prisma.product.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'classic-cotton-tshirt' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Classic Cotton T-Shirt',
-          slug: 'classic-cotton-tshirt',
-          description: 'Premium 100% cotton t-shirt with a comfortable fit. Available in multiple colors and sizes.',
-          shortDescription: 'Comfortable 100% cotton tee',
-          sku: 'CLO-TS-001',
-          price: 29.99,
-          compareAtPrice: 39.99,
-          quantity: 200,
-          status: 'active',
-          trackInventory: true,
-          categories: {
-            create: { categoryId: categories[1].id },
-          },
-          images: {
-            create: [
-              { url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800', position: 0 },
-            ],
-          },
-        },
-      }),
-      prisma.product.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'denim-jacket' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Classic Denim Jacket',
-          slug: 'denim-jacket',
-          description: 'Timeless denim jacket with a modern fit. Perfect for layering in any season.',
-          shortDescription: 'Timeless denim jacket',
-          sku: 'CLO-DJ-001',
-          price: 89.99,
-          compareAtPrice: 119.99,
-          quantity: 45,
-          status: 'active',
-          trackInventory: true,
-          categories: {
-            create: { categoryId: categories[1].id },
-          },
-          images: {
-            create: [
-              { url: 'https://images.unsplash.com/photo-1551537482-f2075a1d41f2?w=800', position: 0 },
-            ],
-          },
-        },
-      }),
-      // Accessories
-      prisma.product.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'leather-wallet' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Premium Leather Wallet',
-          slug: 'leather-wallet',
-          description: 'Handcrafted genuine leather wallet with RFID blocking technology. Multiple card slots and bill compartment.',
-          shortDescription: 'Handcrafted leather wallet with RFID',
-          sku: 'ACC-WL-001',
-          price: 49.99,
-          compareAtPrice: 69.99,
-          quantity: 75,
-          status: 'active',
-          trackInventory: true,
-          categories: {
-            create: { categoryId: categories[2].id },
-          },
-          images: {
-            create: [
-              { url: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=800', position: 0 },
-            ],
-          },
-        },
-      }),
-      prisma.product.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'sunglasses' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Designer Sunglasses',
-          slug: 'sunglasses',
-          description: 'Stylish polarized sunglasses with UV400 protection. Lightweight titanium frame.',
-          shortDescription: 'Polarized designer sunglasses',
-          sku: 'ACC-SG-001',
-          price: 129.99,
-          compareAtPrice: 159.99,
-          quantity: 60,
-          status: 'active',
-          trackInventory: true,
-          categories: {
-            create: { categoryId: categories[2].id },
-          },
-          images: {
-            create: [
-              { url: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800', position: 0 },
-            ],
-          },
-        },
-      }),
-      // Home & Decor
-      prisma.product.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'ceramic-vase' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Minimalist Ceramic Vase',
-          slug: 'ceramic-vase',
-          description: 'Elegant handcrafted ceramic vase perfect for fresh or dried flowers. Adds a touch of sophistication to any room.',
-          shortDescription: 'Handcrafted minimalist vase',
-          sku: 'HOME-VAS-001',
-          price: 45.99,
-          compareAtPrice: 59.99,
-          quantity: 40,
-          status: 'active',
-          trackInventory: true,
-          categories: {
-            create: { categoryId: categories[3].id },
-          },
-          images: {
-            create: [
-              { url: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800', position: 0 },
-            ],
-          },
-        },
-      }),
-      prisma.product.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'scented-candle' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Luxury Scented Candle',
-          slug: 'scented-candle',
-          description: 'Hand-poured soy wax candle with natural essential oils. Burns for up to 60 hours with a warm, inviting fragrance.',
-          shortDescription: 'Hand-poured soy wax candle',
-          sku: 'HOME-CAN-001',
-          price: 34.99,
-          compareAtPrice: 44.99,
-          quantity: 80,
-          status: 'active',
-          trackInventory: true,
-          categories: {
-            create: { categoryId: categories[3].id },
-          },
-          images: {
-            create: [
-              { url: 'https://images.unsplash.com/photo-1602607507892-3e1c7b9c7e09?w=800', position: 0 },
-            ],
-          },
-        },
-      }),
-      prisma.product.upsert({
-        where: { storeId_slug: { storeId: demoStore.id, slug: 'throw-blanket' } },
-        update: {},
-        create: {
-          storeId: demoStore.id,
-          name: 'Cozy Throw Blanket',
-          slug: 'throw-blanket',
-          description: 'Ultra-soft microfiber throw blanket. Perfect for snuggling on the couch or adding texture to your bedroom.',
-          shortDescription: 'Ultra-soft microfiber blanket',
-          sku: 'HOME-BLK-001',
-          price: 59.99,
-          compareAtPrice: 79.99,
-          quantity: 55,
-          status: 'active',
-          trackInventory: true,
-          categories: {
-            create: { categoryId: categories[3].id },
-          },
-          images: {
-            create: [
-              { url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800', position: 0 },
-            ],
-          },
-        },
-      }),
-    ]);
-
-    console.log(`✅ Created ${products.length} products`);
-
-    // ========================================
-    // Create Demo Customer (for Storefront)
-    // ========================================
-    const customerPasswordHash = await hash('Customer@123', 12);
-
-    const demoCustomer = await prisma.customer.upsert({
-      where: { storeId_email: { storeId: demoStore.id, email: 'customer@demo.com' } },
-      update: {},
-      create: {
-        storeId: demoStore.id,
-        email: 'customer@demo.com',
-        passwordHash: customerPasswordHash,
-        firstName: 'John',
-        lastName: 'Customer',
-        phone: '+1 555-123-4567',
-        acceptsMarketing: true,
-        addresses: {
-          create: [
-            {
-              firstName: 'John',
-              lastName: 'Customer',
-              address1: '123 Main Street',
-              city: 'New York',
-              state: 'NY',
-              postalCode: '10001',
-              country: 'US',
-              phone: '+1 555-123-4567',
-              isDefault: true,
-            },
-          ],
-        },
-      },
-    });
-
-    console.log('✅ Created demo customer');
-
-    // ========================================
-    // Create a Coupon
-    // ========================================
-    await prisma.coupon.upsert({
-      where: { storeId_code: { storeId: demoStore.id, code: 'WELCOME10' } },
-      update: {},
-      create: {
-        storeId: demoStore.id,
-        code: 'WELCOME10',
-        type: 'percentage',
-        value: 10,
-        minimumOrder: 50,
-        usageLimit: 100,
-        isActive: true,
-        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
-      },
-    });
-
-    console.log('✅ Created coupon: WELCOME10');
-
-    // ========================================
-    // Print Login Credentials
+    // Print Login Credentials & Summary
     // ========================================
     console.log('\n========================================');
     console.log('🔐 LOGIN CREDENTIALS');
@@ -1320,13 +981,25 @@ async function main() {
     console.log('   Demo Account:');
     console.log('   Email: demo@rendrix.com');
     console.log('   Password: Demo@123456');
-    console.log('\n🛒 Storefront (Customer):');
-    console.log('   URL: http://localhost:3001');
+    console.log('\n🏪 SEEDED STORES:');
     console.log('   --------------------------------');
-    console.log('   Customer Account:');
-    console.log('   Email: customer@demo.com');
-    console.log('   Password: Customer@123');
-    console.log('\n🎁 Coupon Code: WELCOME10 (10% off, min $50)');
+    console.log('   1. Ramlit Limited (IT Services, AI, DevOps, Cloud)');
+    console.log('   2. ColorPark (Design Agency: Logo, Branding, UI/UX)');
+    console.log('   3. xCyberSecurity (Security: Pentesting, Compliance)');
+    console.log('\n📦 SEEDED DATA SUMMARY:');
+    console.log('   --------------------------------');
+    console.log('   - Products: 15-16 per store (45+ total)');
+    console.log('   - Customers: 15 per store with segments');
+    console.log('   - Orders: 25+ per store with various statuses');
+    console.log('   - Coupons: 8-9 per store (active, scheduled, expired)');
+    console.log('   - Blog Posts: 6-7 per store (published, draft, scheduled)');
+    console.log('   - Pages: 7 per store (About, Services, Contact, FAQ, etc.)');
+    console.log('   - Media: 12-15 assets per store');
+    console.log('\n🎁 SAMPLE COUPON CODES:');
+    console.log('   --------------------------------');
+    console.log('   Ramlit: TECH20, STARTUP15, DEVOPS25');
+    console.log('   ColorPark: DESIGN15, BRAND25, WELCOME20');
+    console.log('   xCyberSecurity: SECURE20, PENTEST25, COMPLIANCE15');
     console.log('========================================\n');
   }
 

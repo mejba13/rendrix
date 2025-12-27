@@ -425,10 +425,10 @@ export default function CustomersPage() {
             <SelectTrigger className="w-[160px] h-10 bg-white/[0.02] border-white/[0.06] text-white">
               <SelectValue placeholder="Marketing" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All customers</SelectItem>
-              <SelectItem value="true">Subscribed</SelectItem>
-              <SelectItem value="false">Not subscribed</SelectItem>
+            <SelectContent className="bg-[#1a1a1a] border-white/[0.06]">
+              <SelectItem value="all" className="text-white/70 focus:bg-white/[0.06] focus:text-white">All customers</SelectItem>
+              <SelectItem value="true" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Subscribed</SelectItem>
+              <SelectItem value="false" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Not subscribed</SelectItem>
             </SelectContent>
           </Select>
 
@@ -441,11 +441,11 @@ export default function CustomersPage() {
             <SelectTrigger className="w-[150px] h-10 bg-white/[0.02] border-white/[0.06] text-white">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="createdAt">Date joined</SelectItem>
-              <SelectItem value="totalSpent">Total spent</SelectItem>
-              <SelectItem value="totalOrders">Order count</SelectItem>
-              <SelectItem value="email">Email</SelectItem>
+            <SelectContent className="bg-[#1a1a1a] border-white/[0.06]">
+              <SelectItem value="createdAt" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Date joined</SelectItem>
+              <SelectItem value="totalSpent" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Total spent</SelectItem>
+              <SelectItem value="totalOrders" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Order count</SelectItem>
+              <SelectItem value="email" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Email</SelectItem>
             </SelectContent>
           </Select>
 
@@ -552,10 +552,10 @@ export default function CustomersPage() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteCustomerId} onOpenChange={() => setDeleteCustomerId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-[#1a1a1a] border-white/[0.06]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete customer?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-white">Delete customer?</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/50">
               This will permanently delete this customer and all their associated data.
               This action cannot be undone.
             </AlertDialogDescription>

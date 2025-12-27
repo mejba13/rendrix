@@ -54,7 +54,13 @@ export function OrderStatusBadge({ status, size = 'sm' }: OrderStatusBadgeProps)
     },
   };
 
-  const { bg, text, dot, label } = config[status];
+  const statusConfig = config[status] || {
+    bg: 'bg-white/[0.06]',
+    text: 'text-white/50',
+    dot: 'bg-white/40',
+    label: status || 'Unknown'
+  };
+  const { bg, text, dot, label } = statusConfig;
 
   return (
     <span className={cn(
@@ -114,7 +120,13 @@ export function PaymentStatusBadge({ status, size = 'sm' }: PaymentStatusBadgePr
     },
   };
 
-  const { bg, text, dot, label } = config[status];
+  const statusConfig = config[status] || {
+    bg: 'bg-white/[0.06]',
+    text: 'text-white/50',
+    dot: 'bg-white/40',
+    label: status || 'Unknown'
+  };
+  const { bg, text, dot, label } = statusConfig;
 
   return (
     <span className={cn(
@@ -162,7 +174,13 @@ export function FulfillmentStatusBadge({ status, size = 'sm' }: FulfillmentStatu
     },
   };
 
-  const { bg, text, dot, label } = config[status];
+  const statusConfig = config[status] || {
+    bg: 'bg-white/[0.06]',
+    text: 'text-white/50',
+    dot: 'bg-white/40',
+    label: status || 'Unknown'
+  };
+  const { bg, text, dot, label } = statusConfig;
 
   return (
     <span className={cn(

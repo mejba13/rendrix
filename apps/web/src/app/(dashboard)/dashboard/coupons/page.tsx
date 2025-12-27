@@ -452,12 +452,12 @@ export default function CouponsPage() {
             <SelectTrigger className="w-[140px] h-10 bg-white/[0.02] border-white/[0.06] text-white">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All types</SelectItem>
-              <SelectItem value="percentage">Percentage</SelectItem>
-              <SelectItem value="fixed">Fixed amount</SelectItem>
-              <SelectItem value="free_shipping">Free shipping</SelectItem>
-              <SelectItem value="bogo">BOGO</SelectItem>
+            <SelectContent className="bg-[#1a1a1a] border-white/[0.06]">
+              <SelectItem value="all" className="text-white/70 focus:bg-white/[0.06] focus:text-white">All types</SelectItem>
+              <SelectItem value="percentage" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Percentage</SelectItem>
+              <SelectItem value="fixed" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Fixed amount</SelectItem>
+              <SelectItem value="free_shipping" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Free shipping</SelectItem>
+              <SelectItem value="bogo" className="text-white/70 focus:bg-white/[0.06] focus:text-white">BOGO</SelectItem>
             </SelectContent>
           </Select>
 
@@ -480,10 +480,10 @@ export default function CouponsPage() {
             <SelectTrigger className="w-[130px] h-10 bg-white/[0.02] border-white/[0.06] text-white">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectContent className="bg-[#1a1a1a] border-white/[0.06]">
+              <SelectItem value="all" className="text-white/70 focus:bg-white/[0.06] focus:text-white">All status</SelectItem>
+              <SelectItem value="active" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Active</SelectItem>
+              <SelectItem value="inactive" className="text-white/70 focus:bg-white/[0.06] focus:text-white">Inactive</SelectItem>
             </SelectContent>
           </Select>
 
@@ -590,10 +590,10 @@ export default function CouponsPage() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteCouponId} onOpenChange={() => setDeleteCouponId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-[#1a1a1a] border-white/[0.06]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete coupon?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-white">Delete coupon?</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/50">
               This will permanently delete this coupon. Customers will no longer be able
               to use this code. This action cannot be undone.
             </AlertDialogDescription>
