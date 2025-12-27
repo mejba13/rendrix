@@ -3,6 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
   transpilePackages: ['@rendrix/types', '@rendrix/utils'],
+
   images: {
     remotePatterns: [
       {
@@ -13,8 +14,13 @@ const nextConfig = {
         protocol: 'http',
         hostname: 'localhost',
       },
+      {
+        protocol: 'http',
+        hostname: '*.localhost',
+      },
     ],
   },
+
   async rewrites() {
     return [
       {
@@ -22,6 +28,11 @@ const nextConfig = {
         destination: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/:path*`,
       },
     ];
+  },
+
+  // Enable experimental features for subdomain handling
+  experimental: {
+    // Allow middleware to modify request headers
   },
 };
 

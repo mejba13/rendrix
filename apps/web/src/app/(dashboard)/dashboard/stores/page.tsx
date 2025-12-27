@@ -39,7 +39,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { api, ApiError } from '@/lib/api';
 import { StoreSwitchModal } from '@/components/store/store-switch-modal';
-import { cn } from '@/lib/utils';
+import { cn, getStorefrontUrl } from '@/lib/utils';
 import { useStoreStore } from '@/store/store';
 import { useAuthStore } from '@/store/auth';
 
@@ -88,7 +88,11 @@ function AmbientBackground() {
 // Store Card Component
 function StoreCard({ store, onSelect, isCurrentStore }: { store: StoreData; onSelect: () => void; isCurrentStore: boolean }) {
   const config = industryConfig[store.industry] || industryConfig.general;
-  const storeUrl = store.customDomain || (store.subdomain ? `${store.subdomain}.rendrix.com` : `${store.slug}.rendrix.com`);
+  const storefrontUrl = getStorefrontUrl({
+    slug: store.slug,
+    subdomain: store.subdomain,
+    customDomain: store.customDomain,
+  });
 
   return (
     <div className={cn(
@@ -128,7 +132,7 @@ function StoreCard({ store, onSelect, isCurrentStore }: { store: StoreData; onSe
               </h3>
               <div className="flex items-center gap-2 text-xs text-white/40">
                 <Globe className="w-3 h-3" />
-                <span>{storeUrl}</span>
+                <span>{storefrontUrl.displayUrl}</span>
               </div>
             </div>
           </div>
@@ -163,13 +167,16 @@ function StoreCard({ store, onSelect, isCurrentStore }: { store: StoreData; onSe
               <DropdownMenuSeparator className="bg-white/[0.08]" />
               <DropdownMenuItem asChild>
                 <a
-                  href={`https://${storeUrl}`}
+                  href={storefrontUrl.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-white hover:bg-white/[0.08] cursor-pointer"
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />
                   View Storefront
+                  {storefrontUrl.isDev && (
+                    <span className="ml-1 text-[10px] text-amber-400">(Dev)</span>
+                  )}
                 </a>
               </DropdownMenuItem>
             </DropdownMenuContent>

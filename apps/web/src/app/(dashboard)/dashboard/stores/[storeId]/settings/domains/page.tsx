@@ -42,7 +42,7 @@ import {
   useVerifyDomain,
   useRemoveCustomDomain,
 } from '@/hooks/use-stores';
-import { cn } from '@/lib/utils';
+import { cn, getStorefrontUrl } from '@/lib/utils';
 
 const subdomainSchema = z.object({
   subdomain: z
@@ -223,9 +223,14 @@ export default function DomainsSettingsPage() {
         storeId,
         subdomain: data.subdomain,
       });
+      const updatedUrl = getStorefrontUrl({
+        slug: store?.slug || '',
+        subdomain: data.subdomain,
+        customDomain: store?.customDomain,
+      });
       toast({
         title: 'Subdomain updated',
-        description: `Your store is now available at ${data.subdomain}.rendrix.store`,
+        description: `Your store is now available at ${updatedUrl.displayUrl}`,
       });
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to update subdomain.';
@@ -316,9 +321,16 @@ export default function DomainsSettingsPage() {
     );
   }
 
-  const subdomainUrl = store?.subdomain
-    ? `https://${store.subdomain}.rendrix.store`
+  // Get storefront URL (handles dev vs production automatically)
+  const storefrontUrl = store
+    ? getStorefrontUrl({
+        slug: store.slug || '',
+        subdomain: store.subdomain,
+        customDomain: store.customDomain,
+      })
     : null;
+
+  const subdomainUrl = storefrontUrl?.url || null;
 
   return (
     <div className="space-y-6">
@@ -347,21 +359,28 @@ export default function DomainsSettingsPage() {
               </div>
             </FormField>
 
-            {subdomainUrl && (
+            {subdomainUrl && storefrontUrl && (
               <div className="flex items-center justify-between p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
                     <CheckCircle className="w-4 h-4 text-emerald-400" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">Store is live</p>
+                    <p className="text-sm font-medium text-white">
+                      Store is live
+                      {storefrontUrl.isDev && (
+                        <span className="ml-2 text-xs text-amber-400 px-1.5 py-0.5 rounded bg-amber-500/10">
+                          Dev Mode
+                        </span>
+                      )}
+                    </p>
                     <a
                       href={subdomainUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs text-emerald-400 hover:underline inline-flex items-center gap-1"
                     >
-                      {subdomainUrl}
+                      {storefrontUrl.displayUrl}
                       <ExternalLink className="h-3 w-3" />
                     </a>
                   </div>

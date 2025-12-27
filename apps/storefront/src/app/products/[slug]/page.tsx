@@ -1,122 +1,115 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Minus, Plus, ShoppingBag, ChevronLeft, Check, Truck, RotateCcw, Shield } from 'lucide-react';
+import { Minus, Plus, ShoppingBag, ChevronLeft, Truck, RotateCcw, Shield, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCartStore } from '@/store/cart';
 import { formatPrice, getDiscountPercentage, cn } from '@/lib/utils';
 import { ProductCard } from '@/components/products/product-card';
-import type { Product, ProductVariant } from '@/lib/api';
-
-// Demo product data - in production this would come from the API
-const demoProduct: Product & { longDescription?: string } = {
-  id: '1',
-  name: 'Classic White T-Shirt',
-  slug: 'classic-white-tshirt',
-  description: 'A comfortable everyday essential made from premium organic cotton.',
-  longDescription: `
-    <p>Introducing our Classic White T-Shirt - the perfect foundation for any outfit. Crafted from 100% organic cotton, this tee offers unparalleled comfort and breathability.</p>
-    <h3>Features</h3>
-    <ul>
-      <li>100% organic cotton for softness and sustainability</li>
-      <li>Pre-shrunk fabric for consistent fit</li>
-      <li>Reinforced stitching for durability</li>
-      <li>Classic crew neck design</li>
-      <li>Relaxed fit for everyday comfort</li>
-    </ul>
-    <h3>Care Instructions</h3>
-    <p>Machine wash cold with like colors. Tumble dry low. Do not bleach.</p>
-  `,
-  price: 29.99,
-  compareAtPrice: 39.99,
-  images: [],
-  status: 'active',
-  quantity: 100,
-  sku: 'TSHIRT-001',
-  categories: [{ id: 'cat-1', name: 'Clothing' }],
-  variants: [
-    { id: 'v1', name: 'Small', sku: 'TSHIRT-001-S', price: 29.99, quantity: 30, options: { size: 'S' } },
-    { id: 'v2', name: 'Medium', sku: 'TSHIRT-001-M', price: 29.99, quantity: 40, options: { size: 'M' } },
-    { id: 'v3', name: 'Large', sku: 'TSHIRT-001-L', price: 29.99, quantity: 20, options: { size: 'L' } },
-    { id: 'v4', name: 'X-Large', sku: 'TSHIRT-001-XL', price: 29.99, quantity: 10, options: { size: 'XL' } },
-  ],
-};
-
-const relatedProducts: Product[] = [
-  {
-    id: '2',
-    name: 'Premium Leather Wallet',
-    slug: 'premium-leather-wallet',
-    description: 'Handcrafted genuine leather',
-    price: 79.99,
-    compareAtPrice: 99.99,
-    images: [],
-    status: 'active',
-    quantity: 50,
-    sku: 'WALLET-001',
-    categories: [{ id: 'cat-2', name: 'Accessories' }],
-    variants: [],
-  },
-  {
-    id: '5',
-    name: 'Running Sneakers',
-    slug: 'running-sneakers',
-    description: 'Lightweight and responsive',
-    price: 129.99,
-    compareAtPrice: null,
-    images: [],
-    status: 'active',
-    quantity: 40,
-    sku: 'SNEAKERS-001',
-    categories: [{ id: 'cat-1', name: 'Clothing' }],
-    variants: [],
-  },
-  {
-    id: '6',
-    name: 'Stainless Steel Watch',
-    slug: 'stainless-steel-watch',
-    description: 'Timeless elegance',
-    price: 199.99,
-    compareAtPrice: 249.99,
-    images: [],
-    status: 'active',
-    quantity: 20,
-    sku: 'WATCH-001',
-    categories: [{ id: 'cat-2', name: 'Accessories' }],
-    variants: [],
-  },
-  {
-    id: '8',
-    name: 'Moisturizing Lip Balm',
-    slug: 'moisturizing-lip-balm',
-    description: 'All-day hydration',
-    price: 12.99,
-    compareAtPrice: null,
-    images: [],
-    status: 'active',
-    quantity: 200,
-    sku: 'LIPBALM-001',
-    categories: [{ id: 'cat-4', name: 'Beauty' }],
-    variants: [],
-  },
-];
+import { useStore } from '@/lib/store-context';
+import { getProduct, getProducts, type Product, type ProductVariant } from '@/lib/api';
 
 export default function ProductDetailPage() {
   const params = useParams();
-  const { addItem } = useCartStore();
+  const slug = params.slug as string;
+  const { store, isLoading: storeLoading } = useStore();
+  const { addItem, setStoreId } = useCartStore();
 
-  // In production, fetch product by slug
-  const product = demoProduct;
+  const [product, setProduct] = useState<(Product & { longDescription?: string }) | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
-    product.variants.length > 0 ? product.variants[0] : null
-  );
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  // Fetch product when store is available
+  useEffect(() => {
+    async function fetchProduct() {
+      if (!store?.id || !slug) return;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await getProduct(store.id, slug);
+
+        if (response.success && response.data) {
+          setProduct(response.data);
+
+          // Set first variant as selected if available
+          if (response.data.variants?.length > 0) {
+            setSelectedVariant(response.data.variants[0]);
+          }
+
+          // Set store ID in cart for multi-tenant support
+          setStoreId(store.id);
+
+          // Fetch related products
+          const relatedResponse = await getProducts(store.id, { limit: 4 });
+          if (relatedResponse.success && relatedResponse.data) {
+            // Filter out current product and limit to 4
+            setRelatedProducts(
+              relatedResponse.data
+                .filter((p) => p.id !== response.data.id)
+                .slice(0, 4)
+            );
+          }
+        } else {
+          setError('Product not found');
+        }
+      } catch (err) {
+        console.error('Failed to fetch product:', err);
+        setError('Failed to load product');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProduct();
+  }, [store?.id, slug, setStoreId]);
+
+  // Show loading state
+  if (storeLoading || loading) {
+    return (
+      <div className="container-wide py-8">
+        <div className="flex items-center justify-center py-24">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error || !product) {
+    return (
+      <div className="container-wide py-8">
+        <nav className="mb-8">
+          <Link
+            href="/products"
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ChevronLeft className="mr-1 h-4 w-4" />
+            Back to products
+          </Link>
+        </nav>
+        <div className="rounded-lg border border-dashed p-12 text-center">
+          <h2 className="text-xl font-semibold">Product Not Found</h2>
+          <p className="mt-2 text-muted-foreground">
+            {error || 'The product you are looking for does not exist.'}
+          </p>
+          <Button asChild className="mt-4">
+            <Link href="/products">Browse Products</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price;
   const discountPercent = hasDiscount
@@ -243,7 +236,7 @@ export default function ProductDetailPage() {
           <p className="mt-4 text-muted-foreground">{product.description}</p>
 
           {/* Variants */}
-          {product.variants.length > 0 && (
+          {product.variants && product.variants.length > 0 && (
             <div className="mt-6">
               <h3 className="text-sm font-medium">Size</h3>
               <div className="mt-2 flex flex-wrap gap-2">
@@ -263,7 +256,7 @@ export default function ProductDetailPage() {
                     }
                     disabled={variant.quantity <= 0}
                   >
-                    {variant.options.size || variant.name}
+                    {variant.options?.size || variant.name}
                   </button>
                 ))}
               </div>
@@ -344,14 +337,16 @@ export default function ProductDetailPage() {
       </div>
 
       {/* Related products */}
-      <section className="mt-16 border-t pt-16">
-        <h2 className="text-2xl font-bold">You May Also Like</h2>
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">
-          {relatedProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </section>
+      {relatedProducts.length > 0 && (
+        <section className="mt-16 border-t pt-16">
+          <h2 className="text-2xl font-bold">You May Also Like</h2>
+          <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">
+            {relatedProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

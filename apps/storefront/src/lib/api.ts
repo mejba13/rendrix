@@ -109,7 +109,16 @@ export async function getProducts(
   storeId: string,
   params?: ProductListParams
 ): Promise<ApiResponse<Product[]>> {
-  return fetcher<Product[]>(`/api/v1/storefront/${storeId}/products`, { params });
+  const queryParams: Record<string, string | number | undefined> | undefined = params ? {
+    page: params.page,
+    limit: params.limit,
+    category: params.category,
+    search: params.search,
+    sort: params.sort,
+    minPrice: params.minPrice,
+    maxPrice: params.maxPrice,
+  } : undefined;
+  return fetcher<Product[]>(`/api/v1/storefront/${storeId}/products`, { params: queryParams });
 }
 
 export async function getProduct(

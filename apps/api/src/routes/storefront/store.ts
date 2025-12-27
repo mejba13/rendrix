@@ -2,25 +2,33 @@ import { FastifyInstance, FastifyRequest } from 'fastify';
 import { prisma } from '../../lib/prisma';
 
 export async function storefrontStoreRoutes(app: FastifyInstance) {
-  // Get store by slug
+  // Get store by slug or subdomain
+  // This endpoint supports both slug and subdomain lookup for flexibility
   app.get(
-    '/stores/:slug',
+    '/stores/:identifier',
     async (
       request: FastifyRequest<{
-        Params: { slug: string };
+        Params: { identifier: string };
       }>,
       reply
     ) => {
-      const { slug } = request.params;
+      const { identifier } = request.params;
 
+      // Try to find by subdomain first, then by slug
       const store = await prisma.store.findFirst({
-        where: { slug },
+        where: {
+          OR: [
+            { subdomain: identifier },
+            { slug: identifier },
+          ],
+        },
         select: {
           id: true,
           name: true,
           slug: true,
+          subdomain: true,
           description: true,
-          logo: true,
+          logoUrl: true,
           settings: true,
         },
       });
@@ -40,8 +48,9 @@ export async function storefrontStoreRoutes(app: FastifyInstance) {
           id: store.id,
           name: store.name,
           slug: store.slug,
+          subdomain: store.subdomain,
           description: store.description,
-          logo: store.logo,
+          logo: store.logoUrl,
           currency: settings.currency || 'USD',
           theme: settings.theme || {},
         },
@@ -66,8 +75,9 @@ export async function storefrontStoreRoutes(app: FastifyInstance) {
           id: true,
           name: true,
           slug: true,
+          subdomain: true,
           description: true,
-          logo: true,
+          logoUrl: true,
           settings: true,
         },
       });
@@ -87,8 +97,9 @@ export async function storefrontStoreRoutes(app: FastifyInstance) {
           id: store.id,
           name: store.name,
           slug: store.slug,
+          subdomain: store.subdomain,
           description: store.description,
-          logo: store.logo,
+          logo: store.logoUrl,
           currency: settings.currency || 'USD',
           theme: settings.theme || {},
         },

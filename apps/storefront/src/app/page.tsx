@@ -3,75 +3,41 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/products/product-card';
+import { getStoreData, fetchProducts, fetchCategories } from '@/lib/store-server';
 
-// Demo data - in production, this would come from the API
-const featuredProducts = [
-  {
-    id: '1',
-    name: 'Classic White T-Shirt',
-    slug: 'classic-white-tshirt',
-    description: 'A comfortable everyday essential',
-    price: 29.99,
-    compareAtPrice: null,
-    images: [],
-    status: 'active',
-    quantity: 100,
-    sku: 'TSHIRT-001',
-    categories: [{ id: 'cat-1', name: 'Clothing' }],
-    variants: [],
-  },
-  {
-    id: '2',
-    name: 'Premium Leather Wallet',
-    slug: 'premium-leather-wallet',
-    description: 'Handcrafted genuine leather',
-    price: 79.99,
-    compareAtPrice: 99.99,
-    images: [],
-    status: 'active',
-    quantity: 50,
-    sku: 'WALLET-001',
-    categories: [{ id: 'cat-2', name: 'Accessories' }],
-    variants: [],
-  },
-  {
-    id: '3',
-    name: 'Wireless Earbuds Pro',
-    slug: 'wireless-earbuds-pro',
-    description: 'Crystal clear sound, all day comfort',
-    price: 149.99,
-    compareAtPrice: null,
-    images: [],
-    status: 'active',
-    quantity: 25,
-    sku: 'EARBUDS-001',
-    categories: [{ id: 'cat-3', name: 'Electronics' }],
-    variants: [],
-  },
-  {
-    id: '4',
-    name: 'Organic Face Cream',
-    slug: 'organic-face-cream',
-    description: 'Natural ingredients for radiant skin',
-    price: 45.00,
-    compareAtPrice: 55.00,
-    images: [],
-    status: 'active',
-    quantity: 75,
-    sku: 'CREAM-001',
-    categories: [{ id: 'cat-4', name: 'Beauty' }],
-    variants: [],
-  },
-];
+export default async function HomePage() {
+  const { store } = await getStoreData();
 
-const categories = [
-  { name: 'Clothing', href: '/products?category=clothing', image: null },
-  { name: 'Accessories', href: '/products?category=accessories', image: null },
-  { name: 'Electronics', href: '/products?category=electronics', image: null },
-  { name: 'Beauty', href: '/products?category=beauty', image: null },
-];
+  // Fetch products and categories if we have a store
+  let featuredProducts: any[] = [];
+  let categories: any[] = [];
 
-export default function HomePage() {
+  if (store) {
+    const [productsData, categoriesData] = await Promise.all([
+      fetchProducts(store.id, { limit: 8 }),
+      fetchCategories(store.id),
+    ]);
+    featuredProducts = productsData.products;
+    categories = categoriesData.slice(0, 4).map(cat => ({
+      id: cat.id,
+      name: cat.name,
+      href: `/products?category=${cat.slug}`,
+      image: cat.image,
+    }));
+  }
+
+  // Fallback categories if none from API
+  if (categories.length === 0) {
+    categories = [
+      { name: 'Clothing', href: '/products?category=clothing', image: null },
+      { name: 'Accessories', href: '/products?category=accessories', image: null },
+      { name: 'Electronics', href: '/products?category=electronics', image: null },
+      { name: 'Beauty', href: '/products?category=beauty', image: null },
+    ];
+  }
+  const storeName = store?.name || 'Our Store';
+  const storeDescription = store?.description || 'Discover our curated collection of premium products. Quality you can trust, style you\'ll love.';
+
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -79,11 +45,10 @@ export default function HomePage() {
         <div className="container-wide py-24 sm:py-32">
           <div className="mx-auto max-w-2xl text-center">
             <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-              Welcome to Our Store
+              Welcome to {storeName}
             </h1>
             <p className="mt-6 text-lg leading-8 text-slate-300">
-              Discover our curated collection of premium products. Quality you can
-              trust, style you'll love.
+              {storeDescription}
             </p>
             <div className="mt-10 flex items-center justify-center gap-4">
               <Button asChild size="lg">
@@ -167,11 +132,19 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">
-            {featuredProducts.map((product, i) => (
-              <ProductCard key={product.id} product={product} priority={i < 2} />
-            ))}
-          </div>
+          {featuredProducts.length > 0 ? (
+            <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">
+              {featuredProducts.map((product, i) => (
+                <ProductCard key={product.id} product={product} priority={i < 2} />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-8 rounded-lg border border-dashed p-12 text-center">
+              <p className="text-muted-foreground">
+                No products available yet. Check back soon!
+              </p>
+            </div>
+          )}
         </div>
       </section>
 

@@ -1,137 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { SlidersHorizontal, X, ChevronDown } from 'lucide-react';
+import { SlidersHorizontal, X, ChevronDown, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ProductGrid } from '@/components/products/product-grid';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import type { Product, Category } from '@/lib/api';
-
-// Demo data - in production, these would come from the API
-const demoProducts: Product[] = [
-  {
-    id: '1',
-    name: 'Classic White T-Shirt',
-    slug: 'classic-white-tshirt',
-    description: 'A comfortable everyday essential',
-    price: 29.99,
-    compareAtPrice: null,
-    images: [],
-    status: 'active',
-    quantity: 100,
-    sku: 'TSHIRT-001',
-    categories: [{ id: 'cat-1', name: 'Clothing' }],
-    variants: [],
-  },
-  {
-    id: '2',
-    name: 'Premium Leather Wallet',
-    slug: 'premium-leather-wallet',
-    description: 'Handcrafted genuine leather',
-    price: 79.99,
-    compareAtPrice: 99.99,
-    images: [],
-    status: 'active',
-    quantity: 50,
-    sku: 'WALLET-001',
-    categories: [{ id: 'cat-2', name: 'Accessories' }],
-    variants: [],
-  },
-  {
-    id: '3',
-    name: 'Wireless Earbuds Pro',
-    slug: 'wireless-earbuds-pro',
-    description: 'Crystal clear sound, all day comfort',
-    price: 149.99,
-    compareAtPrice: null,
-    images: [],
-    status: 'active',
-    quantity: 25,
-    sku: 'EARBUDS-001',
-    categories: [{ id: 'cat-3', name: 'Electronics' }],
-    variants: [],
-  },
-  {
-    id: '4',
-    name: 'Organic Face Cream',
-    slug: 'organic-face-cream',
-    description: 'Natural ingredients for radiant skin',
-    price: 45.00,
-    compareAtPrice: 55.00,
-    images: [],
-    status: 'active',
-    quantity: 75,
-    sku: 'CREAM-001',
-    categories: [{ id: 'cat-4', name: 'Beauty' }],
-    variants: [],
-  },
-  {
-    id: '5',
-    name: 'Running Sneakers',
-    slug: 'running-sneakers',
-    description: 'Lightweight and responsive',
-    price: 129.99,
-    compareAtPrice: null,
-    images: [],
-    status: 'active',
-    quantity: 40,
-    sku: 'SNEAKERS-001',
-    categories: [{ id: 'cat-1', name: 'Clothing' }],
-    variants: [],
-  },
-  {
-    id: '6',
-    name: 'Stainless Steel Watch',
-    slug: 'stainless-steel-watch',
-    description: 'Timeless elegance',
-    price: 199.99,
-    compareAtPrice: 249.99,
-    images: [],
-    status: 'active',
-    quantity: 20,
-    sku: 'WATCH-001',
-    categories: [{ id: 'cat-2', name: 'Accessories' }],
-    variants: [],
-  },
-  {
-    id: '7',
-    name: 'Bluetooth Speaker',
-    slug: 'bluetooth-speaker',
-    description: 'Portable sound anywhere',
-    price: 89.99,
-    compareAtPrice: null,
-    images: [],
-    status: 'active',
-    quantity: 60,
-    sku: 'SPEAKER-001',
-    categories: [{ id: 'cat-3', name: 'Electronics' }],
-    variants: [],
-  },
-  {
-    id: '8',
-    name: 'Moisturizing Lip Balm',
-    slug: 'moisturizing-lip-balm',
-    description: 'All-day hydration',
-    price: 12.99,
-    compareAtPrice: null,
-    images: [],
-    status: 'active',
-    quantity: 200,
-    sku: 'LIPBALM-001',
-    categories: [{ id: 'cat-4', name: 'Beauty' }],
-    variants: [],
-  },
-];
-
-const demoCategories: Category[] = [
-  { id: 'cat-1', name: 'Clothing', slug: 'clothing', description: null, image: null, productCount: 2 },
-  { id: 'cat-2', name: 'Accessories', slug: 'accessories', description: null, image: null, productCount: 2 },
-  { id: 'cat-3', name: 'Electronics', slug: 'electronics', description: null, image: null, productCount: 2 },
-  { id: 'cat-4', name: 'Beauty', slug: 'beauty', description: null, image: null, productCount: 2 },
-];
+import { useStore } from '@/lib/store-context';
+import { getProducts, getCategories, type Product, type Category } from '@/lib/api';
 
 const sortOptions = [
   { value: 'newest', label: 'Newest' },
@@ -144,10 +22,11 @@ const sortOptions = [
 export default function ProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { store, categories: storeCategories, isLoading: storeLoading } = useStore();
 
-  const [products, setProducts] = useState<Product[]>(demoProducts);
-  const [categories] = useState<Category[]>(demoCategories);
-  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>(storeCategories);
+  const [loading, setLoading] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
 
@@ -157,56 +36,56 @@ export default function ProductsPage() {
   const minPriceParam = searchParams.get('minPrice');
   const maxPriceParam = searchParams.get('maxPrice');
 
-  // Filter and sort products
+  // Fetch products when store or filters change
+  const fetchProducts = useCallback(async () => {
+    if (!store?.id) return;
+
+    setLoading(true);
+    try {
+      const response = await getProducts(store.id, {
+        category: categoryParam || undefined,
+        search: searchParam || undefined,
+        sort: sortParam,
+        minPrice: minPriceParam ? parseFloat(minPriceParam) : undefined,
+        maxPrice: maxPriceParam ? parseFloat(maxPriceParam) : undefined,
+        limit: 50,
+      });
+
+      if (response.success && response.data) {
+        setProducts(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [store?.id, categoryParam, searchParam, sortParam, minPriceParam, maxPriceParam]);
+
+  // Fetch categories if not already loaded
   useEffect(() => {
-    let filtered = [...demoProducts];
+    async function fetchCategories() {
+      if (!store?.id || storeCategories.length > 0) {
+        setCategories(storeCategories);
+        return;
+      }
 
-    // Category filter
-    if (categoryParam) {
-      filtered = filtered.filter((p) =>
-        p.categories.some((c) => c.name.toLowerCase() === categoryParam.toLowerCase())
-      );
+      try {
+        const response = await getCategories(store.id);
+        if (response.success && response.data) {
+          setCategories(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      }
     }
 
-    // Search filter
-    if (searchParam) {
-      const search = searchParam.toLowerCase();
-      filtered = filtered.filter(
-        (p) =>
-          p.name.toLowerCase().includes(search) ||
-          p.description?.toLowerCase().includes(search)
-      );
-    }
+    fetchCategories();
+  }, [store?.id, storeCategories]);
 
-    // Price filter
-    if (minPriceParam) {
-      filtered = filtered.filter((p) => p.price >= parseFloat(minPriceParam));
-    }
-    if (maxPriceParam) {
-      filtered = filtered.filter((p) => p.price <= parseFloat(maxPriceParam));
-    }
-
-    // Sort
-    switch (sortParam) {
-      case 'price-asc':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'name-asc':
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'name-desc':
-        filtered.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      default:
-        // newest - keep original order
-        break;
-    }
-
-    setProducts(filtered);
-  }, [categoryParam, searchParam, sortParam, minPriceParam, maxPriceParam]);
+  // Fetch products when dependencies change
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const updateParams = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -226,6 +105,31 @@ export default function ProductsPage() {
     Boolean
   ).length;
 
+  // Show loading state while store is loading
+  if (storeLoading) {
+    return (
+      <div className="container-wide py-8">
+        <div className="flex items-center justify-center py-24">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no store found
+  if (!store) {
+    return (
+      <div className="container-wide py-8">
+        <div className="rounded-lg border border-dashed p-12 text-center">
+          <h2 className="text-xl font-semibold">Store Not Found</h2>
+          <p className="mt-2 text-muted-foreground">
+            Please access this page through a valid store subdomain.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container-wide py-8">
       {/* Header */}
@@ -237,7 +141,7 @@ export default function ProductsPage() {
               : 'All Products'}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {products.length} product{products.length !== 1 ? 's' : ''}
+            {loading ? 'Loading...' : `${products.length} product${products.length !== 1 ? 's' : ''}`}
           </p>
         </div>
 
