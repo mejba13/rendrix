@@ -38,6 +38,11 @@ const paymentSchema = z.object({
   cancelUrl: z.string().optional(),
 });
 
+const paypalCaptureSchema = z.object({
+  orderId: z.string().uuid(),
+  paypalOrderId: z.string().min(1),
+});
+
 export async function storefrontCheckoutRoutes(app: FastifyInstance) {
   // Create checkout / order
   app.post(
@@ -373,12 +378,12 @@ export async function storefrontCheckoutRoutes(app: FastifyInstance) {
     async (
       request: FastifyRequest<{
         Params: { storeId: string };
-        Body: { orderId: string; paypalOrderId: string };
+        Body: z.infer<typeof paypalCaptureSchema>;
       }>,
       reply
     ) => {
       const { storeId } = request.params;
-      const { orderId, paypalOrderId } = request.body;
+      const { orderId, paypalOrderId } = paypalCaptureSchema.parse(request.body);
 
       const order = await prisma.order.findFirst({
         where: {

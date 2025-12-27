@@ -403,7 +403,7 @@ export async function organizationRoutes(app: FastifyInstance) {
       const inviter = request.currentUser!;
       await queueTeamInviteEmail(body.email, {
         inviterName: `${inviter.firstName || ''} ${inviter.lastName || ''}`.trim() || inviter.email,
-        organizationName: organization.name,
+        organizationName: request.currentOrganization!.name,
         role: body.role,
         inviteUrl,
       });
