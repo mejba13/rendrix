@@ -858,242 +858,466 @@ function HeroSection() {
 function SocialProofSection() {
   const { ref, isInView } = useInView();
   const mounted = useMounted();
+  const [countedValues, setCountedValues] = useState<{ [key: string]: number }>({});
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  // Stats data with unique colors and visualizations
+  // Count-up animation effect
+  useEffect(() => {
+    if (!isInView || !mounted) return;
+
+    const targets = {
+      stores: 50000,
+      gmv: 2,
+      uptime: 99.99,
+      countries: 150,
+    };
+
+    const duration = 2000;
+    const steps = 60;
+    const interval = duration / steps;
+
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      const progress = step / steps;
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+
+      setCountedValues({
+        stores: Math.floor(targets.stores * easeOut),
+        gmv: Math.round(targets.gmv * easeOut * 10) / 10,
+        uptime: Math.round(targets.uptime * easeOut * 100) / 100,
+        countries: Math.floor(targets.countries * easeOut),
+      });
+
+      if (step >= steps) clearInterval(timer);
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [isInView, mounted]);
+
+  // 3D tilt effect handler
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>, cardId: string) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMousePosition({ x: x * 20, y: y * -20 });
+  };
+
+  const handleMouseLeave = () => {
+    setMousePosition({ x: 0, y: 0 });
+  };
+
+  // Stats configuration
   const stats = [
     {
-      value: '50K',
+      id: 'stores',
+      value: countedValues.stores || 0,
+      displayValue: `${Math.floor((countedValues.stores || 0) / 1000)}K`,
       suffix: '+',
       label: 'Active Stores',
       sublabel: 'Worldwide merchants',
       icon: Store,
       color: '#FF9100',
-      bgGradient: 'rgba(255,145,0,0.15)',
+      secondaryColor: '#FFB800',
+      featured: true,
     },
     {
-      value: '$2B',
+      id: 'gmv',
+      value: countedValues.gmv || 0,
+      displayValue: `$${countedValues.gmv || 0}B`,
       suffix: '+',
       label: 'GMV Processed',
       sublabel: 'Annual transaction volume',
       icon: DollarSign,
-      color: '#FFD700',
-      bgGradient: 'rgba(255,215,0,0.15)',
+      color: '#22C55E',
+      secondaryColor: '#4ADE80',
+      featured: false,
     },
     {
-      value: '99.99',
+      id: 'uptime',
+      value: countedValues.uptime || 0,
+      displayValue: (countedValues.uptime || 0).toFixed(2),
       suffix: '%',
       label: 'Uptime SLA',
       sublabel: 'Enterprise guarantee',
       icon: Shield,
-      color: '#22C55E',
-      bgGradient: 'rgba(34,197,94,0.15)',
+      color: '#8B5CF6',
+      secondaryColor: '#A78BFA',
+      featured: false,
     },
     {
-      value: '150',
+      id: 'countries',
+      value: countedValues.countries || 0,
+      displayValue: `${countedValues.countries || 0}`,
       suffix: '+',
       label: 'Countries',
       sublabel: 'Global coverage',
       icon: Globe,
       color: '#3B82F6',
-      bgGradient: 'rgba(59,130,246,0.15)',
+      secondaryColor: '#60A5FA',
+      featured: false,
     },
   ];
 
-  // Extended brand list for marquee
+  // Brand logos
   const brands = [
     'Allbirds', 'Gymshark', 'MVMT', 'Bombas', 'Warby Parker',
     'Casper', 'Away', 'Glossier', 'Brooklinen', 'Outdoor Voices',
     'Rothy\'s', 'Everlane', 'Mejuri', 'Parachute', 'Koio',
   ];
 
+  // Trust badges
+  const trustBadges = [
+    { label: 'Enterprise Ready', icon: Shield, color: '#FF9100' },
+    { label: 'SOC 2 Certified', icon: Lock, color: '#22C55E' },
+    { label: 'GDPR Compliant', icon: CheckCircle2, color: '#8B5CF6' },
+    { label: '24/7 Support', icon: Clock, color: '#3B82F6' },
+  ];
+
   return (
-    <section ref={ref} className="py-28 lg:py-36 relative overflow-hidden">
-      {/* ===== BACKGROUND EFFECTS ===== */}
+    <section ref={ref} className="py-28 lg:py-40 relative overflow-hidden">
+      {/* ===== PREMIUM BACKGROUND EFFECTS ===== */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Top gradient line */}
+        {/* Animated gradient mesh */}
         <div
-          className="absolute top-0 left-0 right-0 h-[1px]"
+          className="absolute inset-0 opacity-30"
           style={{
-            background: 'linear-gradient(90deg, transparent 0%, rgba(255,145,0,0.5) 50%, transparent 100%)',
+            background: `
+              radial-gradient(ellipse 80% 50% at 20% 40%, rgba(255,145,0,0.15) 0%, transparent 50%),
+              radial-gradient(ellipse 60% 40% at 80% 60%, rgba(139,92,246,0.1) 0%, transparent 50%),
+              radial-gradient(ellipse 50% 30% at 50% 80%, rgba(59,130,246,0.08) 0%, transparent 50%)
+            `,
           }}
         />
 
-        {/* Central glow */}
+        {/* Floating orbs with glow */}
+        {mounted && (
+          <>
+            <div
+              className="absolute w-[500px] h-[500px] rounded-full"
+              style={{
+                top: '10%',
+                left: '-10%',
+                background: 'radial-gradient(circle, rgba(255,145,0,0.08) 0%, transparent 60%)',
+                filter: 'blur(80px)',
+                animation: 'orbFloat 20s ease-in-out infinite',
+              }}
+            />
+            <div
+              className="absolute w-[400px] h-[400px] rounded-full"
+              style={{
+                bottom: '10%',
+                right: '-5%',
+                background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 60%)',
+                filter: 'blur(60px)',
+                animation: 'orbFloat 25s ease-in-out infinite reverse',
+              }}
+            />
+            <div
+              className="absolute w-[300px] h-[300px] rounded-full"
+              style={{
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                background: 'radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 60%)',
+                filter: 'blur(50px)',
+                animation: 'orbPulse 15s ease-in-out infinite',
+              }}
+            />
+          </>
+        )}
+
+        {/* Noise texture overlay */}
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full"
+          className="absolute inset-0 opacity-[0.03]"
           style={{
-            background: 'radial-gradient(circle, rgba(255,145,0,0.06) 0%, transparent 50%)',
-            filter: 'blur(60px)',
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
           }}
         />
 
-        {/* Floating particles */}
-        {mounted && [...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 rounded-full"
-            style={{
-              left: `${10 + (i * 7)}%`,
-              top: `${20 + (i * 5) % 60}%`,
-              background: i % 4 === 0 ? '#FF9100' : i % 4 === 1 ? '#FFD700' : i % 4 === 2 ? '#22C55E' : '#3B82F6',
-              opacity: 0.4,
-              animation: `floatParticle ${8 + (i * 1.5)}s ease-in-out infinite`,
-              animationDelay: `${i * 0.4}s`,
-            }}
-          />
-        ))}
+        {/* Grid lines effect */}
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '100px 100px',
+          }}
+        />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         {/* ===== HEADER ===== */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-20">
+          {/* Trust badge */}
           <div
-            className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-full mb-6 transition-all duration-700 ${
-              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+            className={`inline-flex items-center gap-3 px-6 py-3 rounded-full mb-8 transition-all duration-1000 ${
+              isInView ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-8 scale-95'
             }`}
             style={{
-              background: 'linear-gradient(135deg, rgba(255,145,0,0.15) 0%, rgba(255,145,0,0.05) 100%)',
-              border: '1px solid rgba(255,145,0,0.25)',
+              background: 'linear-gradient(135deg, rgba(255,145,0,0.12) 0%, rgba(255,184,0,0.06) 100%)',
+              border: '1px solid rgba(255,145,0,0.2)',
+              boxShadow: '0 8px 32px rgba(255,145,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
             }}
           >
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-3.5 h-3.5 fill-primary text-primary" />
+                <Star
+                  key={i}
+                  className="w-4 h-4 fill-[#FFB800] text-[#FFB800]"
+                  style={{
+                    animation: isInView ? `starPop 0.5s ease-out ${i * 0.1}s both` : 'none',
+                  }}
+                />
               ))}
             </div>
-            <span className="text-sm font-medium text-white/80">Trusted by 50,000+ businesses worldwide</span>
+            <div className="w-px h-4 bg-white/10" />
+            <span className="text-sm font-medium text-white/80 tracking-wide">
+              Trusted by 50,000+ businesses worldwide
+            </span>
           </div>
+
+          {/* Main headline */}
           <h2
-            className={`text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight transition-all duration-700 delay-100 ${
-              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            className={`text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight transition-all duration-1000 delay-150 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
             }`}
           >
-            Powering{' '}
+            <span className="text-white">Powering </span>
             <span
-              className="bg-clip-text text-transparent"
+              className="relative inline-block"
               style={{
-                background: 'linear-gradient(135deg, #FF9100 0%, #FFD700 50%, #FF6B00 100%)',
+                background: 'linear-gradient(135deg, #FF9100 0%, #FFB800 40%, #FF6B00 100%)',
                 WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent',
               }}
             >
               commerce
+              {/* Animated underline */}
+              <svg
+                className="absolute -bottom-2 left-0 w-full h-3"
+                viewBox="0 0 200 12"
+                fill="none"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M2 8C40 2 160 2 198 8"
+                  stroke="url(#commerceUnderline)"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  style={{
+                    strokeDasharray: 200,
+                    strokeDashoffset: isInView ? 0 : 200,
+                    transition: 'stroke-dashoffset 1.5s ease-out 0.5s',
+                  }}
+                />
+                <defs>
+                  <linearGradient id="commerceUnderline" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#FF9100" />
+                    <stop offset="50%" stopColor="#FFB800" />
+                    <stop offset="100%" stopColor="#FF6B00" />
+                  </linearGradient>
+                </defs>
+              </svg>
             </span>
-            {' '}at scale
+            <span className="text-white"> at scale</span>
           </h2>
+
+          {/* Subtitle */}
+          <p
+            className={`mt-6 text-lg lg:text-xl text-white/50 max-w-2xl mx-auto transition-all duration-1000 delay-300 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            Join the fastest-growing brands building their commerce empires with enterprise-grade infrastructure
+          </p>
         </div>
 
-        {/* ===== STATS BENTO GRID ===== */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 mb-20">
-          {stats.map((stat, i) => (
+        {/* ===== ASYMMETRIC BENTO GRID ===== */}
+        <div className="grid grid-cols-12 gap-4 lg:gap-5 mb-20">
+          {/* Featured stat card - spans more columns */}
+          <div
+            className={`col-span-12 lg:col-span-5 lg:row-span-2 transition-all duration-1000 delay-200 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'
+            }`}
+            onMouseMove={(e) => handleMouseMove(e, 'featured')}
+            onMouseLeave={handleMouseLeave}
+          >
             <div
-              key={stat.label}
-              className={`group relative rounded-3xl p-6 lg:p-8 overflow-hidden transition-all duration-700 hover:-translate-y-2 hover:scale-[1.02] ${
-                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-              }`}
+              className="relative h-full min-h-[320px] lg:min-h-[400px] rounded-3xl p-8 lg:p-10 overflow-hidden group cursor-pointer"
               style={{
-                transitionDelay: `${i * 100}ms`,
-                background: `linear-gradient(135deg, ${stat.bgGradient} 0%, rgba(0,0,0,0.4) 100%)`,
-                border: `1px solid ${stat.color}25`,
+                background: 'linear-gradient(145deg, rgba(255,145,0,0.12) 0%, rgba(20,20,25,0.95) 50%, rgba(255,145,0,0.05) 100%)',
+                border: '1px solid rgba(255,145,0,0.2)',
+                boxShadow: '0 25px 80px -20px rgba(255,145,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
+                transform: `perspective(1000px) rotateY(${mousePosition.x * 0.3}deg) rotateX(${mousePosition.y * 0.3}deg)`,
+                transition: 'transform 0.1s ease-out, box-shadow 0.3s ease',
               }}
             >
-              {/* Hover glow effect */}
+              {/* Animated gradient border */}
               <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                 style={{
-                  background: `radial-gradient(circle at 50% 0%, ${stat.color}20 0%, transparent 60%)`,
+                  background: 'linear-gradient(135deg, rgba(255,145,0,0.3) 0%, transparent 50%, rgba(255,184,0,0.3) 100%)',
+                  mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  maskComposite: 'exclude',
+                  padding: '2px',
                 }}
               />
 
-              {/* Top accent line */}
+              {/* Glow orb */}
               <div
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[2px] rounded-full"
+                className="absolute -top-20 -right-20 w-60 h-60 rounded-full opacity-40 group-hover:opacity-60 transition-opacity duration-500"
                 style={{
-                  background: `linear-gradient(90deg, transparent, ${stat.color}, transparent)`,
+                  background: 'radial-gradient(circle, rgba(255,145,0,0.4) 0%, transparent 70%)',
+                  filter: 'blur(40px)',
                 }}
               />
 
-              <div className="relative">
-                {/* Icon */}
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110"
-                  style={{
-                    background: `linear-gradient(135deg, ${stat.color}30 0%, ${stat.color}10 100%)`,
-                    border: `1px solid ${stat.color}40`,
-                    boxShadow: `0 8px 24px ${stat.color}20`,
-                  }}
-                >
-                  <stat.icon className="w-7 h-7" style={{ color: stat.color }} />
-                </div>
-
-                {/* Value with animated effect */}
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span
-                    className="text-4xl lg:text-5xl font-black tracking-tight"
+              {/* Content */}
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                {/* Icon with pulse ring */}
+                <div className="relative">
+                  <div
+                    className="w-16 h-16 lg:w-20 lg:h-20 rounded-2xl flex items-center justify-center mb-6"
                     style={{
-                      color: stat.color,
-                      textShadow: `0 0 40px ${stat.color}40`,
+                      background: 'linear-gradient(135deg, rgba(255,145,0,0.3) 0%, rgba(255,145,0,0.1) 100%)',
+                      border: '1px solid rgba(255,145,0,0.4)',
+                      boxShadow: '0 10px 40px rgba(255,145,0,0.3)',
                     }}
                   >
-                    {stat.value}
-                  </span>
-                  <span
-                    className="text-2xl lg:text-3xl font-bold"
-                    style={{ color: stat.color }}
-                  >
-                    {stat.suffix}
-                  </span>
+                    <Store className="w-8 h-8 lg:w-10 lg:h-10 text-[#FF9100]" />
+                  </div>
+                  {/* Pulse rings */}
+                  <div
+                    className="absolute top-0 left-0 w-16 h-16 lg:w-20 lg:h-20 rounded-2xl"
+                    style={{
+                      border: '2px solid rgba(255,145,0,0.3)',
+                      animation: 'pulseRing 2s ease-out infinite',
+                    }}
+                  />
                 </div>
 
-                {/* Labels */}
-                <div className="text-base font-semibold text-white mb-1">{stat.label}</div>
-                <div className="text-sm text-white/40">{stat.sublabel}</div>
+                {/* Value */}
+                <div>
+                  <div className="flex items-baseline gap-2 mb-3">
+                    <span
+                      className="text-6xl lg:text-8xl font-black tracking-tight"
+                      style={{
+                        background: 'linear-gradient(135deg, #FF9100 0%, #FFB800 50%, #FF6B00 100%)',
+                        WebkitBackgroundClip: 'text',
+                        backgroundClip: 'text',
+                        color: 'transparent',
+                        textShadow: '0 0 80px rgba(255,145,0,0.5)',
+                      }}
+                    >
+                      {stats[0].displayValue}
+                    </span>
+                    <span className="text-4xl lg:text-5xl font-bold text-[#FFB800]">+</span>
+                  </div>
+                  <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2">{stats[0].label}</h3>
+                  <p className="text-base lg:text-lg text-white/40">{stats[0].sublabel}</p>
+                </div>
 
-                {/* Mini visualization based on stat type */}
-                <div className="absolute bottom-6 right-6 opacity-20 group-hover:opacity-40 transition-opacity">
-                  {i === 0 && (
-                    // Store growth chart
-                    <div className="flex items-end gap-1 h-10">
-                      {[40, 55, 45, 70, 60, 85, 75, 95].map((h, idx) => (
-                        <div
-                          key={idx}
-                          className="w-1.5 rounded-full transition-all duration-500"
+                {/* Mini chart decoration */}
+                <div className="absolute bottom-8 right-8 flex items-end gap-1.5 opacity-30 group-hover:opacity-50 transition-opacity">
+                  {[35, 50, 40, 65, 55, 80, 70, 95, 85, 100].map((h, idx) => (
+                    <div
+                      key={idx}
+                      className="w-2 lg:w-2.5 rounded-full"
+                      style={{
+                        height: `${h * 0.8}px`,
+                        background: 'linear-gradient(to top, #FF9100, #FFB800)',
+                        transform: isInView ? 'scaleY(1)' : 'scaleY(0)',
+                        transformOrigin: 'bottom',
+                        transition: `transform 0.5s ease-out ${idx * 0.05 + 0.5}s`,
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Secondary stat cards */}
+          {stats.slice(1).map((stat, i) => (
+            <div
+              key={stat.id}
+              className={`col-span-12 sm:col-span-6 lg:col-span-${i === 0 ? '7' : i === 1 ? '4' : '3'} transition-all duration-1000 ${
+                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+              }`}
+              style={{ transitionDelay: `${300 + i * 100}ms` }}
+            >
+              <div
+                className="relative h-full min-h-[180px] rounded-2xl p-6 lg:p-8 overflow-hidden group cursor-pointer"
+                style={{
+                  background: `linear-gradient(145deg, ${stat.color}10 0%, rgba(20,20,25,0.9) 100%)`,
+                  border: `1px solid ${stat.color}20`,
+                  boxShadow: `0 15px 40px -15px ${stat.color}15`,
+                }}
+                onMouseMove={(e) => handleMouseMove(e, stat.id)}
+                onMouseLeave={handleMouseLeave}
+              >
+                {/* Top accent line with animation */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-[2px]"
+                  style={{
+                    background: `linear-gradient(90deg, transparent 0%, ${stat.color} 50%, transparent 100%)`,
+                    transform: isInView ? 'scaleX(1)' : 'scaleX(0)',
+                    transition: 'transform 0.8s ease-out 0.5s',
+                  }}
+                />
+
+                {/* Hover glow */}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `radial-gradient(circle at 30% 30%, ${stat.color}15 0%, transparent 60%)`,
+                  }}
+                />
+
+                <div className="relative z-10 flex items-start justify-between h-full">
+                  <div className="flex flex-col justify-between h-full">
+                    {/* Icon */}
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+                      style={{
+                        background: `linear-gradient(135deg, ${stat.color}25 0%, ${stat.color}10 100%)`,
+                        border: `1px solid ${stat.color}30`,
+                      }}
+                    >
+                      <stat.icon className="w-6 h-6" style={{ color: stat.color }} />
+                    </div>
+
+                    {/* Value and labels */}
+                    <div>
+                      <div className="flex items-baseline gap-1 mb-2">
+                        <span
+                          className="text-4xl lg:text-5xl font-black tracking-tight"
                           style={{
-                            height: `${h}%`,
-                            background: stat.color,
-                            transitionDelay: `${idx * 50}ms`,
-                            transform: isInView ? 'scaleY(1)' : 'scaleY(0)',
-                            transformOrigin: 'bottom',
+                            color: stat.color,
+                            textShadow: `0 0 40px ${stat.color}40`,
                           }}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  {i === 1 && (
-                    // Transaction flow
-                    <div className="relative w-12 h-12">
-                      <DollarSign className="w-12 h-12" style={{ color: stat.color }} />
-                    </div>
-                  )}
-                  {i === 2 && (
-                    // Uptime indicator
-                    <div className="relative">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ border: `2px solid ${stat.color}` }}
-                      >
-                        <div
-                          className="w-4 h-4 rounded-full animate-pulse"
-                          style={{ background: stat.color }}
-                        />
+                        >
+                          {stat.displayValue}
+                        </span>
+                        <span className="text-2xl font-bold" style={{ color: stat.secondaryColor }}>
+                          {stat.suffix}
+                        </span>
                       </div>
+                      <h3 className="text-base font-semibold text-white mb-1">{stat.label}</h3>
+                      <p className="text-sm text-white/40">{stat.sublabel}</p>
                     </div>
-                  )}
-                  {i === 3 && (
-                    // Globe dots
-                    <div className="relative w-12 h-12">
-                      <Globe className="w-12 h-12" style={{ color: stat.color }} />
-                    </div>
-                  )}
+                  </div>
+
+                  {/* Decorative icon */}
+                  <stat.icon
+                    className="w-20 h-20 opacity-[0.06] group-hover:opacity-[0.12] transition-opacity absolute right-4 bottom-4"
+                    style={{ color: stat.color }}
+                  />
                 </div>
               </div>
             </div>
@@ -1102,67 +1326,88 @@ function SocialProofSection() {
 
         {/* ===== TRUST BADGES ===== */}
         <div
-          className={`flex flex-wrap items-center justify-center gap-4 lg:gap-6 mb-16 transition-all duration-700 delay-500 ${
-            isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          className={`flex flex-wrap items-center justify-center gap-3 lg:gap-4 mb-20 transition-all duration-1000 delay-500 ${
+            isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          {[
-            { label: 'Enterprise Ready', icon: Shield },
-            { label: 'SOC 2 Certified', icon: Lock },
-            { label: 'GDPR Compliant', icon: CheckCircle2 },
-            { label: '24/7 Support', icon: Clock },
-          ].map((badge) => (
+          {trustBadges.map((badge, i) => (
             <div
               key={badge.label}
-              className="flex items-center gap-2 px-4 py-2 rounded-full"
+              className="group flex items-center gap-2.5 px-5 py-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-105"
               style={{
-                background: 'rgba(255,255,255,0.03)',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
                 border: '1px solid rgba(255,255,255,0.08)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+                animation: isInView ? `badgeFadeIn 0.5s ease-out ${0.6 + i * 0.1}s both` : 'none',
               }}
             >
-              <badge.icon className="w-4 h-4 text-primary" />
-              <span className="text-sm text-white/50">{badge.label}</span>
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+                style={{
+                  background: `${badge.color}15`,
+                  border: `1px solid ${badge.color}25`,
+                }}
+              >
+                <badge.icon className="w-3.5 h-3.5" style={{ color: badge.color }} />
+              </div>
+              <span className="text-sm font-medium text-white/60 group-hover:text-white/80 transition-colors">
+                {badge.label}
+              </span>
             </div>
           ))}
         </div>
 
         {/* ===== BRAND LOGOS MARQUEE ===== */}
         <div
-          className={`relative transition-all duration-1000 delay-600 ${
+          className={`relative transition-all duration-1000 delay-700 ${
             isInView ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <p className="text-center text-xs text-white/30 uppercase tracking-[0.25em] mb-10">
-            Powering the world&apos;s fastest-growing brands
-          </p>
+          {/* Section label */}
+          <div className="text-center mb-12">
+            <p className="text-xs text-white/30 uppercase tracking-[0.3em] font-medium">
+              Powering the world&apos;s fastest-growing brands
+            </p>
+          </div>
 
-          {/* Fade edges */}
-          <div className="absolute left-0 top-0 bottom-0 w-40 bg-gradient-to-r from-black via-black/80 to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-40 bg-gradient-to-l from-black via-black/80 to-transparent z-10 pointer-events-none" />
+          {/* Fade edges with stronger gradient */}
+          <div
+            className="absolute left-0 top-0 bottom-0 w-32 lg:w-48 z-10 pointer-events-none"
+            style={{
+              background: 'linear-gradient(90deg, rgb(0,0,0) 0%, rgba(0,0,0,0.8) 50%, transparent 100%)',
+            }}
+          />
+          <div
+            className="absolute right-0 top-0 bottom-0 w-32 lg:w-48 z-10 pointer-events-none"
+            style={{
+              background: 'linear-gradient(270deg, rgb(0,0,0) 0%, rgba(0,0,0,0.8) 50%, transparent 100%)',
+            }}
+          />
 
           {/* First row - scroll left */}
-          <div className="overflow-hidden mb-6">
+          <div className="overflow-hidden mb-5">
             <div
-              className="flex items-center gap-12"
+              className="flex items-center gap-8"
               style={{
-                animation: 'marqueeLeft 35s linear infinite',
+                animation: 'marqueeLeft 40s linear infinite',
               }}
             >
               {[...brands, ...brands, ...brands].map((brand, i) => (
                 <div
                   key={`row1-${brand}-${i}`}
-                  className="group flex items-center gap-3 px-6 py-3 rounded-xl whitespace-nowrap transition-all duration-300 hover:bg-white/5"
+                  className="group flex items-center gap-3 px-5 py-3 rounded-xl whitespace-nowrap transition-all duration-300 hover:bg-white/[0.03]"
                 >
                   <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold"
+                    className="w-11 h-11 rounded-xl flex items-center justify-center text-base font-bold transition-all duration-300 group-hover:scale-110"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'linear-gradient(135deg, rgba(255,145,0,0.1) 0%, rgba(255,255,255,0.03) 100%)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      color: 'rgba(255,145,0,0.8)',
                     }}
                   >
                     {brand[0]}
                   </div>
-                  <span className="text-lg font-semibold text-white/25 group-hover:text-white/60 transition-colors">
+                  <span className="text-base font-semibold text-white/20 group-hover:text-white/50 transition-colors">
                     {brand}
                   </span>
                 </div>
@@ -1173,26 +1418,27 @@ function SocialProofSection() {
           {/* Second row - scroll right */}
           <div className="overflow-hidden">
             <div
-              className="flex items-center gap-12"
+              className="flex items-center gap-8"
               style={{
-                animation: 'marqueeRight 40s linear infinite',
+                animation: 'marqueeRight 45s linear infinite',
               }}
             >
               {[...brands.slice().reverse(), ...brands.slice().reverse(), ...brands.slice().reverse()].map((brand, i) => (
                 <div
                   key={`row2-${brand}-${i}`}
-                  className="group flex items-center gap-3 px-6 py-3 rounded-xl whitespace-nowrap transition-all duration-300 hover:bg-white/5"
+                  className="group flex items-center gap-3 px-5 py-3 rounded-xl whitespace-nowrap transition-all duration-300 hover:bg-white/[0.03]"
                 >
                   <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold"
+                    className="w-11 h-11 rounded-xl flex items-center justify-center text-base font-bold transition-all duration-300 group-hover:scale-110"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(255,255,255,0.03) 100%)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      color: 'rgba(139,92,246,0.8)',
                     }}
                   >
                     {brand[0]}
                   </div>
-                  <span className="text-lg font-semibold text-white/25 group-hover:text-white/60 transition-colors">
+                  <span className="text-base font-semibold text-white/20 group-hover:text-white/50 transition-colors">
                     {brand}
                   </span>
                 </div>
@@ -1212,9 +1458,28 @@ function SocialProofSection() {
           0% { transform: translateX(-33.33%); }
           100% { transform: translateX(0); }
         }
-        @keyframes floatParticle {
-          0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
-          50% { transform: translateY(-30px) scale(1.5); opacity: 0.8; }
+        @keyframes orbFloat {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          25% { transform: translate(30px, -20px) scale(1.1); }
+          50% { transform: translate(-20px, 30px) scale(0.95); }
+          75% { transform: translate(20px, 20px) scale(1.05); }
+        }
+        @keyframes orbPulse {
+          0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+          50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.3; }
+        }
+        @keyframes pulseRing {
+          0% { transform: scale(1); opacity: 0.6; }
+          100% { transform: scale(1.5); opacity: 0; }
+        }
+        @keyframes starPop {
+          0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+          50% { transform: scale(1.3) rotate(0deg); }
+          100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        @keyframes badgeFadeIn {
+          0% { transform: translateY(20px) scale(0.9); opacity: 0; }
+          100% { transform: translateY(0) scale(1); opacity: 1; }
         }
       `}</style>
     </section>
