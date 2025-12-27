@@ -24,6 +24,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,26 +47,30 @@ import {
 import { formatCurrency, formatDate } from '@rendrix/utils';
 
 // Plan icons and colors mapping
-const planConfig: Record<string, { icon: React.ElementType; color: string; gradient: string }> = {
+const planConfig: Record<string, { icon: React.ElementType; color: string; gradient: string; iconColor: string }> = {
   free: {
     icon: Gift,
     color: 'emerald',
-    gradient: 'from-emerald-500/20 to-emerald-500/5',
+    gradient: 'from-emerald-500/20 to-emerald-500/10',
+    iconColor: 'text-emerald-500',
   },
   pro: {
     icon: Zap,
     color: 'primary',
-    gradient: 'from-primary/20 to-primary/5',
+    gradient: 'from-primary/20 to-orange-500/10',
+    iconColor: 'text-primary',
   },
   business: {
     icon: Building2,
     color: 'blue',
-    gradient: 'from-blue-500/20 to-blue-500/5',
+    gradient: 'from-blue-500/20 to-cyan-500/10',
+    iconColor: 'text-blue-500',
   },
   enterprise: {
     icon: Crown,
     color: 'purple',
-    gradient: 'from-purple-500/20 to-purple-500/5',
+    gradient: 'from-purple-500/20 to-violet-500/10',
+    iconColor: 'text-purple-500',
   },
 };
 
@@ -101,16 +106,16 @@ function UsageBar({
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
-        <span className="text-sm text-muted-foreground">{label}</span>
-        <span className="text-sm font-medium">
+        <span className="text-sm text-white/50">{label}</span>
+        <span className="text-sm font-medium text-white">
           {used}
           {limit && (
-            <span className="text-muted-foreground"> / {limit}</span>
+            <span className="text-white/40"> / {limit}</span>
           )}
         </span>
       </div>
       {limit && (
-        <div className="h-2.5 bg-muted/50 rounded-full overflow-hidden">
+        <div className="h-2 bg-white/[0.04] rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${percentage}%` }}
@@ -165,15 +170,15 @@ function PlanCard({
     <motion.div
       variants={fadeInUp}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className={`relative rounded-2xl p-6 transition-all duration-300 ${
+      className={`relative rounded-xl p-6 transition-all duration-300 ${
         isCurrent
-          ? `bg-gradient-to-b ${config.gradient} border-2 border-${config.color === 'primary' ? 'primary' : config.color + '-500'}/50 shadow-lg`
-          : 'bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 hover:shadow-lg hover:bg-zinc-900'
-      } ${isPopular && !isCurrent ? 'ring-2 ring-primary/50' : ''}`}
+          ? `bg-gradient-to-br ${config.gradient} border-2 border-${config.color === 'primary' ? 'primary' : config.color + '-500'}/30`
+          : 'bg-white/[0.02] border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.04]'
+      } ${isPopular && !isCurrent ? 'ring-2 ring-primary/40' : ''}`}
     >
       {/* Popular Badge */}
       {isPopular && !isCurrent && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
           <Badge className="bg-primary text-primary-foreground shadow-lg">
             <Star className="w-3 h-3 mr-1 fill-current" />
             Recommended
@@ -183,7 +188,7 @@ function PlanCard({
 
       {/* Current Badge */}
       {isCurrent && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
           <Badge variant="success" className="shadow-lg">
             <Check className="w-3 h-3 mr-1" />
             Current Plan
@@ -194,25 +199,13 @@ function PlanCard({
       <div className="space-y-5 pt-2">
         {/* Header */}
         <div className="flex items-start gap-3">
-          <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${
-            isCurrent
-              ? config.color === 'primary'
-                ? 'bg-primary/20'
-                : `bg-${config.color}-500/20`
-              : 'bg-zinc-800'
-          }`}>
-            <Icon className={`w-5 h-5 ${
-              isCurrent
-                ? config.color === 'primary'
-                  ? 'text-primary'
-                  : `text-${config.color}-500`
-                : 'text-zinc-400'
-            }`} />
+          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center`}>
+            <Icon className={`w-5 h-5 ${config.iconColor}`} />
           </div>
           <div>
-            <h3 className="font-semibold text-lg">{plan.name}</h3>
+            <h3 className="font-semibold text-lg text-white">{plan.name}</h3>
             {plan.description && (
-              <p className="text-sm text-muted-foreground">{plan.description}</p>
+              <p className="text-sm text-white/40">{plan.description}</p>
             )}
           </div>
         </div>
@@ -220,10 +213,10 @@ function PlanCard({
         {/* Price */}
         <div>
           <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-bold">
+            <span className="text-3xl font-bold text-white">
               {price ? formatCurrency(price, 'USD') : '$0'}
             </span>
-            <span className="text-muted-foreground text-sm">
+            <span className="text-white/40 text-sm">
               /{billingInterval === 'monthly' ? 'mo' : 'year'}
             </span>
           </div>
@@ -241,26 +234,22 @@ function PlanCard({
             <li key={feature} className="flex items-center gap-2.5 text-sm">
               <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
                 isCurrent
-                  ? config.color === 'primary'
-                    ? 'bg-primary/20'
-                    : `bg-${config.color}-500/20`
-                  : 'bg-emerald-500/20'
+                  ? `bg-${config.color === 'primary' ? 'primary' : config.color + '-500'}/20`
+                  : 'bg-emerald-500/10'
               }`}>
                 <Check className={`w-3 h-3 ${
                   isCurrent
-                    ? config.color === 'primary'
-                      ? 'text-primary'
-                      : `text-${config.color}-500`
-                    : 'text-emerald-400'
+                    ? config.iconColor
+                    : 'text-emerald-500'
                 }`} />
               </div>
-              <span className="text-zinc-400">
+              <span className="text-white/60">
                 {feature.replace(/_/g, ' ')}
               </span>
             </li>
           ))}
           {features.length > 5 && (
-            <li className="text-xs text-zinc-500 pl-7">
+            <li className="text-xs text-white/30 pl-7">
               + {features.length - 5} more features
             </li>
           )}
@@ -268,7 +257,7 @@ function PlanCard({
 
         {/* Action Button */}
         {isCurrent ? (
-          <Button disabled className="w-full" variant="outline">
+          <Button disabled className="w-full bg-white/[0.04] border-white/[0.08] text-white/40">
             <Check className="mr-2 h-4 w-4" />
             Current plan
           </Button>
@@ -276,8 +265,8 @@ function PlanCard({
           <Button
             className={`w-full group ${
               isPopular
-                ? 'bg-primary hover:bg-primary/90'
-                : ''
+                ? 'bg-primary hover:bg-primary/90 text-black font-medium'
+                : 'bg-white/[0.04] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.08]'
             }`}
             variant={isPopular ? 'default' : 'outline'}
             onClick={onUpgrade}
@@ -380,8 +369,20 @@ export default function BillingPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-[200px] rounded-2xl" />
-        <Skeleton className="h-[500px] rounded-2xl" />
+        <Card className="bg-white/[0.02] border-white/[0.08]">
+          <CardContent className="p-6">
+            <Skeleton className="h-[180px] rounded-xl" />
+          </CardContent>
+        </Card>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="bg-white/[0.02] border-white/[0.08]">
+              <CardContent className="p-6">
+                <Skeleton className="h-[280px] rounded-xl" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }
@@ -398,177 +399,174 @@ export default function BillingPage() {
       variants={staggerContainer}
       className="space-y-8"
     >
-      {/* Current Plan Card - Premium Design */}
-      <motion.div
-        variants={fadeInUp}
-        className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${currentConfig.gradient} border border-border/50 p-6 md:p-8`}
-      >
-        {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-white/5 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+      {/* Current Plan Card */}
+      <motion.div variants={fadeInUp}>
+        <Card className="bg-white/[0.02] border-white/[0.08] overflow-hidden">
+          <CardContent className="p-6 md:p-8 relative">
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-white/[0.02] to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-        <div className="relative">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-8">
-            <div className="flex items-start gap-4">
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
-                currentConfig.color === 'primary'
-                  ? 'bg-primary/20'
-                  : `bg-${currentConfig.color}-500/20`
-              }`}>
-                <CurrentPlanIcon className={`w-7 h-7 ${
-                  currentConfig.color === 'primary'
-                    ? 'text-primary'
-                    : `text-${currentConfig.color}-500`
-                }`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-3 mb-1">
-                  <h2 className="text-2xl font-bold">{subscription?.plan?.name || 'Free'}</h2>
-                  {subscription?.status === 'active' && !isCancelling && (
-                    <Badge variant="success" className="shadow-sm">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse" />
-                      Active
-                    </Badge>
+            <div className="relative">
+              {/* Header */}
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-8">
+                <div className="flex items-start gap-4">
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${currentConfig.gradient} flex items-center justify-center`}>
+                    <CurrentPlanIcon className={`w-6 h-6 ${currentConfig.iconColor}`} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-3 mb-1">
+                      <h2 className="text-2xl font-semibold text-white">{subscription?.plan?.name || 'Free'}</h2>
+                      {subscription?.status === 'active' && !isCancelling && (
+                        <Badge variant="success" className="shadow-sm">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse" />
+                          Active
+                        </Badge>
+                      )}
+                      {isCancelling && (
+                        <Badge variant="warning" className="shadow-sm">
+                          <Clock className="w-3 h-3 mr-1" />
+                          Cancelling
+                        </Badge>
+                      )}
+                    </div>
+                    {subscription?.currentPeriodEnd && (
+                      <p className="text-sm text-white/50">
+                        {isCancelling
+                          ? `Access ends on ${formatDate(subscription.currentPeriodEnd)}`
+                          : `Renews on ${formatDate(subscription.currentPeriodEnd)}`}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  {subscription?.status === 'active' && (
+                    <Button
+                      variant="outline"
+                      onClick={handleManageBilling}
+                      className="border-white/[0.08] bg-white/[0.04] text-white/70 hover:text-white hover:bg-white/[0.08]"
+                    >
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Manage billing
+                    </Button>
                   )}
-                  {isCancelling && (
-                    <Badge variant="warning" className="shadow-sm">
-                      <Clock className="w-3 h-3 mr-1" />
-                      Cancelling
-                    </Badge>
-                  )}
-                </div>
-                {subscription?.currentPeriodEnd && (
-                  <p className="text-sm text-muted-foreground">
-                    {isCancelling
-                      ? `Access ends on ${formatDate(subscription.currentPeriodEnd)}`
-                      : `Renews on ${formatDate(subscription.currentPeriodEnd)}`}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              {subscription?.status === 'active' && (
-                <Button
-                  variant="outline"
-                  onClick={handleManageBilling}
-                  className="bg-background/50 backdrop-blur-sm"
-                >
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  Manage billing
-                </Button>
-              )}
-              {isCancelling ? (
-                <Button
-                  onClick={handleResume}
-                  disabled={resumeSubscription.isPending}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white"
-                >
-                  {resumeSubscription.isPending && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Resume subscription
-                </Button>
-              ) : (
-                subscription?.status === 'active' && currentPlanSlug !== 'free' && (
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowCancelDialog(true)}
-                    className="text-destructive border-destructive/30 hover:bg-destructive/10"
-                  >
-                    Cancel subscription
-                  </Button>
-                )
-              )}
-            </div>
-          </div>
-
-          {/* Usage Stats */}
-          {subscription?.usage && (
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="p-4 rounded-xl bg-background/50 backdrop-blur-sm border border-border/50">
-                <div className="flex items-center gap-2 mb-4">
-                  <Shield className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Resource Usage</span>
-                </div>
-                <div className="space-y-4">
-                  <UsageBar
-                    used={subscription.usage.stores.used}
-                    limit={subscription.usage.stores.limit}
-                    label="Stores"
-                    color={currentConfig.color}
-                  />
-                  <UsageBar
-                    used={subscription.usage.products.used}
-                    limit={subscription.usage.products.limit}
-                    label="Products"
-                    color={currentConfig.color}
-                  />
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-background/50 backdrop-blur-sm border border-border/50">
-                <div className="flex items-center gap-2 mb-4">
-                  <TrendingUp className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Plan Benefits</span>
-                </div>
-                <ul className="space-y-2">
-                  {currentPlanSlug === 'free' ? (
-                    <>
-                      <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Check className="w-4 h-4 text-emerald-500" />
-                        Basic analytics
-                      </li>
-                      <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Check className="w-4 h-4 text-emerald-500" />
-                        Community support
-                      </li>
-                      <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <X className="w-4 h-4 text-muted-foreground/50" />
-                        <span className="line-through">Priority support</span>
-                      </li>
-                    </>
+                  {isCancelling ? (
+                    <Button
+                      onClick={handleResume}
+                      disabled={resumeSubscription.isPending}
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                    >
+                      {resumeSubscription.isPending && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Resume subscription
+                    </Button>
                   ) : (
-                    <>
-                      <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Check className="w-4 h-4 text-emerald-500" />
-                        Advanced analytics
-                      </li>
-                      <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Check className="w-4 h-4 text-emerald-500" />
-                        Priority support
-                      </li>
-                      <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Check className="w-4 h-4 text-emerald-500" />
-                        AI features enabled
-                      </li>
-                    </>
+                    subscription?.status === 'active' && currentPlanSlug !== 'free' && (
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowCancelDialog(true)}
+                        className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-400"
+                      >
+                        Cancel subscription
+                      </Button>
+                    )
                   )}
-                </ul>
+                </div>
               </div>
+
+              {/* Usage Stats */}
+              {subscription?.usage && (
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.08]">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center">
+                        <Shield className="w-4 h-4 text-white/50" />
+                      </div>
+                      <span className="text-sm font-medium text-white">Resource Usage</span>
+                    </div>
+                    <div className="space-y-4">
+                      <UsageBar
+                        used={subscription.usage.stores.used}
+                        limit={subscription.usage.stores.limit}
+                        label="Stores"
+                        color={currentConfig.color}
+                      />
+                      <UsageBar
+                        used={subscription.usage.products.used}
+                        limit={subscription.usage.products.limit}
+                        label="Products"
+                        color={currentConfig.color}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.08]">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center">
+                        <TrendingUp className="w-4 h-4 text-white/50" />
+                      </div>
+                      <span className="text-sm font-medium text-white">Plan Benefits</span>
+                    </div>
+                    <ul className="space-y-2.5">
+                      {currentPlanSlug === 'free' ? (
+                        <>
+                          <li className="flex items-center gap-2 text-sm text-white/60">
+                            <Check className="w-4 h-4 text-emerald-500" />
+                            Basic analytics
+                          </li>
+                          <li className="flex items-center gap-2 text-sm text-white/60">
+                            <Check className="w-4 h-4 text-emerald-500" />
+                            Community support
+                          </li>
+                          <li className="flex items-center gap-2 text-sm text-white/40">
+                            <X className="w-4 h-4 text-white/20" />
+                            <span className="line-through">Priority support</span>
+                          </li>
+                        </>
+                      ) : (
+                        <>
+                          <li className="flex items-center gap-2 text-sm text-white/60">
+                            <Check className="w-4 h-4 text-emerald-500" />
+                            Advanced analytics
+                          </li>
+                          <li className="flex items-center gap-2 text-sm text-white/60">
+                            <Check className="w-4 h-4 text-emerald-500" />
+                            Priority support
+                          </li>
+                          <li className="flex items-center gap-2 text-sm text-white/60">
+                            <Check className="w-4 h-4 text-emerald-500" />
+                            AI features enabled
+                          </li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </CardContent>
+        </Card>
       </motion.div>
 
       {/* Upgrade Plans Section */}
       <motion.div variants={fadeInUp} className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold">Upgrade Plan</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="text-xl font-semibold text-white">Upgrade Plan</h2>
+            <p className="text-sm text-white/50">
               Choose the plan that best fits your needs
             </p>
           </div>
 
           {/* Billing Toggle */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/50 border border-border">
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/[0.08]">
             <button
               onClick={() => setBillingInterval('monthly')}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                 billingInterval === 'monthly'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-white/[0.08] text-white shadow-sm'
+                  : 'text-white/50 hover:text-white'
               }`}
             >
               Monthly
@@ -577,8 +575,8 @@ export default function BillingPage() {
               onClick={() => setBillingInterval('yearly')}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-2 ${
                 billingInterval === 'yearly'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-white/[0.08] text-white shadow-sm'
+                  : 'text-white/50 hover:text-white'
               }`}
             >
               Yearly
@@ -592,7 +590,7 @@ export default function BillingPage() {
         {/* Plans Grid - Sorted by price */}
         <motion.div
           variants={staggerContainer}
-          className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
+          className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
         >
           {plans
             ?.slice()
@@ -620,14 +618,14 @@ export default function BillingPage() {
         {/* Trust Badges */}
         <motion.div
           variants={fadeInUp}
-          className="flex flex-wrap items-center justify-center gap-6 pt-6 border-t border-border/50"
+          className="flex flex-wrap items-center justify-center gap-8 pt-6 border-t border-white/[0.06]"
         >
           {[
             { icon: Shield, text: 'Secure payments' },
             { icon: Clock, text: 'Cancel anytime' },
             { icon: CreditCard, text: '30-day money back' },
           ].map((item) => (
-            <div key={item.text} className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div key={item.text} className="flex items-center gap-2 text-sm text-white/40">
               <item.icon className="w-4 h-4" />
               {item.text}
             </div>
@@ -637,25 +635,27 @@ export default function BillingPage() {
 
       {/* Cancel Dialog */}
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-        <AlertDialogContent className="sm:max-w-md">
+        <AlertDialogContent className="sm:max-w-md bg-zinc-900 border-white/[0.08]">
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
-                <AlertCircle className="h-5 w-5 text-destructive" />
+            <AlertDialogTitle className="flex items-center gap-2 text-white">
+              <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
+                <AlertCircle className="h-5 w-5 text-red-500" />
               </div>
               Cancel subscription?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-left">
+            <AlertDialogDescription className="text-left text-white/60">
               Your subscription will remain active until the end of the current billing
               period. After that, you&apos;ll be downgraded to the free plan and may lose
               access to premium features.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="sm:space-x-3">
-            <AlertDialogCancel>Keep subscription</AlertDialogCancel>
+            <AlertDialogCancel className="border-white/[0.08] bg-white/[0.04] text-white/70 hover:text-white hover:bg-white/[0.08]">
+              Keep subscription
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCancel}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-red-500 text-white hover:bg-red-600"
             >
               {cancelSubscription.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
