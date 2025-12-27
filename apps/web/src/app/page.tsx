@@ -148,7 +148,7 @@ function Header() {
       hasDropdown: true,
       items: [
         { icon: BookOpen, label: 'Documentation', description: 'Guides and references', href: '/docs' },
-        { icon: Code2, label: 'API Reference', description: 'Build custom integrations', href: '/api' },
+        { icon: Code2, label: 'API Reference', description: 'Build custom integrations', href: '/api-docs' },
         { icon: MessageSquare, label: 'Community', description: 'Join the discussion', href: '/community' },
         { icon: Play, label: 'Tutorials', description: 'Learn by watching', href: '/tutorials' },
       ],
@@ -3811,7 +3811,7 @@ function Footer() {
     ],
     Resources: [
       { label: 'Documentation', href: '/docs' },
-      { label: 'API Reference', href: '/api' },
+      { label: 'API Reference', href: '/api-docs' },
       { label: 'Blog', href: '/blog' },
       { label: 'Help Center', href: '/help' },
       { label: 'Community', href: '/community' },
