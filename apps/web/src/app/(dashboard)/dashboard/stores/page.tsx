@@ -25,7 +25,6 @@ import {
   Zap,
   Shield,
   BarChart3,
-  Loader2,
   CheckCircle2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -38,14 +37,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { api, ApiError } from '@/lib/api';
+import { StoreSwitchModal } from '@/components/store/store-switch-modal';
 import { cn } from '@/lib/utils';
 import { useStoreStore } from '@/store/store';
 import { useAuthStore } from '@/store/auth';
@@ -656,140 +649,14 @@ export default function StoresPage() {
         )}
       </div>
 
-      {/* Store Switching Modal */}
-      <Dialog open={showSwitchModal} onOpenChange={handleCancelSwitch}>
-        <DialogContent className="bg-[#0a0a0a] border-white/[0.08] sm:max-w-md overflow-hidden p-0">
-          {/* Gradient background */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/30 to-orange-500/10 rounded-full blur-3xl opacity-50" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur-2xl opacity-40" />
-          </div>
-
-          <div className="relative">
-            {/* Header */}
-            <DialogHeader className="p-6 pb-0">
-              <DialogTitle className="text-white text-xl font-semibold text-center">
-                Switch to Store
-              </DialogTitle>
-              <DialogDescription className="text-white/50 text-center">
-                You&apos;re about to switch your active workspace
-              </DialogDescription>
-            </DialogHeader>
-
-            {/* Store Card Preview */}
-            {selectedStore && (
-              <div className="px-6 py-6">
-                <div className="relative rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 overflow-hidden">
-                  {/* Subtle glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-50" />
-
-                  <div className="relative">
-                    {/* Store Identity */}
-                    <div className="flex items-center gap-4 mb-4">
-                      {selectedStore.logoUrl ? (
-                        <img
-                          src={selectedStore.logoUrl}
-                          alt={selectedStore.name}
-                          className="w-16 h-16 rounded-2xl object-cover ring-2 ring-primary/30"
-                        />
-                      ) : (
-                        <div className={cn(
-                          "w-16 h-16 rounded-2xl flex items-center justify-center ring-2 ring-primary/30",
-                          (industryConfig[selectedStore.industry] || industryConfig.general).bg
-                        )}>
-                          <Store className={cn(
-                            "w-8 h-8",
-                            (industryConfig[selectedStore.industry] || industryConfig.general).color
-                          )} />
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-white mb-1">
-                          {selectedStore.name}
-                        </h3>
-                        <div className="flex items-center gap-2">
-                          <span className={cn(
-                            "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                            (industryConfig[selectedStore.industry] || industryConfig.general).bg,
-                            (industryConfig[selectedStore.industry] || industryConfig.general).color
-                          )}>
-                            {(industryConfig[selectedStore.industry] || industryConfig.general).label}
-                          </span>
-                          <span className={cn(
-                            "inline-flex items-center px-2 py-0.5 rounded-full text-xs",
-                            selectedStore.status === 'active'
-                              ? "bg-emerald-500/20 text-emerald-400"
-                              : "bg-amber-500/20 text-amber-400"
-                          )}>
-                            {selectedStore.status === 'active' ? 'Active' : 'Inactive'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Store Stats */}
-                    <div className="grid grid-cols-3 gap-3 pt-4 border-t border-white/[0.08]">
-                      <div className="text-center p-3 rounded-xl bg-white/[0.04]">
-                        <Package className="w-4 h-4 text-primary mx-auto mb-1" />
-                        <p className="text-lg font-bold text-white">{selectedStore.stats.products}</p>
-                        <p className="text-[10px] text-white/40 uppercase tracking-wider">Products</p>
-                      </div>
-                      <div className="text-center p-3 rounded-xl bg-white/[0.04]">
-                        <ShoppingCart className="w-4 h-4 text-primary mx-auto mb-1" />
-                        <p className="text-lg font-bold text-white">{selectedStore.stats.orders}</p>
-                        <p className="text-[10px] text-white/40 uppercase tracking-wider">Orders</p>
-                      </div>
-                      <div className="text-center p-3 rounded-xl bg-white/[0.04]">
-                        <Users className="w-4 h-4 text-primary mx-auto mb-1" />
-                        <p className="text-lg font-bold text-white">{selectedStore.stats.customers}</p>
-                        <p className="text-[10px] text-white/40 uppercase tracking-wider">Customers</p>
-                      </div>
-                    </div>
-
-                    {/* Store URL */}
-                    <div className="flex items-center gap-2 mt-4 p-2 rounded-lg bg-white/[0.04]">
-                      <Globe className="w-4 h-4 text-white/40" />
-                      <span className="text-sm text-white/60 font-mono truncate">
-                        {selectedStore.customDomain || `${selectedStore.subdomain || selectedStore.slug}.rendrix.com`}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="p-6 pt-0 space-y-3">
-              <Button
-                onClick={handleConfirmSwitch}
-                disabled={isSwitching}
-                className="w-full h-12 bg-gradient-to-r from-primary to-orange-600 hover:opacity-90 text-black font-semibold rounded-xl shadow-lg shadow-primary/25 transition-all duration-200"
-              >
-                {isSwitching ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Switching...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5" />
-                    <span>Switch & Manage Store</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </div>
-                )}
-              </Button>
-              <Button
-                onClick={handleCancelSwitch}
-                disabled={isSwitching}
-                variant="ghost"
-                className="w-full h-10 text-white/60 hover:text-white hover:bg-white/[0.06]"
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Premium Store Switching Modal */}
+      <StoreSwitchModal
+        isOpen={showSwitchModal}
+        onClose={handleCancelSwitch}
+        onConfirm={handleConfirmSwitch}
+        store={selectedStore}
+        isLoading={isSwitching}
+      />
     </div>
   );
 }
