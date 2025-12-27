@@ -1,8 +1,11 @@
 # Rendrix - Master Your Commerce Universe
 
 <p align="center">
-  <img width="3456" height="1928" alt="CleanShot 2025-12-19 at 8  01 36@2x" src="https://github.com/user-attachments/assets/4c419c96-f86f-43b3-a1f5-73142bc20fdd" />
+  <<img width="2001" height="1440" alt="index" src="https://github.com/user-attachments/assets/d92275e8-024b-41ef-8fe6-cd1c2e530e32" />
 
+</p>
+<p align="center">
+<img width="2024" height="1426" alt="dashboard" src="https://github.com/user-attachments/assets/036dbd47-a504-41c0-bfea-959bb83c5b81" />
 </p>
 
 <p align="center">
