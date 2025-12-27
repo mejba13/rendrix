@@ -292,11 +292,9 @@ function BillingToggle({
 function PricingCard({
   plan,
   isAnnual,
-  index,
 }: {
   plan: typeof pricingPlans[0];
   isAnnual: boolean;
-  index: number;
 }) {
   const Icon = plan.icon;
   const price = isAnnual ? plan.yearlyPrice : plan.monthlyPrice;
@@ -305,7 +303,7 @@ function PricingCard({
   return (
     <motion.div
       variants={scaleIn}
-      className={`relative rounded-2xl overflow-hidden ${
+      className={`relative rounded-2xl ${plan.popular ? 'mt-4' : ''} ${
         plan.popular
           ? 'bg-gradient-to-b from-primary/20 via-primary/5 to-transparent border-2 border-primary/50'
           : 'bg-white/[0.02] border border-white/[0.06]'
@@ -313,8 +311,8 @@ function PricingCard({
     >
       {/* Popular badge */}
       {plan.popular && (
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="px-4 py-1 bg-primary text-black text-xs font-bold rounded-full">
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+          <div className="px-4 py-1.5 bg-primary text-black text-xs font-bold rounded-full shadow-lg shadow-primary/30">
             MOST POPULAR
           </div>
         </div>
@@ -322,7 +320,7 @@ function PricingCard({
 
       {/* Glow effect for popular */}
       {plan.popular && (
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none rounded-2xl" />
       )}
 
       <div className="relative p-8">
@@ -480,6 +478,35 @@ export default function PricingPage() {
       {/* Background gradient */}
       <div className="fixed inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
 
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-black/80 backdrop-blur-xl">
+        <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center">
+              <span className="text-sm font-bold text-black">R</span>
+            </div>
+            <span className="text-xl font-semibold tracking-tight">Rendrix</span>
+          </Link>
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="/#features" className="text-sm text-white/60 hover:text-white transition-colors">Features</Link>
+            <Link href="/pricing" className="text-sm text-primary">Pricing</Link>
+            <Link href="/about" className="text-sm text-white/60 hover:text-white transition-colors">About</Link>
+            <Link href="/contact" className="text-sm text-white/60 hover:text-white transition-colors">Contact</Link>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="text-sm text-white/70 hover:text-white transition-colors">
+              Sign In
+            </Link>
+            <Link
+              href="/register"
+              className="px-4 py-2 text-sm font-medium text-black bg-gradient-to-r from-primary to-orange-500 rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300"
+            >
+              Get Started
+            </Link>
+          </div>
+        </nav>
+      </header>
+
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-6">
         <div className="max-w-7xl mx-auto">
@@ -528,8 +555,8 @@ export default function PricingPage() {
             variants={staggerContainer}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
           >
-            {pricingPlans.map((plan, index) => (
-              <PricingCard key={plan.id} plan={plan} isAnnual={isAnnual} index={index} />
+            {pricingPlans.map((plan) => (
+              <PricingCard key={plan.id} plan={plan} isAnnual={isAnnual} />
             ))}
           </motion.div>
         </div>
@@ -682,7 +709,7 @@ export default function PricingPage() {
                   title: 'Scale with confidence',
                   description: 'From 10 orders to 10 million. Our infrastructure grows with you, handling traffic spikes effortlessly.',
                 },
-              ].map((item, index) => (
+              ].map((item) => (
                 <motion.div
                   key={item.title}
                   variants={fadeInUp}
@@ -829,6 +856,23 @@ export default function PricingPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="relative py-12 px-6 border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center">
+              <span className="text-xs font-bold text-black">R</span>
+            </div>
+            <span className="text-sm text-white/60">© 2025 Rendrix. All rights reserved.</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <Link href="/privacy" className="text-sm text-white/40 hover:text-white transition-colors">Privacy</Link>
+            <Link href="/terms" className="text-sm text-white/40 hover:text-white transition-colors">Terms</Link>
+            <Link href="/contact" className="text-sm text-white/40 hover:text-white transition-colors">Contact</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
