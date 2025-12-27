@@ -4,7 +4,7 @@ const nextConfig = {
   output: 'standalone',
   transpilePackages: ['@rendrix/types', '@rendrix/utils'],
   images: {
-    domains: ['localhost', 'rendrix.com'],
+    domains: ['localhost', 'rendrix.com', 'images.unsplash.com'],
   },
   experimental: {
     serverActions: true,
