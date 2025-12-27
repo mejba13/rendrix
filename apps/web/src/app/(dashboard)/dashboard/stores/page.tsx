@@ -93,12 +93,24 @@ function AmbientBackground() {
 }
 
 // Store Card Component
-function StoreCard({ store, onSelect }: { store: StoreData; onSelect: () => void }) {
+function StoreCard({ store, onSelect, isCurrentStore }: { store: StoreData; onSelect: () => void; isCurrentStore: boolean }) {
   const config = industryConfig[store.industry] || industryConfig.general;
   const storeUrl = store.customDomain || (store.subdomain ? `${store.subdomain}.rendrix.com` : `${store.slug}.rendrix.com`);
 
   return (
-    <div className="group relative rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300 overflow-hidden">
+    <div className={cn(
+      "group relative rounded-2xl border bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-300 overflow-hidden",
+      isCurrentStore
+        ? "border-primary/40 ring-1 ring-primary/20"
+        : "border-white/[0.06] hover:border-white/[0.1]"
+    )}>
+      {/* Current store indicator */}
+      {isCurrentStore && (
+        <div className="absolute top-3 left-3 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/20 text-primary text-xs font-medium">
+          <CheckCircle2 className="w-3 h-3" />
+          <span>Current</span>
+        </div>
+      )}
       {/* Gradient overlay on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
@@ -144,7 +156,7 @@ function StoreCard({ store, onSelect }: { store: StoreData; onSelect: () => void
                 className="text-white hover:bg-white/[0.08] cursor-pointer"
               >
                 <Store className="w-4 h-4 mr-2" />
-                Select Store
+                {isCurrentStore ? 'Manage Store' : 'Switch to Store'}
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link
@@ -216,10 +228,15 @@ function StoreCard({ store, onSelect }: { store: StoreData; onSelect: () => void
           <Button
             size="sm"
             onClick={onSelect}
-            className="flex-1 bg-primary/10 hover:bg-primary/20 text-primary border-0"
+            className={cn(
+              "flex-1 border-0",
+              isCurrentStore
+                ? "bg-primary hover:bg-primary/90 text-black"
+                : "bg-primary/10 hover:bg-primary/20 text-primary"
+            )}
           >
             <Store className="w-4 h-4 mr-1.5" />
-            Manage
+            {isCurrentStore ? 'Manage' : 'Switch & Manage'}
           </Button>
           <Button
             size="sm"
@@ -436,7 +453,7 @@ export default function StoresPage() {
   const [selectedStore, setSelectedStore] = React.useState<StoreData | null>(null);
   const [showSwitchModal, setShowSwitchModal] = React.useState(false);
   const [isSwitching, setIsSwitching] = React.useState(false);
-  const { switchStore } = useStoreStore();
+  const { switchStore, currentStore } = useStoreStore();
   const { currentOrganization } = useAuthStore();
 
   const { data: storesData, isLoading, error, refetch } = useQuery({
@@ -477,6 +494,12 @@ export default function StoresPage() {
   }, [storesData, searchQuery]);
 
   const handleSelectStore = (store: StoreData) => {
+    // If the store is already selected, just navigate directly without showing modal
+    if (currentStore?.id === store.id) {
+      router.push(`/dashboard/stores/${store.id}`);
+      return;
+    }
+    // Otherwise, show the switch confirmation modal
     setSelectedStore(store);
     setShowSwitchModal(true);
   };
@@ -610,6 +633,7 @@ export default function StoresPage() {
                 key={store.id}
                 store={store}
                 onSelect={() => handleSelectStore(store)}
+                isCurrentStore={currentStore?.id === store.id}
               />
             ))}
           </div>
