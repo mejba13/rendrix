@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-iuyt for creating and managing multiple ecommerce stores. It uses a monorepo architecture with Turborepo.
+Rendrix is a multi-tenant SaaS platform for creating and managing multiple ecommerce stores. It uses a monorepo architecture with Turborepo.
 
 ## Commands
 
@@ -14,8 +14,15 @@ pnpm dev                    # Start all apps (web on :3000, api on :4000)
 pnpm build                  # Build all apps and packages
 pnpm lint                   # Lint all packages
 pnpm type-check             # TypeScript type checking
-pnpm test                   # Run all tests
 pnpm clean                  # Clean all build outputs
+```
+
+### Testing
+```bash
+pnpm test                                       # Run all tests
+pnpm --filter @rendrix/api test                 # Test API only
+pnpm --filter @rendrix/api test src/test/auth.test.ts  # Run single test file
+pnpm --filter @rendrix/api test:coverage        # Test with coverage
 ```
 
 ### Database (Prisma)
@@ -31,13 +38,23 @@ pnpm db:studio              # Open Prisma Studio GUI
 ```bash
 pnpm --filter @rendrix/api dev      # API only
 pnpm --filter @rendrix/web dev      # Web only
-pnpm --filter @rendrix/api test     # Test API only
+```
+
+### Building Packages (required before apps when modifying shared code)
+```bash
+pnpm --filter @rendrix/database build   # Build database package
+pnpm --filter @rendrix/types build      # Build types package
+pnpm --filter @rendrix/utils build      # Build utils package
 ```
 
 ### Infrastructure
 ```bash
 docker-compose up -d        # Start PostgreSQL, Redis, Meilisearch, MinIO, Mailhog
 ```
+
+### Demo Credentials (after seeding)
+- Email: demo@rendrix.com
+- Password: demo123456
 
 ## Architecture
 

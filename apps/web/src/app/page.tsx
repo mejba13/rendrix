@@ -2429,151 +2429,447 @@ function IntegrationsSection() {
 function DeveloperSection() {
   const { ref, isInView } = useInView();
   const mounted = useMounted();
+  const [typedCode, setTypedCode] = useState('');
+  const [currentLine, setCurrentLine] = useState(0);
+  const [showCursor, setShowCursor] = useState(true);
 
-  const codeLines = [
-    { text: '// Create a product', type: 'comment' },
+  const codeSnippets = [
+    { text: '// Initialize Rendrix SDK', type: 'comment' },
+    { text: 'import { Rendrix } from "@rendrix/sdk";', type: 'import' },
+    { text: '', type: 'empty' },
+    { text: 'const rendrix = new Rendrix({', type: 'code' },
+    { text: '  apiKey: process.env.RENDRIX_API_KEY,', type: 'string' },
+    { text: '  environment: "production"', type: 'string' },
+    { text: '});', type: 'code' },
+    { text: '', type: 'empty' },
+    { text: '// Create a new product', type: 'comment' },
     { text: 'const product = await rendrix.products.create({', type: 'code' },
-    { text: '  name: "Premium Headphones",', type: 'string' },
+    { text: '  name: "Premium Wireless Headphones",', type: 'string' },
     { text: '  price: 299.99,', type: 'number' },
     { text: '  currency: "USD",', type: 'string' },
-    { text: '  inventory: { quantity: 500 }', type: 'code' },
+    { text: '  inventory: { quantity: 500, trackStock: true }', type: 'code' },
     { text: '});', type: 'code' },
   ];
 
+  const sdkLanguages = [
+    { name: 'JavaScript', icon: '⚡', color: '#F7DF1E' },
+    { name: 'TypeScript', icon: '🔷', color: '#3178C6' },
+    { name: 'Python', icon: '🐍', color: '#3776AB' },
+    { name: 'Ruby', icon: '💎', color: '#CC342D' },
+    { name: 'Go', icon: '🔵', color: '#00ADD8' },
+    { name: 'PHP', icon: '🐘', color: '#777BB4' },
+  ];
+
+  const apiStats = [
+    { label: 'Uptime', value: '99.99%', icon: CheckCircle2, color: '#22C55E' },
+    { label: 'Avg Latency', value: '<50ms', icon: Zap, color: '#FF9100' },
+    { label: 'Daily Requests', value: '1M+', icon: Globe, color: '#3B82F6' },
+  ];
+
+  const features = [
+    {
+      title: 'REST API',
+      description: 'Full CRUD operations with intuitive endpoints',
+      icon: Code2,
+      gradient: 'from-orange-500/20 to-amber-500/10'
+    },
+    {
+      title: 'GraphQL',
+      description: 'Query exactly what you need, nothing more',
+      icon: Sparkles,
+      gradient: 'from-purple-500/20 to-pink-500/10'
+    },
+    {
+      title: 'Webhooks',
+      description: 'Real-time event notifications to your server',
+      icon: Zap,
+      gradient: 'from-blue-500/20 to-cyan-500/10'
+    },
+    {
+      title: 'Type Safety',
+      description: 'Full TypeScript support with auto-generated types',
+      icon: Lock,
+      gradient: 'from-green-500/20 to-emerald-500/10'
+    },
+  ];
+
+  // Typing animation effect
+  useEffect(() => {
+    if (!isInView || !mounted) return;
+
+    let lineIndex = 0;
+    let charIndex = 0;
+    let currentText = '';
+
+    const typeInterval = setInterval(() => {
+      if (lineIndex >= codeSnippets.length) {
+        clearInterval(typeInterval);
+        return;
+      }
+
+      const currentLineText = codeSnippets[lineIndex].text;
+
+      if (charIndex < currentLineText.length) {
+        currentText += currentLineText[charIndex];
+        charIndex++;
+      } else {
+        currentText += '\n';
+        lineIndex++;
+        charIndex = 0;
+        setCurrentLine(lineIndex);
+      }
+
+      setTypedCode(currentText);
+    }, 25);
+
+    return () => clearInterval(typeInterval);
+  }, [isInView, mounted]);
+
+  // Cursor blink effect
+  useEffect(() => {
+    const cursorInterval = setInterval(() => {
+      setShowCursor(prev => !prev);
+    }, 530);
+    return () => clearInterval(cursorInterval);
+  }, []);
+
+  const getLineColor = (type: string) => {
+    switch (type) {
+      case 'comment': return 'text-white/40';
+      case 'import': return 'text-purple-400';
+      case 'string': return 'text-emerald-400';
+      case 'number': return 'text-orange-400';
+      case 'empty': return '';
+      default: return 'text-white/80';
+    }
+  };
+
   return (
-    <section ref={ref} className="py-32 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Left Content */}
-          <div>
-            <div
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.06] mb-6 transition-all duration-700 ${
-                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
-            >
-              <Code2 className="w-4 h-4 text-primary" />
-              <span className="text-sm text-white/60">Developer Platform</span>
-            </div>
+    <section ref={ref} className="py-24 lg:py-32 relative overflow-hidden">
+      {/* Ambient background effects */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute top-1/4 -left-1/4 w-[600px] h-[600px] rounded-full opacity-30"
+          style={{
+            background: 'radial-gradient(circle, rgba(255,145,0,0.15) 0%, transparent 70%)',
+            filter: 'blur(100px)',
+          }}
+        />
+        <div
+          className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] rounded-full opacity-20"
+          style={{
+            background: 'radial-gradient(circle, rgba(255,107,0,0.2) 0%, transparent 70%)',
+            filter: 'blur(80px)',
+          }}
+        />
+      </div>
 
-            <h2
-              className={`text-4xl sm:text-5xl font-medium tracking-tight mb-6 transition-all duration-700 delay-100 ${
-                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-            >
-              Built for{' '}
-              <span
-                className="bg-clip-text text-transparent"
-                style={{
-                  background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
-                  WebkitBackgroundClip: 'text',
-                }}
-              >
-                developers
-              </span>
-            </h2>
-
-            <p
-              className={`text-lg text-white/50 mb-8 transition-all duration-700 delay-200 ${
-                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
-            >
-              Powerful APIs, comprehensive SDKs, and extensive documentation.
-              Build custom experiences or extend the platform.
-            </p>
-
-            <div
-              className={`space-y-4 mb-8 transition-all duration-700 delay-300 ${
-                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
-            >
-              {[
-                'RESTful API with 99.99% uptime',
-                'SDKs for JavaScript, Python, Ruby, Go',
-                'Webhooks for real-time events',
-                'GraphQL support',
-              ].map((feature) => (
-                <div key={feature} className="flex items-center gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
-                  <span className="text-white/70">{feature}</span>
-                </div>
-              ))}
-            </div>
-
-            <div
-              className={`flex gap-4 transition-all duration-700 delay-400 ${
-                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
-            >
-              <Link href="/docs">
-                <Button
-                  className="text-black font-semibold h-12 px-6 rounded-xl"
-                  style={{ background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)' }}
-                >
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  Read Docs
-                </Button>
-              </Link>
-              <Link href="/api">
-                <Button variant="outline" className="border-white/20 bg-transparent hover:bg-white/5 text-white h-12 px-6 rounded-xl">
-                  API Reference
-                </Button>
-              </Link>
-            </div>
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <div
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 transition-all duration-700 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,145,0,0.1) 0%, rgba(255,107,0,0.05) 100%)',
+              border: '1px solid rgba(255,145,0,0.2)',
+            }}
+          >
+            <Code2 className="w-4 h-4 text-[#FF9100]" />
+            <span className="text-sm font-medium text-[#FF9100]">Developer Platform</span>
           </div>
 
-          {/* Right Content - Code Preview */}
+          <h2
+            className={`text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 transition-all duration-700 delay-100 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            Built for{' '}
+            <span
+              className="relative inline-block"
+              style={{
+                background: 'linear-gradient(135deg, #FF9100 0%, #FFB800 50%, #FF6B00 100%)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent',
+              }}
+            >
+              developers
+              <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none">
+                <path
+                  d="M2 8C50 2 150 2 198 8"
+                  stroke="url(#underlineGradient)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  className={`transition-all duration-1000 delay-500 ${isInView ? 'opacity-100' : 'opacity-0'}`}
+                  style={{
+                    strokeDasharray: 200,
+                    strokeDashoffset: isInView ? 0 : 200,
+                    transition: 'stroke-dashoffset 1s ease-out 0.5s',
+                  }}
+                />
+                <defs>
+                  <linearGradient id="underlineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#FF9100" />
+                    <stop offset="100%" stopColor="#FF6B00" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </span>
+          </h2>
+
+          <p
+            className={`text-lg lg:text-xl text-white/50 max-w-2xl mx-auto transition-all duration-700 delay-200 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
+            Powerful APIs, comprehensive SDKs, and extensive documentation.
+            Build custom experiences or extend the platform with ease.
+          </p>
+        </div>
+
+        {/* Bento Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5">
+
+          {/* Main Code Preview - Large Card */}
           <div
-            className={`relative transition-all duration-1000 delay-300 ${
-              isInView ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
+            className={`lg:col-span-7 lg:row-span-2 transition-all duration-1000 delay-300 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
             }`}
           >
             <div
-              className="rounded-2xl overflow-hidden"
+              className="h-full rounded-2xl overflow-hidden group relative"
               style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                boxShadow: '0 25px 50px rgba(0,0,0,0.4)',
+                background: 'linear-gradient(145deg, rgba(20,20,25,0.9) 0%, rgba(10,10,15,0.95) 100%)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                boxShadow: '0 25px 80px -20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
               }}
             >
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+              {/* Code editor header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
-                  <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
-                  <div className="w-3 h-3 rounded-full bg-[#28c840]" />
+                  <div className="w-3 h-3 rounded-full bg-[#ff5f57] group-hover:shadow-[0_0_8px_rgba(255,95,87,0.5)] transition-shadow" />
+                  <div className="w-3 h-3 rounded-full bg-[#febc2e] group-hover:shadow-[0_0_8px_rgba(254,188,46,0.5)] transition-shadow" />
+                  <div className="w-3 h-3 rounded-full bg-[#28c840] group-hover:shadow-[0_0_8px_rgba(40,200,64,0.5)] transition-shadow" />
                 </div>
-                <span className="text-sm text-white/40 font-mono">create-product.js</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-white/30 font-mono">rendrix-sdk-demo.ts</span>
+                  <div className="flex items-center gap-1 px-2 py-1 rounded bg-white/[0.03]">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[10px] text-white/40 uppercase tracking-wider">Live</span>
+                  </div>
+                </div>
               </div>
 
-              <pre className="p-6 text-sm overflow-x-auto">
-                <code className="font-mono leading-relaxed">
-                  {mounted && codeLines.map((line, i) => (
-                    <div key={i} className="flex">
-                      <span className="w-8 text-white/20 select-none">{i + 1}</span>
-                      <span className={
-                        line.type === 'comment' ? 'text-white/30' :
-                        line.type === 'string' ? 'text-green-400' :
-                        line.type === 'number' ? 'text-orange-400' :
-                        'text-white/70'
-                      }>
-                        {line.text}
-                      </span>
-                    </div>
-                  ))}
-                  {!mounted && codeLines.map((line, i) => (
-                    <div key={i} className="flex">
-                      <span className="w-8 text-white/20 select-none">{i + 1}</span>
-                      <span className="text-white/70">{line.text}</span>
-                    </div>
-                  ))}
-                </code>
-              </pre>
-            </div>
+              {/* Code content with typing animation */}
+              <div className="p-5 lg:p-6 overflow-hidden">
+                <pre className="text-sm lg:text-[13px] leading-relaxed font-mono">
+                  <code>
+                    {mounted && codeSnippets.map((line, i) => (
+                      <div
+                        key={i}
+                        className={`flex transition-opacity duration-300 ${i <= currentLine ? 'opacity-100' : 'opacity-0'}`}
+                      >
+                        <span className="w-8 text-white/20 select-none text-right pr-4">{i + 1}</span>
+                        <span className={getLineColor(line.type)}>
+                          {i < currentLine ? line.text : (
+                            i === currentLine ? (
+                              <>
+                                {typedCode.split('\n')[i] || ''}
+                                {showCursor && <span className="inline-block w-[2px] h-4 bg-[#FF9100] ml-[1px] animate-pulse" />}
+                              </>
+                            ) : ''
+                          )}
+                        </span>
+                      </div>
+                    ))}
+                    {!mounted && codeSnippets.map((line, i) => (
+                      <div key={i} className="flex">
+                        <span className="w-8 text-white/20 select-none text-right pr-4">{i + 1}</span>
+                        <span className={getLineColor(line.type)}>{line.text}</span>
+                      </div>
+                    ))}
+                  </code>
+                </pre>
+              </div>
 
-            {/* Glow effect */}
-            <div className="absolute -inset-4 -z-10 bg-gradient-to-r from-primary/10 via-transparent to-primary/10 blur-3xl" />
+              {/* Subtle glow effect on hover */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-amber-500/5" />
+              </div>
+            </div>
+          </div>
+
+          {/* API Stats Cards */}
+          <div className="lg:col-span-5 grid grid-cols-3 gap-3 lg:gap-4">
+            {apiStats.map((stat, i) => (
+              <div
+                key={stat.label}
+                className={`relative group transition-all duration-700 ${
+                  isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+                style={{ transitionDelay: `${400 + i * 100}ms` }}
+              >
+                <div
+                  className="h-full p-4 lg:p-5 rounded-xl text-center relative overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                >
+                  <stat.icon
+                    className="w-5 h-5 mx-auto mb-2 transition-transform group-hover:scale-110"
+                    style={{ color: stat.color }}
+                  />
+                  <div className="text-xl lg:text-2xl font-bold text-white mb-1">{stat.value}</div>
+                  <div className="text-xs text-white/40 uppercase tracking-wider">{stat.label}</div>
+
+                  {/* Hover glow */}
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"
+                    style={{
+                      background: `radial-gradient(circle at center, ${stat.color}10 0%, transparent 70%)`,
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* SDK Languages Card */}
+          <div
+            className={`lg:col-span-5 transition-all duration-700 delay-500 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            <div
+              className="h-full p-5 lg:p-6 rounded-xl relative overflow-hidden"
+              style={{
+                background: 'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+                border: '1px solid rgba(255,255,255,0.06)',
+              }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-white/60">Official SDKs</span>
+                <span className="text-xs text-white/30">6 languages</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {sdkLanguages.map((lang) => (
+                  <div
+                    key={lang.name}
+                    className="group flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                    style={{
+                      background: 'rgba(255,255,255,0.02)',
+                      border: '1px solid rgba(255,255,255,0.04)',
+                    }}
+                  >
+                    <span className="text-base">{lang.icon}</span>
+                    <span className="text-xs text-white/60 group-hover:text-white/80 transition-colors truncate">
+                      {lang.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Feature Cards - 2x2 Grid */}
+          {features.map((feature, i) => (
+            <div
+              key={feature.title}
+              className={`lg:col-span-3 transition-all duration-700 ${
+                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
+              style={{ transitionDelay: `${600 + i * 100}ms` }}
+            >
+              <div
+                className="h-full p-5 rounded-xl group relative overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.02]"
+                style={{
+                  background: 'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                <div className="relative">
+                  <feature.icon className="w-8 h-8 text-[#FF9100] mb-3 transition-transform group-hover:scale-110 group-hover:rotate-3" />
+                  <h4 className="text-sm font-semibold text-white mb-1">{feature.title}</h4>
+                  <p className="text-xs text-white/40 leading-relaxed">{feature.description}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* CTA Row */}
+          <div
+            className={`lg:col-span-12 transition-all duration-700 delay-700 ${
+              isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            <div
+              className="p-6 lg:p-8 rounded-2xl relative overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,145,0,0.08) 0%, rgba(255,107,0,0.04) 100%)',
+                border: '1px solid rgba(255,145,0,0.15)',
+              }}
+            >
+              {/* Animated gradient border effect */}
+              <div className="absolute inset-0 opacity-50">
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,145,0,0.1) 50%, transparent 100%)',
+                    animation: 'shimmer 3s infinite',
+                  }}
+                />
+              </div>
+
+              <div className="relative flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div className="text-center lg:text-left">
+                  <h3 className="text-xl lg:text-2xl font-semibold text-white mb-2">
+                    Ready to start building?
+                  </h3>
+                  <p className="text-white/50 text-sm lg:text-base">
+                    Get your API keys and start integrating in minutes. Full documentation included.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <Link href="/docs">
+                    <Button
+                      className="h-12 px-6 rounded-xl font-semibold text-black transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_30px_rgba(255,145,0,0.4)]"
+                      style={{
+                        background: 'linear-gradient(135deg, #FF9100 0%, #FFB800 50%, #FF6B00 100%)',
+                        boxShadow: '0 4px 20px rgba(255,145,0,0.3)',
+                      }}
+                    >
+                      <BookOpen className="w-4 h-4 mr-2" />
+                      Read Documentation
+                    </Button>
+                  </Link>
+                  <Link href="/api">
+                    <Button
+                      variant="outline"
+                      className="h-12 px-6 rounded-xl font-medium bg-transparent border-white/20 text-white hover:bg-white/5 hover:border-white/30 transition-all duration-300"
+                    >
+                      <Code2 className="w-4 h-4 mr-2" />
+                      API Reference
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Shimmer animation keyframes */}
+      <style jsx>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
     </section>
   );
 }

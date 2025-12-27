@@ -1,0 +1,38 @@
+{
+  "name": "rendrix-lsp",
+  "version": "1.0.0",
+  "description": "TypeScript LSP integration for Rendrix monorepo",
+  "author": {
+    "name": "Rendrix Team"
+  },
+  "lspServers": {
+    "typescript": {
+      "command": "typescript-language-server",
+      "args": ["--stdio"],
+      "extensionToLanguage": {
+        ".ts": "typescript",
+        ".tsx": "typescriptreact",
+        ".js": "javascript",
+        ".jsx": "javascriptreact",
+        ".mjs": "javascript",
+        ".mts": "typescript"
+      },
+      "initializationOptions": {
+        "preferences": {
+          "includeInlayParameterNameHints": "all",
+          "includeInlayPropertyDeclarationTypeHints": true,
+          "includeInlayFunctionParameterTypeHints": true
+        }
+      },
+      "settings": {
+        "typescript": {
+          "inlayHints": {
+            "includeInlayParameterNameHints": "all"
+          }
+        }
+      },
+      "restartOnCrash": true,
+      "maxRestarts": 3
+    }
+  }
+}
