@@ -1,4 +1,4 @@
-# Rendrix - Master Your Commerce Universe
+# `Rendrix - Master Your Commerce Universe`
 
 <p align="center">
   <<img width="2001" height="1440" alt="index" src="https://github.com/user-attachments/assets/d92275e8-024b-41ef-8fe6-cd1c2e530e32" />
