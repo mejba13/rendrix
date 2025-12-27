@@ -1,38 +1,40 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import {
   Check,
-  X,
   Zap,
   Shield,
-  Headphones,
-  Clock,
-  Globe,
   Sparkles,
   ArrowRight,
   ChevronDown,
-  Store,
   Users,
-  Package,
-  BarChart3,
   Cpu,
   Lock,
   CreditCard,
   MessageSquare,
   Star,
   Building2,
-  Rocket,
   Crown,
+  Gift,
+  Infinity,
+  TrendingUp,
+  Award,
+  Heart,
 } from 'lucide-react';
 
 // Animation variants
 const fadeInUp: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+};
+
+const fadeInScale: Variants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
 };
 
 const staggerContainer: Variants = {
@@ -43,61 +45,56 @@ const staggerContainer: Variants = {
   },
 };
 
-const scaleIn: Variants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
-};
-
-// Pricing data
+// Standard SaaS Pricing - Aligned with dashboard
 const pricingPlans = [
   {
-    id: 'starter',
-    name: 'Starter',
-    description: 'Perfect for individuals launching their first online store',
-    icon: Rocket,
-    monthlyPrice: 29,
-    yearlyPrice: 290,
-    savings: 58,
+    id: 'free',
+    name: 'Free',
+    tagline: 'Start selling today',
+    description: 'Everything you need to launch your first store',
+    icon: Gift,
+    monthlyPrice: 0,
+    yearlyPrice: 0,
+    savings: 0,
     popular: false,
+    highlighted: false,
+    color: 'emerald',
     features: [
       { name: '1 Online Store', included: true },
-      { name: 'Up to 100 Products', included: true },
-      { name: '2 Team Members', included: true },
-      { name: '2.9% + 30¢ Transaction Fee', included: true },
-      { name: '5GB Storage', included: true },
+      { name: 'Up to 10 Products', included: true },
+      { name: '1 Team Member', included: true },
+      { name: '5% Transaction Fee', included: true },
+      { name: '1GB Storage', included: true },
       { name: 'Basic Analytics', included: true },
-      { name: 'Email Support', included: true },
-      { name: '1 Custom Domain', included: true },
-      { name: 'AI Product Descriptions', included: false },
-      { name: 'Advanced Analytics', included: false },
-      { name: 'Priority Support', included: false },
-      { name: 'API Access', included: false },
+      { name: 'Community Support', included: true },
+      { name: 'Rendrix Branding', included: true },
     ],
-    cta: 'Start Free Trial',
+    cta: 'Get Started Free',
     ctaVariant: 'secondary' as const,
   },
   {
     id: 'pro',
     name: 'Pro',
-    description: 'For growing businesses ready to scale their operations',
+    tagline: 'Most Popular',
+    description: 'For growing businesses ready to scale',
     icon: Zap,
-    monthlyPrice: 79,
-    yearlyPrice: 790,
-    savings: 158,
+    monthlyPrice: 29,
+    yearlyPrice: 290,
+    savings: 58,
     popular: true,
+    highlighted: true,
+    color: 'primary',
     features: [
       { name: '3 Online Stores', included: true },
-      { name: 'Up to 1,000 Products', included: true },
+      { name: 'Up to 500 Products', included: true },
       { name: '5 Team Members', included: true },
-      { name: '2.5% + 30¢ Transaction Fee', included: true },
-      { name: '25GB Storage', included: true },
+      { name: '2.9% Transaction Fee', included: true },
+      { name: '10GB Storage', included: true },
       { name: 'Advanced Analytics', included: true },
       { name: 'Priority Email Support', included: true },
-      { name: '3 Custom Domains', included: true },
+      { name: 'Custom Domain', included: true },
       { name: 'AI Product Descriptions', included: true },
-      { name: 'Inventory Forecasting', included: true },
-      { name: 'Priority Support', included: false },
-      { name: 'API Access', included: false },
+      { name: 'Remove Rendrix Branding', included: true },
     ],
     cta: 'Start Free Trial',
     ctaVariant: 'primary' as const,
@@ -105,25 +102,28 @@ const pricingPlans = [
   {
     id: 'business',
     name: 'Business',
-    description: 'Advanced features for scaling brands with high volume',
+    tagline: 'For scaling brands',
+    description: 'Advanced tools for high-volume sellers',
     icon: Building2,
-    monthlyPrice: 199,
-    yearlyPrice: 1990,
-    savings: 398,
+    monthlyPrice: 79,
+    yearlyPrice: 790,
+    savings: 158,
     popular: false,
+    highlighted: false,
+    color: 'blue',
     features: [
       { name: '10 Online Stores', included: true },
       { name: 'Unlimited Products', included: true },
       { name: '15 Team Members', included: true },
-      { name: '2.2% + 30¢ Transaction Fee', included: true },
-      { name: '100GB Storage', included: true },
+      { name: '2.5% Transaction Fee', included: true },
+      { name: '50GB Storage', included: true },
       { name: 'Advanced Analytics + Reports', included: true },
-      { name: 'Priority Support (Chat & Email)', included: true },
-      { name: '10 Custom Domains', included: true },
+      { name: 'Priority Chat & Email', included: true },
+      { name: '5 Custom Domains', included: true },
       { name: 'AI Suite (Full Access)', included: true },
       { name: 'Inventory Forecasting', included: true },
+      { name: 'API Access', included: true },
       { name: 'Dedicated Account Manager', included: true },
-      { name: 'Full API Access', included: true },
     ],
     cta: 'Start Free Trial',
     ctaVariant: 'secondary' as const,
@@ -131,12 +131,15 @@ const pricingPlans = [
   {
     id: 'enterprise',
     name: 'Enterprise',
-    description: 'Custom solutions for large-scale commerce operations',
+    tagline: 'Custom solutions',
+    description: 'For large-scale commerce operations',
     icon: Crown,
     monthlyPrice: null,
     yearlyPrice: null,
     savings: null,
     popular: false,
+    highlighted: false,
+    color: 'purple',
     features: [
       { name: 'Unlimited Stores', included: true },
       { name: 'Unlimited Products', included: true },
@@ -144,10 +147,10 @@ const pricingPlans = [
       { name: 'Custom Transaction Rates', included: true },
       { name: 'Unlimited Storage', included: true },
       { name: 'Custom Analytics & BI', included: true },
-      { name: '24/7 Phone & Chat Support', included: true },
+      { name: '24/7 Phone Support', included: true },
       { name: 'Unlimited Custom Domains', included: true },
       { name: 'AI Suite + Custom Models', included: true },
-      { name: 'White-label Solutions', included: true },
+      { name: 'White-label Solution', included: true },
       { name: 'Dedicated Success Team', included: true },
       { name: 'SLA & Compliance', included: true },
     ],
@@ -156,265 +159,33 @@ const pricingPlans = [
   },
 ];
 
-// Feature comparison data
-const featureCategories = [
-  {
-    name: 'Store Management',
-    icon: Store,
-    features: [
-      { name: 'Online Stores', starter: '1', pro: '3', business: '10', enterprise: 'Unlimited' },
-      { name: 'Products', starter: '100', pro: '1,000', business: 'Unlimited', enterprise: 'Unlimited' },
-      { name: 'Team Members', starter: '2', pro: '5', business: '15', enterprise: 'Unlimited' },
-      { name: 'Custom Domains', starter: '1', pro: '3', business: '10', enterprise: 'Unlimited' },
-    ],
-  },
-  {
-    name: 'Commerce Features',
-    icon: Package,
-    features: [
-      { name: 'Transaction Fee', starter: '2.9%', pro: '2.5%', business: '2.2%', enterprise: 'Custom' },
-      { name: 'Payment Gateways', starter: 'Stripe, PayPal', pro: 'All Major', business: 'All + Custom', enterprise: 'All + Custom' },
-      { name: 'Abandoned Cart Recovery', starter: false, pro: true, business: true, enterprise: true },
-      { name: 'Multi-currency', starter: false, pro: true, business: true, enterprise: true },
-    ],
-  },
-  {
-    name: 'AI & Automation',
-    icon: Cpu,
-    features: [
-      { name: 'AI Product Descriptions', starter: false, pro: true, business: true, enterprise: true },
-      { name: 'AI-Powered Search', starter: false, pro: true, business: true, enterprise: true },
-      { name: 'Smart Recommendations', starter: false, pro: 'Basic', business: 'Advanced', enterprise: 'Custom' },
-      { name: 'Inventory Forecasting', starter: false, pro: true, business: true, enterprise: true },
-    ],
-  },
-  {
-    name: 'Analytics & Reporting',
-    icon: BarChart3,
-    features: [
-      { name: 'Basic Analytics', starter: true, pro: true, business: true, enterprise: true },
-      { name: 'Advanced Reports', starter: false, pro: true, business: true, enterprise: true },
-      { name: 'Custom Dashboards', starter: false, pro: false, business: true, enterprise: true },
-      { name: 'Data Export', starter: 'CSV', pro: 'CSV, Excel', business: 'All Formats', enterprise: 'All + API' },
-    ],
-  },
-  {
-    name: 'Support & Security',
-    icon: Shield,
-    features: [
-      { name: 'Email Support', starter: true, pro: true, business: true, enterprise: true },
-      { name: 'Priority Support', starter: false, pro: true, business: true, enterprise: true },
-      { name: 'Phone Support', starter: false, pro: false, business: false, enterprise: true },
-      { name: 'Dedicated Account Manager', starter: false, pro: false, business: true, enterprise: true },
-      { name: 'SLA Guarantee', starter: false, pro: false, business: '99.9%', enterprise: '99.99%' },
-    ],
-  },
-];
-
 // FAQ data
 const faqs = [
   {
-    question: 'Can I try Rendrix before committing to a plan?',
-    answer: 'Absolutely! All plans come with a 14-day free trial with full access to features. No credit card required to start. You can upgrade, downgrade, or cancel at any time during or after your trial.',
+    question: 'Can I try Rendrix before committing?',
+    answer: 'Yes! Start with our Free plan or get a 14-day free trial of Pro/Business. No credit card required.',
   },
   {
     question: 'What payment methods do you accept?',
-    answer: 'We accept all major credit cards (Visa, Mastercard, American Express), PayPal, and bank transfers for annual plans. Enterprise customers can also pay via invoice with NET 30 terms.',
+    answer: 'We accept all major credit cards, PayPal, and bank transfers for annual plans.',
   },
   {
     question: 'Can I change my plan later?',
-    answer: 'Yes, you can upgrade or downgrade your plan at any time. When upgrading, you\'ll get immediate access to new features and we\'ll prorate your billing. When downgrading, changes take effect at the next billing cycle.',
+    answer: 'Absolutely. Upgrade or downgrade anytime. Changes take effect immediately with prorated billing.',
   },
   {
-    question: 'What happens if I exceed my plan limits?',
-    answer: 'We\'ll notify you when you\'re approaching your limits. You can either upgrade to a higher plan or purchase add-ons for specific features. We never automatically charge you or shut down your store.',
+    question: 'What happens when I exceed my limits?',
+    answer: "We'll notify you before you hit limits. You can upgrade or purchase add-ons. We never shut down your store.",
   },
   {
-    question: 'Do you offer discounts for annual billing?',
-    answer: 'Yes! When you choose annual billing, you get 2 months free—that\'s roughly 17% savings compared to monthly billing. Enterprise customers can negotiate custom terms for multi-year agreements.',
+    question: 'Is there a money-back guarantee?',
+    answer: 'Yes, 30-day money-back guarantee on all paid plans. No questions asked.',
   },
   {
-    question: 'Is there a setup fee or hidden costs?',
-    answer: 'No setup fees, no hidden costs. The price you see is the price you pay. Transaction fees are clearly stated for each plan and are only charged on successful sales. Domain registration and third-party integrations may have separate costs.',
-  },
-  {
-    question: 'What\'s included in priority support?',
-    answer: 'Priority support includes faster response times (under 4 hours vs 24 hours), access to chat support during business hours, and direct escalation paths. Business and Enterprise plans also get dedicated account managers.',
-  },
-  {
-    question: 'Can I get a refund if I\'m not satisfied?',
-    answer: 'We offer a 30-day money-back guarantee for all new customers. If you\'re not completely satisfied within the first 30 days, contact us for a full refund—no questions asked.',
+    question: 'Do you offer discounts for nonprofits?',
+    answer: 'Yes! Nonprofits get 50% off any plan. Contact us with your organization details.',
   },
 ];
-
-// Trust signals
-const trustSignals = [
-  { icon: Shield, title: '99.99% Uptime', description: 'Enterprise-grade reliability' },
-  { icon: Lock, title: 'SOC 2 Compliant', description: 'Bank-level security' },
-  { icon: CreditCard, title: 'PCI DSS Level 1', description: 'Secure payments' },
-  { icon: Clock, title: '24/7 Monitoring', description: 'Always protected' },
-];
-
-// Billing toggle component
-function BillingToggle({
-  isAnnual,
-  onToggle,
-}: {
-  isAnnual: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <div className="flex items-center justify-center gap-4">
-      <span className={`text-sm font-medium transition-colors ${!isAnnual ? 'text-white' : 'text-white/50'}`}>
-        Monthly
-      </span>
-      <button
-        onClick={onToggle}
-        className="relative w-16 h-8 rounded-full bg-white/10 border border-white/10 transition-colors hover:bg-white/15"
-      >
-        <motion.div
-          className="absolute top-1 w-6 h-6 rounded-full bg-primary"
-          animate={{ left: isAnnual ? '34px' : '2px' }}
-          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        />
-      </button>
-      <span className={`text-sm font-medium transition-colors ${isAnnual ? 'text-white' : 'text-white/50'}`}>
-        Annual
-      </span>
-      <span className="ml-2 px-2 py-0.5 text-xs font-medium text-primary bg-primary/10 rounded-full border border-primary/20">
-        Save 17%
-      </span>
-    </div>
-  );
-}
-
-// Pricing card component
-function PricingCard({
-  plan,
-  isAnnual,
-}: {
-  plan: typeof pricingPlans[0];
-  isAnnual: boolean;
-}) {
-  const Icon = plan.icon;
-  const price = isAnnual ? plan.yearlyPrice : plan.monthlyPrice;
-  const period = isAnnual ? '/year' : '/month';
-
-  return (
-    <motion.div
-      variants={scaleIn}
-      className={`relative rounded-2xl ${plan.popular ? 'mt-4' : ''} ${
-        plan.popular
-          ? 'bg-gradient-to-b from-primary/20 via-primary/5 to-transparent border-2 border-primary/50'
-          : 'bg-white/[0.02] border border-white/[0.06]'
-      }`}
-    >
-      {/* Popular badge */}
-      {plan.popular && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-          <div className="px-4 py-1.5 bg-primary text-black text-xs font-bold rounded-full shadow-lg shadow-primary/30">
-            MOST POPULAR
-          </div>
-        </div>
-      )}
-
-      {/* Glow effect for popular */}
-      {plan.popular && (
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none rounded-2xl" />
-      )}
-
-      <div className="relative p-8">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-            plan.popular ? 'bg-primary/20' : 'bg-white/5'
-          }`}>
-            <Icon className={`w-5 h-5 ${plan.popular ? 'text-primary' : 'text-white/60'}`} />
-          </div>
-          <div>
-            <h3 className="text-xl font-semibold text-white">{plan.name}</h3>
-          </div>
-        </div>
-
-        <p className="text-white/50 text-sm mb-6 min-h-[40px]">{plan.description}</p>
-
-        {/* Price */}
-        <div className="mb-6">
-          {price !== null ? (
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold text-white">${price}</span>
-              <span className="text-white/50 text-sm">{period}</span>
-            </div>
-          ) : (
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold text-white">Custom</span>
-            </div>
-          )}
-          {isAnnual && plan.savings && (
-            <p className="text-sm text-emerald-400 mt-1">Save ${plan.savings}/year</p>
-          )}
-        </div>
-
-        {/* CTA Button */}
-        <Link
-          href={plan.id === 'enterprise' ? '/contact' : '/register'}
-          className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all mb-8 ${
-            plan.ctaVariant === 'primary'
-              ? 'bg-primary text-black hover:bg-primary/90'
-              : 'bg-white/10 text-white hover:bg-white/15 border border-white/10'
-          }`}
-        >
-          {plan.cta}
-          <ArrowRight className="w-4 h-4" />
-        </Link>
-
-        {/* Features */}
-        <div className="space-y-3">
-          {plan.features.map((feature) => (
-            <div key={feature.name} className="flex items-center gap-3">
-              {feature.included ? (
-                <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-              ) : (
-                <X className="w-4 h-4 text-white/20 flex-shrink-0" />
-              )}
-              <span className={`text-sm ${feature.included ? 'text-white/80' : 'text-white/30'}`}>
-                {feature.name}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-// Feature comparison row
-function FeatureRow({
-  feature,
-}: {
-  feature: { name: string; starter: string | boolean; pro: string | boolean; business: string | boolean; enterprise: string | boolean };
-}) {
-  const renderValue = (value: string | boolean) => {
-    if (typeof value === 'boolean') {
-      return value ? (
-        <Check className="w-5 h-5 text-emerald-400 mx-auto" />
-      ) : (
-        <X className="w-5 h-5 text-white/20 mx-auto" />
-      );
-    }
-    return <span className="text-white/80 text-sm">{value}</span>;
-  };
-
-  return (
-    <div className="grid grid-cols-5 py-4 border-b border-white/[0.06] hover:bg-white/[0.02] transition-colors">
-      <div className="text-white/60 text-sm pl-4">{feature.name}</div>
-      <div className="text-center">{renderValue(feature.starter)}</div>
-      <div className="text-center">{renderValue(feature.pro)}</div>
-      <div className="text-center">{renderValue(feature.business)}</div>
-      <div className="text-center">{renderValue(feature.enterprise)}</div>
-    </div>
-  );
-}
 
 // FAQ Item component
 function FAQItem({
@@ -427,7 +198,10 @@ function FAQItem({
   onToggle: () => void;
 }) {
   return (
-    <div className="border-b border-white/[0.06]">
+    <motion.div
+      className="border-b border-white/[0.06] last:border-0"
+      initial={false}
+    >
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between py-5 text-left group"
@@ -438,9 +212,9 @@ function FAQItem({
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
-          className="flex-shrink-0"
+          className="flex-shrink-0 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors"
         >
-          <ChevronDown className="w-5 h-5 text-white/40" />
+          <ChevronDown className="w-4 h-4 text-white/60" />
         </motion.div>
       </button>
       <AnimatePresence>
@@ -449,40 +223,56 @@ function FAQItem({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
             <p className="pb-5 text-white/60 leading-relaxed">{faq.answer}</p>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
 
 export default function PricingPage() {
   const [isAnnual, setIsAnnual] = useState(true);
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
-  const [showComparison, setShowComparison] = useState(false);
+  const [hoveredPlan, setHoveredPlan] = useState<string | null>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const isHeroInView = useInView(heroRef, { once: true });
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Noise texture overlay */}
-      <div
-        className="fixed inset-0 opacity-[0.015] pointer-events-none z-50"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }}
-      />
+    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+      {/* Animated background */}
+      <div className="fixed inset-0 pointer-events-none">
+        {/* Gradient orbs */}
+        <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-primary/[0.07] rounded-full blur-[150px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-blue-500/[0.05] rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-purple-500/[0.04] rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
 
-      {/* Background gradient */}
-      <div className="fixed inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
+        {/* Grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,145,0,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,145,0,0.3) 1px, transparent 1px)`,
+            backgroundSize: '100px 100px',
+          }}
+        />
+
+        {/* Noise texture */}
+        <div
+          className="absolute inset-0 opacity-[0.015]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          }}
+        />
+      </div>
 
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-black/80 backdrop-blur-xl">
         <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-primary/30 transition-all">
               <span className="text-sm font-bold text-black">R</span>
             </div>
             <span className="text-xl font-semibold tracking-tight">Rendrix</span>
@@ -508,250 +298,387 @@ export default function PricingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6">
+      <section ref={heroRef} className="relative pt-32 pb-16 px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial="hidden"
-            animate="visible"
+            animate={isHeroInView ? "visible" : "hidden"}
             variants={staggerContainer}
             className="text-center"
           >
             {/* Badge */}
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8">
+            <motion.div
+              variants={fadeInUp}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/20 to-orange-500/20 border border-primary/30 mb-8"
+            >
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm text-white/70">Simple, transparent pricing</span>
+              <span className="text-sm font-medium bg-gradient-to-r from-primary to-orange-400 bg-clip-text text-transparent">
+                Simple, transparent pricing
+              </span>
             </motion.div>
 
             {/* Title */}
-            <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
-              <span className="text-white">Choose your</span>
+            <motion.h1
+              variants={fadeInUp}
+              className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight"
+            >
+              <span className="text-white">Start free,</span>
               <br />
-              <span className="bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent">
-                growth plan
+              <span className="bg-gradient-to-r from-primary via-orange-400 to-amber-300 bg-clip-text text-transparent">
+                scale without limits
               </span>
             </motion.h1>
 
             {/* Subtitle */}
-            <motion.p variants={fadeInUp} className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10">
-              Start free, scale infinitely. No hidden fees, no surprises.
-              Join thousands of brands building the future of commerce.
+            <motion.p
+              variants={fadeInUp}
+              className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-12"
+            >
+              No hidden fees. No surprises. Cancel anytime.
+              <br className="hidden sm:block" />
+              Join 25,000+ brands building the future of commerce.
             </motion.p>
 
             {/* Billing Toggle */}
-            <motion.div variants={fadeInUp}>
-              <BillingToggle isAnnual={isAnnual} onToggle={() => setIsAnnual(!isAnnual)} />
+            <motion.div variants={fadeInUp} className="flex items-center justify-center gap-4">
+              <button
+                onClick={() => setIsAnnual(false)}
+                className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  !isAnnual
+                    ? 'bg-white text-black'
+                    : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setIsAnnual(true)}
+                className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${
+                  isAnnual
+                    ? 'bg-white text-black'
+                    : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                Annual
+                <span className="px-2 py-0.5 text-xs font-bold bg-emerald-500 text-white rounded-full">
+                  -17%
+                </span>
+              </button>
             </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* Pricing Cards */}
-      <section className="relative pb-20 px-6">
+      {/* Pricing Cards - Bento Grid Layout */}
+      <section className="relative pb-24 px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: '-100px' }}
+            viewport={{ once: true, margin: '-50px' }}
             variants={staggerContainer}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            className="grid grid-cols-1 lg:grid-cols-12 gap-6"
           >
-            {pricingPlans.map((plan) => (
-              <PricingCard key={plan.id} plan={plan} isAnnual={isAnnual} />
-            ))}
+            {/* Free Plan - Compact */}
+            <motion.div
+              variants={fadeInScale}
+              onMouseEnter={() => setHoveredPlan('free')}
+              onMouseLeave={() => setHoveredPlan(null)}
+              className="lg:col-span-3 relative group"
+            >
+              <div className={`h-full p-6 rounded-3xl bg-gradient-to-b from-white/[0.05] to-white/[0.02] border border-white/[0.08] transition-all duration-500 ${
+                hoveredPlan === 'free' ? 'border-emerald-500/50 shadow-2xl shadow-emerald-500/10' : ''
+              }`}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                    <Gift className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Free</h3>
+                    <p className="text-xs text-emerald-400">Forever free</p>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-bold text-white">$0</span>
+                    <span className="text-white/40 text-sm">/month</span>
+                  </div>
+                  <p className="text-sm text-white/50 mt-2">Perfect for getting started</p>
+                </div>
+
+                <Link
+                  href="/register"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-medium hover:bg-white/10 transition-all mb-6"
+                >
+                  Get Started
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+
+                <div className="space-y-3">
+                  {pricingPlans[0].features.slice(0, 6).map((feature) => (
+                    <div key={feature.name} className="flex items-center gap-2.5">
+                      <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                      <span className="text-sm text-white/70">{feature.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Pro Plan - Featured/Large */}
+            <motion.div
+              variants={fadeInScale}
+              onMouseEnter={() => setHoveredPlan('pro')}
+              onMouseLeave={() => setHoveredPlan(null)}
+              className="lg:col-span-5 relative"
+            >
+              {/* Popular Badge */}
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+                <div className="px-4 py-1.5 bg-gradient-to-r from-primary to-orange-500 text-black text-xs font-bold rounded-full shadow-lg shadow-primary/40 flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 fill-current" />
+                  MOST POPULAR
+                </div>
+              </div>
+
+              <div className={`h-full p-8 rounded-3xl bg-gradient-to-b from-primary/20 via-primary/10 to-transparent border-2 border-primary/50 transition-all duration-500 relative overflow-hidden ${
+                hoveredPlan === 'pro' ? 'border-primary shadow-2xl shadow-primary/20' : ''
+              }`}>
+                {/* Glow effect */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-gradient-to-b from-primary/20 to-transparent pointer-events-none" />
+
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center shadow-lg shadow-primary/30">
+                      <Zap className="w-6 h-6 text-black" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white">Pro</h3>
+                      <p className="text-xs text-primary">For growing businesses</p>
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-5xl font-bold text-white">
+                        ${isAnnual ? 24 : 29}
+                      </span>
+                      <span className="text-white/40 text-sm">/month</span>
+                    </div>
+                    {isAnnual && (
+                      <p className="text-sm text-emerald-400 mt-1 flex items-center gap-1">
+                        <TrendingUp className="w-3.5 h-3.5" />
+                        Save $60/year (billed annually)
+                      </p>
+                    )}
+                    <p className="text-sm text-white/50 mt-2">Everything you need to grow</p>
+                  </div>
+
+                  <Link
+                    href="/register"
+                    className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-primary to-orange-500 text-black font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all mb-8 group"
+                  >
+                    Start Free Trial
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    {pricingPlans[1].features.map((feature) => (
+                      <div key={feature.name} className="flex items-center gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-3 h-3 text-primary" />
+                        </div>
+                        <span className="text-sm text-white/80">{feature.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Business Plan */}
+            <motion.div
+              variants={fadeInScale}
+              onMouseEnter={() => setHoveredPlan('business')}
+              onMouseLeave={() => setHoveredPlan(null)}
+              className="lg:col-span-4 relative group"
+            >
+              <div className={`h-full p-6 rounded-3xl bg-gradient-to-b from-white/[0.05] to-white/[0.02] border border-white/[0.08] transition-all duration-500 ${
+                hoveredPlan === 'business' ? 'border-blue-500/50 shadow-2xl shadow-blue-500/10' : ''
+              }`}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                    <Building2 className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Business</h3>
+                    <p className="text-xs text-blue-400">For scaling brands</p>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-bold text-white">
+                      ${isAnnual ? 66 : 79}
+                    </span>
+                    <span className="text-white/40 text-sm">/month</span>
+                  </div>
+                  {isAnnual && (
+                    <p className="text-sm text-emerald-400 mt-1">Save $156/year</p>
+                  )}
+                  <p className="text-sm text-white/50 mt-2">Advanced tools for growth</p>
+                </div>
+
+                <Link
+                  href="/register"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-medium hover:bg-white/10 transition-all mb-6"
+                >
+                  Start Free Trial
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+
+                <div className="space-y-3">
+                  {pricingPlans[2].features.slice(0, 8).map((feature) => (
+                    <div key={feature.name} className="flex items-center gap-2.5">
+                      <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                      <span className="text-sm text-white/70">{feature.name}</span>
+                    </div>
+                  ))}
+                  <p className="text-xs text-white/40 pt-2">+ 4 more features</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Enterprise - Full Width */}
+            <motion.div
+              variants={fadeInScale}
+              onMouseEnter={() => setHoveredPlan('enterprise')}
+              onMouseLeave={() => setHoveredPlan(null)}
+              className="lg:col-span-12"
+            >
+              <div className={`p-8 rounded-3xl bg-gradient-to-r from-purple-500/10 via-white/[0.03] to-violet-500/10 border border-white/[0.08] transition-all duration-500 ${
+                hoveredPlan === 'enterprise' ? 'border-purple-500/50 shadow-2xl shadow-purple-500/10' : ''
+              }`}>
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center">
+                        <Crown className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-white">Enterprise</h3>
+                        <p className="text-xs text-purple-400">Custom solutions for large organizations</p>
+                      </div>
+                    </div>
+                    <p className="text-white/60 max-w-xl">
+                      Tailored solutions with dedicated support, custom integrations, and enterprise-grade security.
+                      Let&apos;s build something amazing together.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 flex-1">
+                    {[
+                      { icon: Infinity, label: 'Unlimited Everything' },
+                      { icon: Shield, label: 'SLA & Compliance' },
+                      { icon: Users, label: 'Dedicated Team' },
+                      { icon: Cpu, label: 'Custom AI Models' },
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                          <item.icon className="w-4 h-4 text-purple-400" />
+                        </div>
+                        <span className="text-sm text-white/70">{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <Link
+                    href="/contact"
+                    className="px-8 py-4 rounded-xl bg-gradient-to-r from-purple-500 to-violet-600 text-white font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center gap-2 whitespace-nowrap"
+                  >
+                    Contact Sales
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
       {/* Trust Signals */}
-      <section className="relative py-16 px-6 border-y border-white/[0.06]">
+      <section className="relative py-16 px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8"
+            className="grid grid-cols-2 md:grid-cols-4 gap-6"
           >
-            {trustSignals.map((signal) => (
-              <motion.div key={signal.title} variants={fadeInUp} className="text-center">
-                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mx-auto mb-3">
-                  <signal.icon className="w-6 h-6 text-primary" />
+            {[
+              { icon: Shield, title: '99.99% Uptime', desc: 'Enterprise reliability', color: 'emerald' },
+              { icon: Lock, title: 'SOC 2 Type II', desc: 'Bank-level security', color: 'blue' },
+              { icon: CreditCard, title: 'PCI Compliant', desc: 'Secure payments', color: 'purple' },
+              { icon: Award, title: '30-Day Guarantee', desc: 'Money back promise', color: 'primary' },
+            ].map((signal) => (
+              <motion.div
+                key={signal.title}
+                variants={fadeInUp}
+                className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/10 transition-all group text-center"
+              >
+                <div className={`w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center transition-all ${
+                  signal.color === 'emerald' ? 'bg-emerald-500/10 group-hover:bg-emerald-500/20' :
+                  signal.color === 'blue' ? 'bg-blue-500/10 group-hover:bg-blue-500/20' :
+                  signal.color === 'purple' ? 'bg-purple-500/10 group-hover:bg-purple-500/20' :
+                  'bg-primary/10 group-hover:bg-primary/20'
+                }`}>
+                  <signal.icon className={`w-7 h-7 ${
+                    signal.color === 'emerald' ? 'text-emerald-400' :
+                    signal.color === 'blue' ? 'text-blue-400' :
+                    signal.color === 'purple' ? 'text-purple-400' :
+                    'text-primary'
+                  }`} />
                 </div>
                 <h4 className="text-white font-semibold mb-1">{signal.title}</h4>
-                <p className="text-sm text-white/50">{signal.description}</p>
+                <p className="text-sm text-white/50">{signal.desc}</p>
               </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
 
-      {/* Feature Comparison Toggle */}
-      <section className="relative py-20 px-6">
-        <div className="max-w-7xl mx-auto">
+      {/* Comparison Banner */}
+      <section className="relative py-16 px-6">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeInUp}
-            className="text-center mb-12"
+            className="relative p-8 md:p-12 rounded-3xl overflow-hidden"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Compare plans in detail
-            </h2>
-            <p className="text-white/60 mb-8">
-              See exactly what you get with each plan
-            </p>
-            <button
-              onClick={() => setShowComparison(!showComparison)}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors"
-            >
-              {showComparison ? 'Hide comparison' : 'Show full comparison'}
-              <motion.div
-                animate={{ rotate: showComparison ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ChevronDown className="w-5 h-5" />
-              </motion.div>
-            </button>
-          </motion.div>
+            {/* Background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-orange-500/10 to-amber-500/20" />
+            <div className="absolute inset-0 bg-black/40" />
 
-          {/* Feature Comparison Table */}
-          <AnimatePresence>
-            {showComparison && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="overflow-hidden"
-              >
-                <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] overflow-hidden">
-                  {/* Header */}
-                  <div className="grid grid-cols-5 py-4 bg-white/[0.02] border-b border-white/[0.06]">
-                    <div className="pl-4 text-white/40 text-sm font-medium">Features</div>
-                    <div className="text-center text-white font-semibold">Starter</div>
-                    <div className="text-center text-primary font-semibold">Pro</div>
-                    <div className="text-center text-white font-semibold">Business</div>
-                    <div className="text-center text-white font-semibold">Enterprise</div>
-                  </div>
-
-                  {/* Feature Categories */}
-                  {featureCategories.map((category) => (
-                    <div key={category.name}>
-                      {/* Category Header */}
-                      <div className="grid grid-cols-5 py-3 bg-white/[0.02] border-b border-white/[0.06]">
-                        <div className="pl-4 flex items-center gap-2">
-                          <category.icon className="w-4 h-4 text-primary" />
-                          <span className="text-white font-medium text-sm">{category.name}</span>
-                        </div>
-                        <div className="col-span-4" />
-                      </div>
-                      {/* Features */}
-                      {category.features.map((feature) => (
-                        <FeatureRow key={feature.name} feature={feature} />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </section>
-
-      {/* Value Propositions */}
-      <section className="relative py-20 px-6 bg-white/[0.01]">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                Why brands choose Rendrix
+            <div className="relative text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                Save up to 60% compared to Shopify
               </h2>
-              <p className="text-white/60 max-w-2xl mx-auto">
-                More than just a platform—a partner in your commerce journey
+              <p className="text-white/70 max-w-2xl mx-auto mb-8">
+                Rendrix offers enterprise-grade features at a fraction of the cost.
+                No hidden fees, no transaction surprises—just transparent pricing that scales with you.
               </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  icon: Globe,
-                  title: 'Go global instantly',
-                  description: 'Multi-currency, multi-language, and local payment methods built-in. Reach customers in 190+ countries from day one.',
-                },
-                {
-                  icon: Sparkles,
-                  title: 'AI-powered growth',
-                  description: 'Smart product recommendations, automated descriptions, and predictive analytics help you sell more with less effort.',
-                },
-                {
-                  icon: Shield,
-                  title: 'Enterprise security',
-                  description: 'SOC 2 compliant, PCI DSS Level 1 certified. Your data and your customers\' data is always protected.',
-                },
-                {
-                  icon: Headphones,
-                  title: 'World-class support',
-                  description: 'Our commerce experts are here to help you succeed. Priority support with response times under 4 hours.',
-                },
-                {
-                  icon: Zap,
-                  title: 'Lightning fast',
-                  description: 'Built for performance with global CDN, edge caching, and optimized checkout. Speed equals conversions.',
-                },
-                {
-                  icon: Users,
-                  title: 'Scale with confidence',
-                  description: 'From 10 orders to 10 million. Our infrastructure grows with you, handling traffic spikes effortlessly.',
-                },
-              ].map((item) => (
-                <motion.div
-                  key={item.title}
-                  variants={fadeInUp}
-                  className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/10 transition-colors group"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
-                    <item.icon className="w-6 h-6 text-primary" />
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                {['Shopify', 'BigCommerce', 'WooCommerce', 'Magento'].map((competitor) => (
+                  <div
+                    key={competitor}
+                    className="px-4 py-2 rounded-full bg-white/10 text-white/60 text-sm"
+                  >
+                    vs {competitor}
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
-                  <p className="text-white/50 text-sm leading-relaxed">{item.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Testimonial */}
-      <section className="relative py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-            className="relative p-8 md:p-12 rounded-3xl bg-gradient-to-br from-primary/10 via-transparent to-transparent border border-primary/20"
-          >
-            <div className="flex gap-1 mb-6">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-5 h-5 text-primary fill-primary" />
-              ))}
-            </div>
-            <blockquote className="text-xl md:text-2xl text-white/90 leading-relaxed mb-8">
-              &quot;Switching to Rendrix was the best decision we made. Our conversion rate increased by 40% in the first month, and the AI features have saved us countless hours. The transparent pricing means no surprises.&quot;
-            </blockquote>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-amber-600 flex items-center justify-center text-black font-bold">
-                JM
-              </div>
-              <div>
-                <p className="text-white font-semibold">Jennifer Martinez</p>
-                <p className="text-white/50 text-sm">CEO, Bloom & Grow Co.</p>
+                ))}
               </div>
             </div>
           </motion.div>
@@ -759,7 +686,7 @@ export default function PricingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="relative py-20 px-6 bg-white/[0.01]">
+      <section className="relative py-20 px-6">
         <div className="max-w-3xl mx-auto">
           <motion.div
             initial="hidden"
@@ -770,17 +697,20 @@ export default function PricingPage() {
             <motion.div variants={fadeInUp} className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6">
                 <MessageSquare className="w-4 h-4 text-primary" />
-                <span className="text-sm text-white/70">Common questions</span>
+                <span className="text-sm text-white/70">FAQ</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                Frequently asked questions
+                Common questions
               </h2>
               <p className="text-white/60">
-                Everything you need to know about our pricing
+                Everything you need to know about pricing
               </p>
             </motion.div>
 
-            <motion.div variants={fadeInUp}>
+            <motion.div
+              variants={fadeInUp}
+              className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6"
+            >
               {faqs.map((faq, index) => (
                 <FAQItem
                   key={index}
@@ -794,32 +724,6 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Money-back Guarantee */}
-      <section className="relative py-16 px-6">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-            className="flex flex-col md:flex-row items-center gap-8 p-8 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-500/20"
-          >
-            <div className="w-20 h-20 rounded-2xl bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
-              <Shield className="w-10 h-10 text-emerald-400" />
-            </div>
-            <div className="text-center md:text-left">
-              <h3 className="text-2xl font-bold text-white mb-2">
-                30-Day Money-Back Guarantee
-              </h3>
-              <p className="text-white/60">
-                Try Rendrix risk-free. If you&apos;re not completely satisfied within the first 30 days,
-                we&apos;ll refund your payment in full—no questions asked. We&apos;re that confident you&apos;ll love it.
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Final CTA */}
       <section className="relative py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
@@ -829,30 +733,44 @@ export default function PricingPage() {
             viewport={{ once: true }}
             variants={staggerContainer}
           >
-            <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Ready to transform your commerce?
+            <motion.div
+              variants={fadeInUp}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 mb-8"
+            >
+              <Heart className="w-4 h-4 text-primary fill-primary" />
+              <span className="text-sm text-primary">Loved by 25,000+ brands</span>
+            </motion.div>
+
+            <motion.h2
+              variants={fadeInUp}
+              className="text-4xl md:text-5xl font-bold text-white mb-6"
+            >
+              Ready to grow your business?
             </motion.h2>
-            <motion.p variants={fadeInUp} className="text-xl text-white/60 mb-10 max-w-2xl mx-auto">
-              Join 25,000+ brands already growing with Rendrix. Start your 14-day free trial today.
+            <motion.p
+              variants={fadeInUp}
+              className="text-xl text-white/60 mb-10 max-w-2xl mx-auto"
+            >
+              Start free today. No credit card required.
             </motion.p>
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <motion.div
+              variants={fadeInUp}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
               <Link
                 href="/register"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-black font-semibold rounded-xl hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-orange-500 text-black font-semibold rounded-xl hover:shadow-xl hover:shadow-primary/30 transition-all group"
               >
-                Start Free Trial
-                <ArrowRight className="w-5 h-5" />
+                Start Building Free
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 text-white font-semibold rounded-xl border border-white/10 hover:bg-white/10 transition-colors"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 text-white font-semibold rounded-xl border border-white/10 hover:bg-white/10 transition-all"
               >
                 Talk to Sales
               </Link>
             </motion.div>
-            <motion.p variants={fadeInUp} className="mt-6 text-sm text-white/40">
-              No credit card required · 14-day free trial · Cancel anytime
-            </motion.p>
           </motion.div>
         </div>
       </section>
