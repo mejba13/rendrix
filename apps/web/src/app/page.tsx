@@ -518,12 +518,23 @@ function Header() {
 
 function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const mounted = useMounted();
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  // YouTube video ready handler
+  useEffect(() => {
+    if (!mounted) return;
+    // Give YouTube iframe time to load
+    const videoTimer = setTimeout(() => setVideoReady(true), 1500);
+    return () => clearTimeout(videoTimer);
+  }, [mounted]);
+
+  const youtubeVideoId = 'oP9fPjf0_Wk';
 
   return (
     <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
@@ -537,34 +548,50 @@ function HeroSection() {
           }}
         />
 
-        {/* Layer 2: Video Element - Full immersive background, ALWAYS visible */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover z-[1]"
+        {/* Layer 2: YouTube Video Background - Full immersive */}
+        <div
+          className={`absolute inset-0 z-[1] overflow-hidden transition-opacity duration-1000 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
           style={{
-            filter: 'brightness(0.6) saturate(1.3)',
+            pointerEvents: 'none',
           }}
         >
-          <source src="/videos/hero-bg.mp4" type="video/mp4" />
-        </video>
+          {/* YouTube iframe container with scale to cover and hide controls */}
+          <div
+            className="absolute w-full h-full"
+            style={{
+              // Scale up to hide YouTube UI elements and ensure full coverage
+              transform: 'scale(1.2)',
+              transformOrigin: 'center center',
+            }}
+          >
+            <iframe
+              src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1&loop=1&playlist=${youtubeVideoId}&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
+              title="Background Video"
+              allow="autoplay; encrypted-media"
+              allowFullScreen={false}
+              className="absolute top-1/2 left-1/2 w-[100vw] h-[100vh] min-w-[177.77vh] min-h-[56.25vw] border-0"
+              style={{
+                transform: 'translate(-50%, -50%)',
+                filter: 'brightness(0.55) saturate(1.4) contrast(1.1)',
+                pointerEvents: 'none',
+              }}
+            />
+          </div>
+        </div>
 
-        {/* Layer 3: Cinematic overlay gradients */}
+        {/* Layer 3: Cinematic overlay gradients - stronger for YouTube video */}
         <div
           className="absolute inset-0 z-[2]"
           style={{
-            background: 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.85) 100%)',
+            background: 'linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 25%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.45) 75%, rgba(0,0,0,0.9) 100%)',
           }}
         />
 
-        {/* Layer 4: Side vignette for depth */}
+        {/* Layer 4: Side vignette for depth - enhanced */}
         <div
           className="absolute inset-0 z-[3]"
           style={{
-            background: 'radial-gradient(ellipse at 50% 50%, transparent 0%, rgba(0,0,0,0.5) 100%)',
+            background: 'radial-gradient(ellipse at 50% 50%, transparent 0%, rgba(0,0,0,0.6) 100%)',
           }}
         />
 
@@ -572,7 +599,7 @@ function HeroSection() {
         <div
           className="absolute inset-0 z-[4]"
           style={{
-            background: 'radial-gradient(ellipse 80% 50% at 50% 100%, rgba(255,145,0,0.15) 0%, transparent 60%)',
+            background: 'radial-gradient(ellipse 80% 50% at 50% 100%, rgba(255,145,0,0.18) 0%, transparent 60%)',
           }}
         />
 
@@ -580,15 +607,23 @@ function HeroSection() {
         <div
           className="absolute inset-0 z-[5]"
           style={{
-            background: 'radial-gradient(ellipse 60% 30% at 50% 0%, rgba(255,145,0,0.08) 0%, transparent 50%)',
+            background: 'radial-gradient(ellipse 60% 30% at 50% 0%, rgba(255,145,0,0.1) 0%, transparent 50%)',
           }}
         />
 
         {/* Layer 7: Noise texture overlay for cinematic feel */}
         <div
-          className="absolute inset-0 z-[6] opacity-[0.03] pointer-events-none"
+          className="absolute inset-0 z-[6] opacity-[0.04] pointer-events-none"
           style={{
             backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")',
+          }}
+        />
+
+        {/* Layer 8: Additional edge darkening for text readability */}
+        <div
+          className="absolute inset-0 z-[7]"
+          style={{
+            background: 'linear-gradient(90deg, rgba(0,0,0,0.4) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.4) 100%)',
           }}
         />
       </div>
