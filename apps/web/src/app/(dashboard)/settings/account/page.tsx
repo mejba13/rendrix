@@ -515,7 +515,7 @@ export default function AccountSecurityPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => setShowRecoveryCodes(true)}
-                  className="border-white/[0.1] text-white/70 hover:text-white"
+                  className="bg-white/[0.04] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.08]"
                 >
                   <Key className="w-4 h-4 mr-2" />
                   View Recovery Codes
@@ -523,7 +523,7 @@ export default function AccountSecurityPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-white/[0.1] text-white/70 hover:text-white"
+                  className="bg-white/[0.04] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.08]"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Regenerate Codes
@@ -558,7 +558,7 @@ export default function AccountSecurityPage() {
               <Button
                 variant="outline"
                 onClick={() => setShow2FASetup(false)}
-                className="border-white/[0.1] text-white/70"
+                className="bg-white/[0.04] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.08]"
               >
                 Cancel
               </Button>
@@ -599,7 +599,7 @@ export default function AccountSecurityPage() {
             <div className="flex gap-3">
               <Button
                 variant="outline"
-                className="flex-1 border-white/[0.1] text-white/70"
+                className="flex-1 bg-white/[0.04] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.08]"
                 onClick={() => {
                   navigator.clipboard.writeText(mockRecoveryCodes.join('\n'));
                   toast({ title: 'Copied', description: 'Recovery codes copied to clipboard' });

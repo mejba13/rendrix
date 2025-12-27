@@ -174,7 +174,7 @@ function AvatarUpload({
           variant="outline"
           size="sm"
           onClick={() => fileInputRef.current?.click()}
-          className="mt-2 border-white/[0.1] text-white/70 hover:text-white hover:bg-white/[0.05]"
+          className="mt-2 bg-white/[0.04] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.08]"
         >
           <Camera className="w-4 h-4 mr-2" />
           Upload Photo
@@ -288,7 +288,7 @@ function ConnectedAccountItem({
           variant="outline"
           size="sm"
           onClick={onDisconnect}
-          className="border-white/[0.1] text-white/70 hover:text-white hover:bg-white/[0.05]"
+          className="bg-white/[0.04] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.08]"
         >
           Disconnect
         </Button>
@@ -558,7 +558,7 @@ export default function ProfileSettingsPage() {
               variant="outline"
               size="sm"
               onClick={handleExportData}
-              className="border-white/[0.1] text-white/70 hover:text-white hover:bg-white/[0.05]"
+              className="bg-white/[0.04] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.08]"
             >
               <Download className="w-4 h-4 mr-2" />
               Export Data
