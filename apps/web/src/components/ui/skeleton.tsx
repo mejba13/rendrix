@@ -4,9 +4,9 @@ function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>)
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-md bg-muted',
+        'relative overflow-hidden rounded-md bg-white/[0.04]',
         'after:absolute after:inset-0 after:translate-x-[-100%]',
-        'after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent',
+        'after:bg-gradient-to-r after:from-transparent after:via-white/[0.08] after:to-transparent',
         'after:animate-[shimmer_2s_infinite]',
         className
       )}
