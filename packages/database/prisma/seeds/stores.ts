@@ -78,9 +78,15 @@ export async function seedStores(
 
   for (const [key, config] of Object.entries(storeConfigs)) {
     const store = await prisma.store.upsert({
-      where: { subdomain: config.subdomain },
+      where: {
+        organizationId_slug: {
+          organizationId,
+          slug: config.slug,
+        },
+      },
       update: {
         name: config.name,
+        subdomain: config.subdomain,
         description: config.description,
         settings: config.settings,
         seoSettings: config.seoSettings,

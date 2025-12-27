@@ -75,6 +75,44 @@ export async function seedOrders(
 ) {
   console.log('  Creating orders for all stores...');
 
+  // Delete existing seeded orders to make this idempotent
+  for (const store of Object.values(stores)) {
+    // First delete related records, then orders
+    const existingOrders = await prisma.order.findMany({
+      where: { storeId: store.id },
+      select: { id: true },
+    });
+
+    if (existingOrders.length > 0) {
+      const orderIds = existingOrders.map(o => o.id);
+
+      // Delete fulfillment items first
+      await prisma.fulfillmentItem.deleteMany({
+        where: { fulfillment: { orderId: { in: orderIds } } },
+      });
+
+      // Delete fulfillments
+      await prisma.fulfillment.deleteMany({
+        where: { orderId: { in: orderIds } },
+      });
+
+      // Delete order transactions
+      await prisma.orderTransaction.deleteMany({
+        where: { orderId: { in: orderIds } },
+      });
+
+      // Delete order items
+      await prisma.orderItem.deleteMany({
+        where: { orderId: { in: orderIds } },
+      });
+
+      // Delete orders
+      await prisma.order.deleteMany({
+        where: { id: { in: orderIds } },
+      });
+    }
+  }
+
   let totalOrders = 0;
   const storePrefixes: Record<string, string> = {
     ramlit: 'RML',
