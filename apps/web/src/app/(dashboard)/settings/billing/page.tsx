@@ -168,7 +168,7 @@ function PlanCard({
       className={`relative rounded-2xl p-6 transition-all duration-300 ${
         isCurrent
           ? `bg-gradient-to-b ${config.gradient} border-2 border-${config.color === 'primary' ? 'primary' : config.color + '-500'}/50 shadow-lg`
-          : 'bg-card border border-border hover:border-muted-foreground/30 hover:shadow-lg'
+          : 'bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 hover:shadow-lg hover:bg-zinc-900'
       } ${isPopular && !isCurrent ? 'ring-2 ring-primary/50' : ''}`}
     >
       {/* Popular Badge */}
@@ -199,14 +199,14 @@ function PlanCard({
               ? config.color === 'primary'
                 ? 'bg-primary/20'
                 : `bg-${config.color}-500/20`
-              : 'bg-muted'
+              : 'bg-zinc-800'
           }`}>
             <Icon className={`w-5 h-5 ${
               isCurrent
                 ? config.color === 'primary'
                   ? 'text-primary'
                   : `text-${config.color}-500`
-                : 'text-muted-foreground'
+                : 'text-zinc-400'
             }`} />
           </div>
           <div>
@@ -244,23 +244,23 @@ function PlanCard({
                   ? config.color === 'primary'
                     ? 'bg-primary/20'
                     : `bg-${config.color}-500/20`
-                  : 'bg-emerald-500/10'
+                  : 'bg-emerald-500/20'
               }`}>
                 <Check className={`w-3 h-3 ${
                   isCurrent
                     ? config.color === 'primary'
                       ? 'text-primary'
                       : `text-${config.color}-500`
-                    : 'text-emerald-500'
+                    : 'text-emerald-400'
                 }`} />
               </div>
-              <span className="text-muted-foreground">
+              <span className="text-zinc-400">
                 {feature.replace(/_/g, ' ')}
               </span>
             </li>
           ))}
           {features.length > 5 && (
-            <li className="text-xs text-muted-foreground pl-7">
+            <li className="text-xs text-zinc-500 pl-7">
               + {features.length - 5} more features
             </li>
           )}
@@ -589,22 +589,32 @@ export default function BillingPage() {
           </div>
         </div>
 
-        {/* Plans Grid */}
+        {/* Plans Grid - Sorted by price */}
         <motion.div
           variants={staggerContainer}
           className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
         >
-          {plans?.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              isCurrent={plan.slug === currentPlanSlug}
-              isPopular={plan.slug === 'pro'}
-              billingInterval={billingInterval}
-              onUpgrade={() => handleUpgrade(plan.slug)}
-              isLoading={createCheckout.isPending}
-            />
-          ))}
+          {plans
+            ?.slice()
+            .sort((a, b) => {
+              const priceA = a.priceMonthly ?? 0;
+              const priceB = b.priceMonthly ?? 0;
+              // Enterprise (null price) should be last
+              if (a.priceMonthly === null && b.priceMonthly !== null) return 1;
+              if (b.priceMonthly === null && a.priceMonthly !== null) return -1;
+              return priceA - priceB;
+            })
+            .map((plan) => (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                isCurrent={plan.slug === currentPlanSlug}
+                isPopular={plan.slug === 'pro'}
+                billingInterval={billingInterval}
+                onUpgrade={() => handleUpgrade(plan.slug)}
+                isLoading={createCheckout.isPending}
+              />
+            ))}
         </motion.div>
 
         {/* Trust Badges */}
