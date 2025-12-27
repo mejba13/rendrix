@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
@@ -624,7 +624,7 @@ export default function HelpCenterPage() {
               { icon: Headphones, label: '24/7 Support', value: 'Always available' },
               { icon: Clock, label: 'Response Time', value: '< 2 hours' },
               { icon: CheckCircle, label: 'Satisfaction', value: '98% rating' },
-            ].map((stat, i) => (
+            ].map((stat) => (
               <div key={stat.label} className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
                   <stat.icon className="w-5 h-5 text-primary" />
