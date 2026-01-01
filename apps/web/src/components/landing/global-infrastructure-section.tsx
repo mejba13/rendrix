@@ -1,819 +1,858 @@
 'use client';
 
 import { useEffect, useState, useRef, useMemo } from 'react';
-import { Globe, Zap, Shield, Activity, Server, Signal } from 'lucide-react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 
-// Real world server locations with approximate SVG map coordinates
+// Server locations with spherical coordinates (longitude, latitude)
 const serverLocations = [
-  { id: 1, name: 'New York', region: 'US East', x: 23.5, y: 38, status: 'active', latency: 12 },
-  { id: 2, name: 'San Francisco', region: 'US West', x: 12, y: 40, status: 'active', latency: 18 },
-  { id: 3, name: 'São Paulo', region: 'South America', x: 30, y: 68, status: 'active', latency: 45 },
-  { id: 4, name: 'London', region: 'EU West', x: 47.5, y: 32, status: 'active', latency: 8 },
-  { id: 5, name: 'Frankfurt', region: 'EU Central', x: 51, y: 33, status: 'active', latency: 10 },
-  { id: 6, name: 'Dubai', region: 'Middle East', x: 60, y: 44, status: 'active', latency: 35 },
-  { id: 7, name: 'Mumbai', region: 'India', x: 66, y: 48, status: 'active', latency: 42 },
-  { id: 8, name: 'Singapore', region: 'Asia Pacific', x: 74, y: 56, status: 'active', latency: 28 },
-  { id: 9, name: 'Tokyo', region: 'Japan', x: 84, y: 38, status: 'active', latency: 22 },
-  { id: 10, name: 'Sydney', region: 'Australia', x: 86, y: 72, status: 'active', latency: 55 },
-  { id: 11, name: 'Toronto', region: 'Canada', x: 21, y: 34, status: 'active', latency: 15 },
-  { id: 12, name: 'Amsterdam', region: 'Netherlands', x: 49, y: 30, status: 'active', latency: 9 },
+  { id: 1, name: 'New York', region: 'US East', lng: -74, lat: 40.7, latency: 12 },
+  { id: 2, name: 'San Francisco', region: 'US West', lng: -122.4, lat: 37.8, latency: 18 },
+  { id: 3, name: 'São Paulo', region: 'South America', lng: -46.6, lat: -23.5, latency: 45 },
+  { id: 4, name: 'London', region: 'EU West', lng: -0.1, lat: 51.5, latency: 8 },
+  { id: 5, name: 'Frankfurt', region: 'EU Central', lng: 8.7, lat: 50.1, latency: 10 },
+  { id: 6, name: 'Dubai', region: 'Middle East', lng: 55.3, lat: 25.2, latency: 35 },
+  { id: 7, name: 'Mumbai', region: 'India', lng: 72.9, lat: 19.1, latency: 42 },
+  { id: 8, name: 'Singapore', region: 'Asia Pacific', lng: 103.8, lat: 1.3, latency: 28 },
+  { id: 9, name: 'Tokyo', region: 'Japan', lng: 139.7, lat: 35.7, latency: 22 },
+  { id: 10, name: 'Sydney', region: 'Australia', lng: 151.2, lat: -33.9, latency: 55 },
 ];
 
-// Network connections between data centers
+// Network connections
 const networkConnections = [
-  { from: 1, to: 4, active: true },
-  { from: 1, to: 2, active: true },
-  { from: 1, to: 11, active: true },
-  { from: 2, to: 9, active: true },
-  { from: 3, to: 1, active: true },
-  { from: 4, to: 5, active: true },
-  { from: 4, to: 12, active: true },
-  { from: 5, to: 6, active: true },
-  { from: 6, to: 7, active: true },
-  { from: 7, to: 8, active: true },
-  { from: 8, to: 9, active: true },
-  { from: 8, to: 10, active: true },
-  { from: 9, to: 10, active: true },
-  { from: 12, to: 5, active: true },
+  { from: 1, to: 4 }, { from: 1, to: 2 }, { from: 2, to: 9 },
+  { from: 3, to: 1 }, { from: 4, to: 5 }, { from: 5, to: 6 },
+  { from: 6, to: 7 }, { from: 7, to: 8 }, { from: 8, to: 9 },
+  { from: 8, to: 10 }, { from: 4, to: 6 },
 ];
 
-// Generate floating particles
-const generateParticles = (count: number) => {
+// City lights data (major population centers)
+const cityLights = [
+  // North America
+  { lng: -74, lat: 40.7, intensity: 1 }, { lng: -118.2, lat: 34, intensity: 0.9 },
+  { lng: -87.6, lat: 41.9, intensity: 0.8 }, { lng: -122.4, lat: 37.8, intensity: 0.7 },
+  { lng: -79.4, lat: 43.7, intensity: 0.6 }, { lng: -95.4, lat: 29.8, intensity: 0.7 },
+  // Europe
+  { lng: -0.1, lat: 51.5, intensity: 1 }, { lng: 2.3, lat: 48.9, intensity: 0.95 },
+  { lng: 13.4, lat: 52.5, intensity: 0.8 }, { lng: -3.7, lat: 40.4, intensity: 0.75 },
+  { lng: 12.5, lat: 41.9, intensity: 0.7 }, { lng: 4.9, lat: 52.4, intensity: 0.65 },
+  // Asia
+  { lng: 139.7, lat: 35.7, intensity: 1 }, { lng: 121.5, lat: 31.2, intensity: 0.95 },
+  { lng: 116.4, lat: 39.9, intensity: 0.9 }, { lng: 126.9, lat: 37.5, intensity: 0.85 },
+  { lng: 103.8, lat: 1.3, intensity: 0.8 }, { lng: 72.9, lat: 19.1, intensity: 0.9 },
+  { lng: 77.2, lat: 28.6, intensity: 0.85 }, { lng: 114.2, lat: 22.3, intensity: 0.8 },
+  // South America
+  { lng: -46.6, lat: -23.5, intensity: 0.85 }, { lng: -58.4, lat: -34.6, intensity: 0.7 },
+  { lng: -43.2, lat: -22.9, intensity: 0.75 },
+  // Africa & Middle East
+  { lng: 31.2, lat: 30, intensity: 0.7 }, { lng: 55.3, lat: 25.2, intensity: 0.8 },
+  { lng: 28, lat: -26.2, intensity: 0.6 },
+  // Australia
+  { lng: 151.2, lat: -33.9, intensity: 0.75 }, { lng: 145, lat: -37.8, intensity: 0.65 },
+];
+
+// Generate stars
+const generateStars = (count: number) => {
   return Array.from({ length: count }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,
-    size: Math.random() * 3 + 1,
-    duration: Math.random() * 20 + 15,
-    delay: Math.random() * 10,
-    opacity: Math.random() * 0.5 + 0.1,
+    size: Math.random() * 2 + 0.5,
+    opacity: Math.random() * 0.8 + 0.2,
+    twinkleDuration: Math.random() * 3 + 2,
+    twinkleDelay: Math.random() * 5,
   }));
 };
 
-// Stats data - simplified 4 core metrics
-const statsData = [
-  {
-    id: 'pop',
-    icon: Globe,
-    value: '250+',
-    label: 'Edge Locations',
-    sublabel: 'Global Points of Presence',
-    color: '#FF9100',
-  },
-  {
-    id: 'latency',
-    icon: Zap,
-    value: '<50ms',
-    label: 'Response Time',
-    sublabel: 'P99 Global Latency',
-    color: '#FF9100',
-  },
-  {
-    id: 'uptime',
-    icon: Shield,
-    value: '99.99%',
-    label: 'Uptime SLA',
-    sublabel: 'Enterprise Guarantee',
-    color: '#FF9100',
-  },
-  {
-    id: 'throughput',
-    icon: Activity,
-    value: '10M+',
-    label: 'Req/Second',
-    sublabel: 'Peak Throughput',
-    color: '#FF9100',
-  },
-];
+// Convert spherical to 2D coordinates on globe
+function sphericalTo2D(lng: number, lat: number, rotation: number, globeRadius: number, padding: number) {
+  const phi = ((90 - lat) * Math.PI) / 180;
+  const theta = ((lng + rotation) * Math.PI) / 180;
 
-// Real-time activity indicators
-const liveMetrics = [
-  { label: 'Active Connections', value: '2.4M', trend: '+12%' },
-  { label: 'Data Transferred', value: '847 TB', trend: '+8%' },
-  { label: 'Cache Hit Rate', value: '99.2%', trend: '+0.3%' },
-];
+  const x = globeRadius * Math.sin(phi) * Math.cos(theta);
+  const y = globeRadius * Math.cos(phi);
+  const z = globeRadius * Math.sin(phi) * Math.sin(theta);
 
-// Animated connection line component
-function ConnectionLine({
+  // Only show points on the front hemisphere
+  const isVisible = z > -globeRadius * 0.1;
+
+  return {
+    x: x + globeRadius + padding,
+    y: globeRadius - y + padding,
+    z,
+    isVisible,
+    depth: (z + globeRadius) / (2 * globeRadius),
+  };
+}
+
+// Animated arc between two points
+function ConnectionArc({
   from,
   to,
-  index,
-  isVisible,
+  rotation,
+  globeRadius,
+  padding,
+  index
 }: {
   from: typeof serverLocations[0];
   to: typeof serverLocations[0];
+  rotation: number;
+  globeRadius: number;
+  padding: number;
   index: number;
-  isVisible: boolean;
 }) {
-  const pathRef = useRef<SVGPathElement>(null);
+  const fromPos = sphericalTo2D(from.lng, from.lat, rotation, globeRadius, padding);
+  const toPos = sphericalTo2D(to.lng, to.lat, rotation, globeRadius, padding);
 
-  // Calculate curved path between two points
-  const path = useMemo(() => {
-    const startX = from.x;
-    const startY = from.y;
-    const endX = to.x;
-    const endY = to.y;
+  if (!fromPos.isVisible || !toPos.isVisible) return null;
 
-    const midX = (startX + endX) / 2;
-    const midY = (startY + endY) / 2;
-    const distance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
-    const curveIntensity = Math.min(distance * 0.15, 8);
+  const midX = (fromPos.x + toPos.x) / 2;
+  const midY = (fromPos.y + toPos.y) / 2;
+  const dist = Math.sqrt(Math.pow(toPos.x - fromPos.x, 2) + Math.pow(toPos.y - fromPos.y, 2));
+  const arcHeight = Math.min(dist * 0.4, globeRadius * 0.3);
 
-    const controlY = midY - curveIntensity;
-
-    return `M ${startX} ${startY} Q ${midX} ${controlY} ${endX} ${endY}`;
-  }, [from, to]);
+  const path = `M ${fromPos.x} ${fromPos.y} Q ${midX} ${midY - arcHeight} ${toPos.x} ${toPos.y}`;
+  const avgDepth = (fromPos.depth + toPos.depth) / 2;
 
   return (
-    <g className={`connection-group ${isVisible ? 'visible' : ''}`}>
-      {/* Base line with gradient */}
+    <g style={{ opacity: avgDepth * 0.8 + 0.2 }}>
+      {/* Arc glow */}
       <path
-        ref={pathRef}
         d={path}
         fill="none"
-        stroke="url(#connectionGradient)"
-        strokeWidth="0.3"
+        stroke="url(#arcGlow)"
+        strokeWidth="4"
         strokeLinecap="round"
-        opacity={isVisible ? 0.4 : 0}
-        style={{
-          transition: 'opacity 0.5s ease',
-          transitionDelay: `${index * 0.1}s`,
-        }}
+        opacity="0.4"
+        filter="url(#blur)"
       />
-
-      {/* Animated pulse along the path */}
-      <circle r="0.8" fill="#FF9100" opacity="0">
-        <animateMotion dur={`${2 + index * 0.2}s`} repeatCount="indefinite" begin={`${index * 0.3}s`}>
-          <mpath href={`#path-${from.id}-${to.id}`} />
-        </animateMotion>
+      {/* Arc line */}
+      <path
+        d={path}
+        fill="none"
+        stroke="url(#arcGradient)"
+        strokeWidth="2"
+        strokeLinecap="round"
+        opacity="0.8"
+        strokeDasharray="6 3"
+      >
         <animate
-          attributeName="opacity"
-          values="0;0.8;0.8;0"
+          attributeName="stroke-dashoffset"
+          from="0"
+          to="-36"
+          dur={`${1.5 + index * 0.1}s`}
+          repeatCount="indefinite"
+        />
+      </path>
+      {/* Traveling pulse */}
+      <circle r="4" fill="#00D4FF" opacity="0">
+        <animateMotion
           dur={`${2 + index * 0.2}s`}
           repeatCount="indefinite"
-          begin={`${index * 0.3}s`}
+          path={path}
+        />
+        <animate
+          attributeName="opacity"
+          values="0;1;1;0"
+          dur={`${2 + index * 0.2}s`}
+          repeatCount="indefinite"
         />
         <animate
           attributeName="r"
-          values="0.5;1;0.5"
+          values="3;5;3"
           dur={`${2 + index * 0.2}s`}
           repeatCount="indefinite"
-          begin={`${index * 0.3}s`}
         />
       </circle>
-
-      {/* Hidden path for animation reference */}
-      <path id={`path-${from.id}-${to.id}`} d={path} fill="none" stroke="none" />
     </g>
   );
 }
 
-// Server node component with pulse animation
-function ServerNode({
+// Data center node
+function DataCenterNode({
   server,
-  isVisible,
-  index,
-  onHover,
+  rotation,
+  globeRadius,
+  padding,
   isHovered,
+  onHover,
 }: {
   server: typeof serverLocations[0];
-  isVisible: boolean;
-  index: number;
-  onHover: (id: number | null) => void;
+  rotation: number;
+  globeRadius: number;
+  padding: number;
   isHovered: boolean;
+  onHover: (id: number | null) => void;
 }) {
+  const pos = sphericalTo2D(server.lng, server.lat, rotation, globeRadius, padding);
+
+  if (!pos.isVisible) return null;
+
+  const scale = pos.depth * 0.5 + 0.5;
+
   return (
     <g
-      className="server-node cursor-pointer"
+      style={{
+        opacity: pos.depth * 0.7 + 0.3,
+        cursor: 'pointer',
+      }}
       onMouseEnter={() => onHover(server.id)}
       onMouseLeave={() => onHover(null)}
-      style={{
-        opacity: isVisible ? 1 : 0,
-        transition: `opacity 0.5s ease ${index * 0.08}s, transform 0.3s ease`,
-        transform: isHovered ? 'scale(1.2)' : 'scale(1)',
-        transformOrigin: `${server.x}% ${server.y}%`,
-      }}
     >
       {/* Outer pulse rings */}
-      <circle cx={server.x} cy={server.y} r="3" fill="none" stroke="#FF9100" strokeWidth="0.3" opacity="0">
-        <animate attributeName="r" values="1;4;4" dur="2s" repeatCount="indefinite" begin={`${index * 0.2}s`} />
-        <animate attributeName="opacity" values="0.6;0;0" dur="2s" repeatCount="indefinite" begin={`${index * 0.2}s`} />
+      <circle cx={pos.x} cy={pos.y} r={14 * scale} fill="none" stroke="#FF9500" strokeWidth="1.5" opacity="0">
+        <animate attributeName="r" values={`${8 * scale};${22 * scale};${22 * scale}`} dur="2s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.6;0;0" dur="2s" repeatCount="indefinite" />
+      </circle>
+      <circle cx={pos.x} cy={pos.y} r={10 * scale} fill="none" stroke="#FF9500" strokeWidth="1" opacity="0">
+        <animate attributeName="r" values={`${6 * scale};${18 * scale};${18 * scale}`} dur="2s" repeatCount="indefinite" begin="0.5s" />
+        <animate attributeName="opacity" values="0.4;0;0" dur="2s" repeatCount="indefinite" begin="0.5s" />
       </circle>
 
-      <circle cx={server.x} cy={server.y} r="2" fill="none" stroke="#FF9100" strokeWidth="0.2" opacity="0">
-        <animate attributeName="r" values="0.8;3;3" dur="2s" repeatCount="indefinite" begin={`${index * 0.2 + 0.5}s`} />
-        <animate attributeName="opacity" values="0.4;0;0" dur="2s" repeatCount="indefinite" begin={`${index * 0.2 + 0.5}s`} />
-      </circle>
-
-      {/* Glow effect */}
-      <circle cx={server.x} cy={server.y} r="1.5" fill="url(#nodeGlow)" opacity={isHovered ? 1 : 0.6} />
-
-      {/* Core node */}
+      {/* Glow */}
       <circle
-        cx={server.x}
-        cy={server.y}
-        r="0.8"
-        fill="#FF9100"
-        filter="url(#nodeFilter)"
+        cx={pos.x}
+        cy={pos.y}
+        r={12 * scale}
+        fill="url(#nodeGlow)"
+        opacity={isHovered ? 1 : 0.7}
       />
 
-      {/* Inner highlight */}
-      <circle cx={server.x - 0.2} cy={server.y - 0.2} r="0.3" fill="rgba(255,255,255,0.6)" />
+      {/* Core */}
+      <circle
+        cx={pos.x}
+        cy={pos.y}
+        r={6 * scale}
+        fill="#FF9500"
+        filter="url(#nodeBlur)"
+      />
 
-      {/* Tooltip on hover */}
-      {isHovered && (
-        <g className="tooltip-group">
-          <rect
-            x={server.x + 2}
-            y={server.y - 4}
-            width="14"
-            height="6"
-            rx="0.8"
-            fill="rgba(0,0,0,0.9)"
-            stroke="rgba(255,145,0,0.3)"
-            strokeWidth="0.15"
-          />
-          <text x={server.x + 3} y={server.y - 1.5} fill="white" fontSize="1.5" fontWeight="600">
-            {server.name}
-          </text>
-          <text x={server.x + 3} y={server.y + 0.5} fill="rgba(255,145,0,0.8)" fontSize="1" fontWeight="500">
-            {server.latency}ms latency
-          </text>
-        </g>
-      )}
+      {/* Highlight */}
+      <circle
+        cx={pos.x - 1.5 * scale}
+        cy={pos.y - 1.5 * scale}
+        r={2 * scale}
+        fill="rgba(255,255,255,0.9)"
+      />
+
+      {/* Tooltip */}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.g
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <rect
+              x={pos.x + 16}
+              y={pos.y - 28}
+              width="110"
+              height="50"
+              rx="10"
+              fill="rgba(0,0,0,0.95)"
+              stroke="rgba(255,149,0,0.4)"
+              strokeWidth="1.5"
+            />
+            <text x={pos.x + 26} y={pos.y - 8} fill="white" fontSize="14" fontWeight="600" fontFamily="system-ui">
+              {server.name}
+            </text>
+            <text x={pos.x + 26} y={pos.y + 10} fill="rgba(255,149,0,0.9)" fontSize="12" fontFamily="system-ui">
+              {server.latency}ms latency
+            </text>
+          </motion.g>
+        )}
+      </AnimatePresence>
     </g>
   );
 }
 
-// Simplified stat card component
-function StatCard({
-  stat,
-  isVisible,
-  index,
+// City light dot
+function CityLight({
+  light,
+  rotation,
+  globeRadius,
+  padding,
 }: {
-  stat: typeof statsData[0];
-  isVisible: boolean;
-  index: number;
+  light: typeof cityLights[0];
+  rotation: number;
+  globeRadius: number;
+  padding: number;
 }) {
-  const Icon = stat.icon;
+  const pos = sphericalTo2D(light.lng, light.lat, rotation, globeRadius, padding);
+
+  if (!pos.isVisible) return null;
+
+  const size = light.intensity * 4 * (pos.depth * 0.5 + 0.5);
 
   return (
-    <div
-      className="stat-card group relative overflow-hidden rounded-xl border transition-all duration-700"
-      style={{
-        background: 'linear-gradient(145deg, rgba(20,20,25,0.9) 0%, rgba(10,10,15,0.95) 100%)',
-        borderColor: 'rgba(255,255,255,0.06)',
-        backdropFilter: 'blur(20px)',
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
-        transitionDelay: `${index * 0.1}s`,
-        boxShadow: '0 0 0 1px rgba(255,255,255,0.03) inset, 0 10px 30px rgba(0,0,0,0.3)',
-      }}
-    >
-      {/* Gradient overlay on hover */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{
-          background: `radial-gradient(circle at 30% 30%, ${stat.color}12 0%, transparent 60%)`,
-        }}
-      />
-
-      {/* Content */}
-      <div className="relative p-5 flex items-start gap-4">
-        {/* Icon */}
-        <div
-          className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110"
-          style={{
-            background: `linear-gradient(135deg, ${stat.color}20 0%, ${stat.color}08 100%)`,
-            boxShadow: `0 0 20px ${stat.color}15`,
-          }}
-        >
-          <Icon className="w-5 h-5" style={{ color: stat.color }} />
-        </div>
-
-        {/* Stats */}
-        <div className="min-w-0">
-          <div
-            className="text-2xl font-bold tracking-tight"
-            style={{
-              fontFamily: "'SF Pro Display', 'Inter', system-ui, sans-serif",
-              background: `linear-gradient(135deg, #FFFFFF 0%, ${stat.color}90 100%)`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          >
-            {stat.value}
-          </div>
-          <div className="text-sm text-white/80 font-medium mt-0.5">
-            {stat.label}
-          </div>
-          <div className="text-xs text-white/40 mt-0.5">
-            {stat.sublabel}
-          </div>
-        </div>
-      </div>
-    </div>
+    <circle
+      cx={pos.x}
+      cy={pos.y}
+      r={size}
+      fill="#FFB347"
+      opacity={pos.depth * light.intensity * 0.9}
+      filter="url(#cityGlow)"
+    />
   );
 }
 
-// Live metrics ticker
-function LiveMetricsTicker({ isVisible }: { isVisible: boolean }) {
-  return (
-    <div
-      className={`flex items-center justify-center gap-8 py-4 px-6 rounded-2xl transition-all duration-700 ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-      }`}
-      style={{
-        background: 'linear-gradient(135deg, rgba(255,145,0,0.08) 0%, rgba(255,145,0,0.02) 100%)',
-        border: '1px solid rgba(255,145,0,0.15)',
-        transitionDelay: '0.8s',
-      }}
-    >
-      <div className="flex items-center gap-2">
-        <Signal className="w-4 h-4 text-green-400 animate-pulse" />
-        <span className="text-xs text-white/60 font-medium uppercase tracking-wider">Live</span>
-      </div>
-      <div className="w-px h-6 bg-white/10" />
-      {liveMetrics.map((metric, i) => (
-        <div key={i} className="flex items-center gap-4">
-          <div className="text-center">
-            <div className="text-white/50 text-xs">{metric.label}</div>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-white font-semibold text-sm tabular-nums">{metric.value}</span>
-              <span className="text-green-400 text-xs font-medium">{metric.trend}</span>
-            </div>
-          </div>
-          {i < liveMetrics.length - 1 && <div className="w-px h-8 bg-white/10" />}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Main World Map Component
-function WorldMapVisualization({ isVisible }: { isVisible: boolean }) {
+// 3D Globe Component
+function Globe3D({ isVisible }: { isVisible: boolean }) {
+  const [rotation, setRotation] = useState(30);
   const [hoveredServer, setHoveredServer] = useState<number | null>(null);
-  const particles = useMemo(() => generateParticles(30), []);
+  const [isHovering, setIsHovering] = useState(false);
+  const globeRadius = 220;
+  const padding = 40; // Padding for glow effects
+  const viewBoxSize = (globeRadius + padding) * 2;
+  const animationRef = useRef<number>();
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    let lastTime = performance.now();
+    const animate = (time: number) => {
+      const delta = time - lastTime;
+      lastTime = time;
+
+      if (!isHovering) {
+        setRotation(prev => (prev + delta * 0.006) % 360);
+      }
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
+  }, [isVisible, isHovering]);
+
+  const centerX = globeRadius + padding;
+  const centerY = globeRadius + padding;
 
   return (
-    <div className="relative w-full aspect-[2/1] max-w-5xl mx-auto">
-      {/* Atmospheric glow */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `
-            radial-gradient(ellipse 80% 50% at 50% 50%, rgba(255,145,0,0.08) 0%, transparent 60%),
-            radial-gradient(ellipse 60% 40% at 30% 40%, rgba(0,200,255,0.05) 0%, transparent 50%),
-            radial-gradient(ellipse 50% 30% at 70% 60%, rgba(255,100,0,0.06) 0%, transparent 50%)
-          `,
-          filter: 'blur(40px)',
-        }}
-      />
-
-      {/* Floating particles */}
-      {particles.map((particle) => (
-        <div
-          key={particle.id}
-          className="absolute rounded-full bg-white/20"
-          style={{
-            left: `${particle.x}%`,
-            top: `${particle.y}%`,
-            width: particle.size,
-            height: particle.size,
-            opacity: particle.opacity,
-            animation: `floatParticle ${particle.duration}s ease-in-out infinite ${particle.delay}s`,
-          }}
-        />
-      ))}
-
-      {/* SVG Map Container */}
+    <div
+      className="relative w-full"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
       <svg
-        viewBox="0 0 100 80"
-        className="w-full h-full"
-        style={{
-          filter: 'drop-shadow(0 0 60px rgba(255,145,0,0.15))',
-        }}
+        viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
+        className="w-full h-auto"
+        style={{ display: 'block' }}
       >
         <defs>
           {/* Gradients */}
-          <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="rgba(255,145,0,0.15)" />
-            <stop offset="50%" stopColor="rgba(255,200,100,0.08)" />
-            <stop offset="100%" stopColor="rgba(255,145,0,0.12)" />
+          <radialGradient id="globeGradient" cx="35%" cy="35%" r="65%">
+            <stop offset="0%" stopColor="#1e4a5c" />
+            <stop offset="30%" stopColor="#0f2d3d" />
+            <stop offset="60%" stopColor="#081c28" />
+            <stop offset="100%" stopColor="#030d12" />
+          </radialGradient>
+
+          <radialGradient id="atmosphereOuter" cx="50%" cy="50%" r="50%">
+            <stop offset="80%" stopColor="transparent" />
+            <stop offset="90%" stopColor="rgba(0,212,255,0.2)" />
+            <stop offset="95%" stopColor="rgba(0,212,255,0.1)" />
+            <stop offset="100%" stopColor="transparent" />
+          </radialGradient>
+
+          <radialGradient id="atmosphereInner" cx="30%" cy="30%" r="80%">
+            <stop offset="0%" stopColor="rgba(100,200,255,0.08)" />
+            <stop offset="50%" stopColor="rgba(0,212,255,0.03)" />
+            <stop offset="100%" stopColor="transparent" />
+          </radialGradient>
+
+          <linearGradient id="arcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="rgba(0,212,255,0.3)" />
+            <stop offset="50%" stopColor="#00D4FF" />
+            <stop offset="100%" stopColor="rgba(0,212,255,0.3)" />
           </linearGradient>
 
-          <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgba(255,145,0,0.1)" />
-            <stop offset="50%" stopColor="rgba(255,145,0,0.5)" />
-            <stop offset="100%" stopColor="rgba(255,145,0,0.1)" />
+          <linearGradient id="arcGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="transparent" />
+            <stop offset="50%" stopColor="rgba(0,212,255,0.6)" />
+            <stop offset="100%" stopColor="transparent" />
           </linearGradient>
 
           <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(255,145,0,0.8)" />
-            <stop offset="100%" stopColor="rgba(255,145,0,0)" />
+            <stop offset="0%" stopColor="rgba(255,149,0,0.9)" />
+            <stop offset="60%" stopColor="rgba(255,149,0,0.3)" />
+            <stop offset="100%" stopColor="transparent" />
+          </radialGradient>
+
+          <radialGradient id="globeShadowGradient" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="transparent" />
+            <stop offset="70%" stopColor="transparent" />
+            <stop offset="100%" stopColor="rgba(0,212,255,0.15)" />
           </radialGradient>
 
           {/* Filters */}
-          <filter id="mapGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="0.8" result="blur" />
+          <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" />
+          </filter>
+
+          <filter id="nodeBlur" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="1.5" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
 
-          <filter id="nodeFilter" x="-100%" y="-100%" width="300%" height="300%">
-            <feGaussianBlur stdDeviation="0.5" result="blur" />
+          <filter id="cityGlow" x="-200%" y="-200%" width="500%" height="500%">
+            <feGaussianBlur stdDeviation="3" />
+          </filter>
+
+          <filter id="globeGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="15" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
 
-          {/* Grid pattern */}
-          <pattern id="gridPattern" width="5" height="5" patternUnits="userSpaceOnUse">
-            <path d="M 5 0 L 0 0 0 5" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="0.1" />
-          </pattern>
-
-          {/* Dot pattern for continents */}
-          <pattern id="dotPattern" width="2" height="2" patternUnits="userSpaceOnUse">
-            <circle cx="1" cy="1" r="0.15" fill="rgba(255,145,0,0.3)" />
-          </pattern>
+          {/* Clip path */}
+          <clipPath id="globeClip">
+            <circle cx={centerX} cy={centerY} r={globeRadius - 2} />
+          </clipPath>
         </defs>
 
-        {/* Background grid */}
-        <rect x="0" y="0" width="100" height="80" fill="url(#gridPattern)" opacity="0.5" />
+        {/* Outer glow ring */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={globeRadius + 25}
+          fill="url(#atmosphereOuter)"
+          filter="url(#blur)"
+        />
 
-        {/* Latitude/Longitude lines */}
-        <g opacity="0.15">
-          {[16, 32, 48, 64].map((y) => (
-            <line key={`lat-${y}`} x1="0" y1={y} x2="100" y2={y} stroke="rgba(255,145,0,0.3)" strokeWidth="0.1" strokeDasharray="1,2" />
-          ))}
-          {[20, 40, 60, 80].map((x) => (
-            <line key={`lng-${x}`} x1={x} y1="0" x2={x} y2="80" stroke="rgba(255,145,0,0.3)" strokeWidth="0.1" strokeDasharray="1,2" />
-          ))}
-        </g>
+        {/* Globe shadow/glow */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={globeRadius + 5}
+          fill="url(#globeShadowGradient)"
+          opacity="0.8"
+        />
 
-        {/* World map continents */}
-        <g filter="url(#mapGlow)">
-          {/* North America */}
-          <path
-            d="M 8,25 Q 12,20 18,22 L 24,20 Q 28,22 30,26 L 28,32 Q 24,36 22,40 L 18,45 Q 14,48 12,44 L 10,38 Q 8,32 8,25 Z"
-            fill="url(#mapGradient)"
-            stroke="rgba(255,145,0,0.3)"
-            strokeWidth="0.2"
-            opacity={isVisible ? 1 : 0}
-            style={{ transition: 'opacity 1s ease 0.2s' }}
-          />
+        {/* Globe base */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={globeRadius}
+          fill="url(#globeGradient)"
+          filter="url(#globeGlow)"
+        />
 
-          {/* South America */}
-          <path
-            d="M 22,52 Q 26,50 32,52 L 36,58 Q 38,66 34,74 L 28,76 Q 22,72 24,64 L 22,56 Q 21,53 22,52 Z"
-            fill="url(#mapGradient)"
-            stroke="rgba(255,145,0,0.3)"
-            strokeWidth="0.2"
-            opacity={isVisible ? 1 : 0}
-            style={{ transition: 'opacity 1s ease 0.3s' }}
-          />
+        {/* Inner atmosphere highlight */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={globeRadius}
+          fill="url(#atmosphereInner)"
+        />
 
-          {/* Europe */}
-          <path
-            d="M 44,22 Q 48,18 54,20 L 58,24 Q 56,28 52,30 L 48,34 Q 44,36 42,34 L 40,30 Q 42,26 44,22 Z"
-            fill="url(#mapGradient)"
-            stroke="rgba(255,145,0,0.3)"
-            strokeWidth="0.2"
-            opacity={isVisible ? 1 : 0}
-            style={{ transition: 'opacity 1s ease 0.4s' }}
-          />
-
-          {/* Africa */}
-          <path
-            d="M 46,38 Q 50,36 56,38 L 62,44 Q 64,52 62,60 L 56,66 Q 48,64 46,56 L 44,48 Q 44,42 46,38 Z"
-            fill="url(#mapGradient)"
-            stroke="rgba(255,145,0,0.3)"
-            strokeWidth="0.2"
-            opacity={isVisible ? 1 : 0}
-            style={{ transition: 'opacity 1s ease 0.5s' }}
-          />
-
-          {/* Asia */}
-          <path
-            d="M 58,20 Q 65,18 75,22 L 88,28 Q 92,34 90,40 L 84,44 Q 76,48 70,46 L 64,42 Q 58,36 58,28 L 58,20 Z"
-            fill="url(#mapGradient)"
-            stroke="rgba(255,145,0,0.3)"
-            strokeWidth="0.2"
-            opacity={isVisible ? 1 : 0}
-            style={{ transition: 'opacity 1s ease 0.6s' }}
-          />
-
-          {/* India subcontinent */}
-          <path
-            d="M 64,44 Q 68,42 72,44 L 74,50 Q 72,56 68,56 L 64,52 Q 62,48 64,44 Z"
-            fill="url(#mapGradient)"
-            stroke="rgba(255,145,0,0.3)"
-            strokeWidth="0.2"
-            opacity={isVisible ? 1 : 0}
-            style={{ transition: 'opacity 1s ease 0.65s' }}
-          />
-
-          {/* Southeast Asia */}
-          <path
-            d="M 72,50 Q 76,48 80,52 L 78,58 Q 74,60 72,56 L 72,50 Z"
-            fill="url(#mapGradient)"
-            stroke="rgba(255,145,0,0.3)"
-            strokeWidth="0.2"
-            opacity={isVisible ? 1 : 0}
-            style={{ transition: 'opacity 1s ease 0.7s' }}
-          />
-
-          {/* Australia */}
-          <path
-            d="M 78,62 Q 84,58 92,62 L 94,70 Q 92,76 86,76 L 80,74 Q 76,70 78,62 Z"
-            fill="url(#mapGradient)"
-            stroke="rgba(255,145,0,0.3)"
-            strokeWidth="0.2"
-            opacity={isVisible ? 1 : 0}
-            style={{ transition: 'opacity 1s ease 0.8s' }}
-          />
-
-          {/* Japan */}
-          <path
-            d="M 84,32 Q 86,30 88,32 L 88,38 Q 86,40 84,38 L 84,32 Z"
-            fill="url(#mapGradient)"
-            stroke="rgba(255,145,0,0.3)"
-            strokeWidth="0.2"
-            opacity={isVisible ? 1 : 0}
-            style={{ transition: 'opacity 1s ease 0.75s' }}
-          />
-        </g>
-
-        {/* Network connections */}
-        <g className="connections-layer">
-          {networkConnections.map((conn, i) => {
-            const from = serverLocations.find((s) => s.id === conn.from)!;
-            const to = serverLocations.find((s) => s.id === conn.to)!;
-            return <ConnectionLine key={`${conn.from}-${conn.to}`} from={from} to={to} index={i} isVisible={isVisible} />;
+        {/* Grid lines */}
+        <g clipPath="url(#globeClip)" opacity="0.2">
+          {/* Latitude lines */}
+          {[-60, -30, 0, 30, 60].map((lat) => {
+            const y = centerY - (lat / 90) * globeRadius * 0.9;
+            const radiusAtLat = Math.cos((lat * Math.PI) / 180) * globeRadius;
+            return (
+              <ellipse
+                key={`lat-${lat}`}
+                cx={centerX}
+                cy={y}
+                rx={radiusAtLat}
+                ry={radiusAtLat * 0.15}
+                fill="none"
+                stroke="rgba(0,212,255,0.5)"
+                strokeWidth="1"
+                strokeDasharray="8 6"
+              />
+            );
+          })}
+          {/* Longitude lines */}
+          {[0, 30, 60, 90, 120, 150].map((lng) => {
+            const adjustedLng = lng + rotation;
+            const x = centerX + Math.sin((adjustedLng * Math.PI) / 180) * globeRadius * 0.9;
+            return (
+              <ellipse
+                key={`lng-${lng}`}
+                cx={x}
+                cy={centerY}
+                rx={Math.abs(Math.cos((adjustedLng * Math.PI) / 180)) * globeRadius * 0.12}
+                ry={globeRadius * 0.9}
+                fill="none"
+                stroke="rgba(0,212,255,0.4)"
+                strokeWidth="1"
+                strokeDasharray="8 6"
+              />
+            );
           })}
         </g>
 
-        {/* Server nodes */}
-        <g className="servers-layer">
-          {serverLocations.map((server, index) => (
-            <ServerNode
+        {/* City lights layer */}
+        <g clipPath="url(#globeClip)">
+          {cityLights.map((light, i) => (
+            <CityLight key={i} light={light} rotation={rotation} globeRadius={globeRadius} padding={padding} />
+          ))}
+        </g>
+
+        {/* Connection arcs */}
+        <g clipPath="url(#globeClip)">
+          {networkConnections.map((conn, i) => {
+            const from = serverLocations.find(s => s.id === conn.from)!;
+            const to = serverLocations.find(s => s.id === conn.to)!;
+            return (
+              <ConnectionArc
+                key={`${conn.from}-${conn.to}`}
+                from={from}
+                to={to}
+                rotation={rotation}
+                globeRadius={globeRadius}
+                padding={padding}
+                index={i}
+              />
+            );
+          })}
+        </g>
+
+        {/* Data center nodes */}
+        <g>
+          {serverLocations.map((server) => (
+            <DataCenterNode
               key={server.id}
               server={server}
-              isVisible={isVisible}
-              index={index}
-              onHover={setHoveredServer}
+              rotation={rotation}
+              globeRadius={globeRadius}
+              padding={padding}
               isHovered={hoveredServer === server.id}
+              onHover={setHoveredServer}
             />
           ))}
         </g>
-      </svg>
 
-      {/* Legend */}
+        {/* Rim highlight */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={globeRadius}
+          fill="none"
+          stroke="rgba(0,212,255,0.15)"
+          strokeWidth="2"
+        />
+      </svg>
+    </div>
+  );
+}
+
+// Floating stat card
+function StatCard({
+  value,
+  label,
+  sublabel,
+  delay,
+  position,
+}: {
+  value: string;
+  label: string;
+  sublabel: string;
+  delay: number;
+  position: 'left' | 'right';
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: position === 'left' ? -20 : 20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.6, delay }}
+      viewport={{ once: true }}
+      className="group"
+    >
       <div
-        className={`absolute bottom-4 left-4 flex items-center gap-4 px-4 py-2 rounded-xl transition-all duration-700 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}
+        className="relative px-5 py-4 rounded-2xl backdrop-blur-xl border border-white/[0.08] overflow-hidden transition-all duration-500 hover:border-white/[0.15]"
         style={{
-          background: 'rgba(0,0,0,0.6)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          transitionDelay: '1s',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
         }}
       >
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
-          <span className="text-xs text-white/60">Active Node</span>
+        {/* Hover glow */}
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{
+            background: 'radial-gradient(circle at 50% 0%, rgba(0,212,255,0.1) 0%, transparent 60%)',
+          }}
+        />
+
+        {/* Icon indicator */}
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-medium">Live</span>
         </div>
-        <div className="w-px h-4 bg-white/10" />
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-0.5 bg-gradient-to-r from-primary/20 via-primary to-primary/20 rounded-full" />
-          <span className="text-xs text-white/60">Data Route</span>
+
+        {/* Value */}
+        <div
+          className="text-2xl sm:text-3xl font-bold tracking-tight mb-1"
+          style={{
+            fontFamily: "'SF Pro Display', system-ui, sans-serif",
+            background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(0,212,255,0.9) 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          {value}
         </div>
+
+        {/* Label */}
+        <div className="text-sm text-white/70 font-medium">{label}</div>
+        <div className="text-xs text-white/40 mt-0.5">{sublabel}</div>
       </div>
+    </motion.div>
+  );
+}
+
+// Floating info card (inside safe zone)
+function FloatingInfoCard({
+  children,
+  className = '',
+  delay,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay }}
+      viewport={{ once: true }}
+      className={className}
+    >
+      <div
+        className="px-4 py-3 rounded-xl backdrop-blur-md border border-white/[0.08]"
+        style={{
+          background: 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%)',
+        }}
+      >
+        {children}
+      </div>
+    </motion.div>
+  );
+}
+
+// Star field background
+function StarField() {
+  const stars = useMemo(() => generateStars(80), []);
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {stars.map((star) => (
+        <div
+          key={star.id}
+          className="absolute rounded-full bg-white"
+          style={{
+            left: `${star.x}%`,
+            top: `${star.y}%`,
+            width: star.size,
+            height: star.size,
+            opacity: star.opacity,
+            animation: `twinkle ${star.twinkleDuration}s ease-in-out infinite ${star.twinkleDelay}s`,
+          }}
+        />
+      ))}
     </div>
   );
 }
 
 // Main Component
 export function GlobalInfrastructureSection() {
-  const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.15 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
 
   return (
     <section
       ref={sectionRef}
-      className="relative py-20 lg:py-24 overflow-hidden"
+      className="relative py-20 lg:py-28 overflow-hidden"
       style={{
-        background: `
-          linear-gradient(180deg, #000000 0%, #030305 20%, #050508 50%, #030305 80%, #000000 100%)
-        `,
+        background: 'linear-gradient(180deg, #000000 0%, #020508 20%, #040a10 50%, #020508 80%, #000000 100%)',
       }}
     >
-      {/* Background effects */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Noise texture */}
-        <div
-          className="absolute inset-0 opacity-[0.015]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-          }}
-        />
+      {/* Star field */}
+      <StarField />
 
-        {/* Gradient orbs */}
+      {/* Ambient glow effects */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
-          className="absolute top-1/4 left-1/4 w-[800px] h-[800px] rounded-full"
+          className="absolute top-1/2 left-1/3 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2"
           style={{
-            background: 'radial-gradient(circle, rgba(255,145,0,0.06) 0%, transparent 50%)',
-            filter: 'blur(100px)',
-            transform: 'translate(-50%, -50%)',
+            background: 'radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 50%)',
+            filter: 'blur(60px)',
           }}
         />
         <div
-          className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] rounded-full"
+          className="absolute top-1/3 right-1/4 w-[500px] h-[500px]"
           style={{
-            background: 'radial-gradient(circle, rgba(0,150,255,0.04) 0%, transparent 50%)',
+            background: 'radial-gradient(circle, rgba(255,149,0,0.08) 0%, transparent 50%)',
             filter: 'blur(80px)',
-            transform: 'translate(50%, 50%)',
           }}
         />
       </div>
 
-      {/* Content container */}
+      {/* Content */}
       <div className="relative max-w-7xl mx-auto px-6">
-        {/* Section header */}
-        <div
-          className={`text-center mb-10 transition-all duration-1000 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-          }`}
-        >
-          {/* Eyebrow badge */}
-          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full mb-5 group">
-            <div
-              className="absolute inset-0 rounded-full"
-              style={{
-                background: 'linear-gradient(135deg, rgba(255,145,0,0.15) 0%, rgba(255,145,0,0.05) 100%)',
-                border: '1px solid rgba(255,145,0,0.2)',
-              }}
-            />
-            <div className="relative flex items-center gap-3">
-              <div className="relative">
-                <Server className="w-4 h-4 text-primary" />
-                <div className="absolute inset-0 animate-ping">
-                  <Server className="w-4 h-4 text-primary opacity-40" />
+        {/* Main grid */}
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          {/* Left: Globe visualization */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={isInView ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+            className="relative order-2 lg:order-1"
+          >
+            {/* Globe container with proper padding */}
+            <div className="relative max-w-[520px] mx-auto lg:mx-0">
+              <Globe3D isVisible={isInView} />
+
+              {/* Info cards positioned inside the container */}
+              <FloatingInfoCard
+                className="absolute bottom-4 left-4 z-10"
+                delay={0.8}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <div>
+                    <div className="text-xs font-bold text-white tracking-wide">250 POINTS OF PRESENCE</div>
+                    <div className="text-[10px] text-emerald-400 uppercase tracking-wider">
+                      So your store loads instantly everywhere
+                    </div>
+                  </div>
                 </div>
+              </FloatingInfoCard>
+
+              <FloatingInfoCard
+                className="absolute top-8 right-4 z-10"
+                delay={1}
+              >
+                <div className="text-right">
+                  <div className="text-lg font-bold text-white">$4,200,000</div>
+                  <div className="text-[10px] text-white/50 uppercase tracking-wider">
+                    Sales per minute during
+                  </div>
+                  <div className="text-[10px] text-cyan-400 uppercase tracking-wider">
+                    Peak sales times
+                  </div>
+                </div>
+              </FloatingInfoCard>
+            </div>
+          </motion.div>
+
+          {/* Right: Content */}
+          <div className="order-1 lg:order-2">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              {/* Eyebrow */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] mb-6">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs text-white/50 font-medium uppercase tracking-wider">Global Infrastructure</span>
               </div>
-              <span className="text-sm text-white/70 font-medium tracking-wide">Global Infrastructure</span>
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            </div>
+
+              {/* Headline */}
+              <h2
+                className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6"
+                style={{
+                  fontFamily: "'SF Pro Display', 'Inter', system-ui, sans-serif",
+                }}
+              >
+                <span
+                  className="block"
+                  style={{
+                    background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(255,255,255,0.7) 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
+                  Rock steady
+                </span>
+                <span
+                  className="block"
+                  style={{
+                    background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(0,212,255,0.8) 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
+                  and blazing fast
+                </span>
+              </h2>
+
+              {/* Description */}
+              <p className="text-lg text-white/50 leading-relaxed max-w-lg mb-8">
+                Rendrix puts your store within 50 milliseconds of every shopper on the planet,
+                with the capacity to handle even the most epic product drops.
+              </p>
+
+              {/* Stats grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <StatCard
+                  value="250+"
+                  label="Edge Locations"
+                  sublabel="Global Points of Presence"
+                  delay={0.4}
+                  position="left"
+                />
+                <StatCard
+                  value="<50ms"
+                  label="Response Time"
+                  sublabel="P99 Global Latency"
+                  delay={0.5}
+                  position="right"
+                />
+                <StatCard
+                  value="99.99%"
+                  label="Uptime SLA"
+                  sublabel="Enterprise Guarantee"
+                  delay={0.6}
+                  position="left"
+                />
+                <StatCard
+                  value="10M+"
+                  label="Requests/Sec"
+                  sublabel="Peak Throughput"
+                  delay={0.7}
+                  position="right"
+                />
+              </div>
+            </motion.div>
           </div>
-
-          {/* Main headline */}
-          <h2
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-5"
-            style={{ fontFamily: "'SF Pro Display', 'Inter', system-ui, sans-serif" }}
-          >
-            <span className="text-white">Enterprise-grade </span>
-            <span
-              className="relative inline-block"
-              style={{
-                background: 'linear-gradient(135deg, #FF9100 0%, #FFB84D 40%, #FF6B00 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              global network
-            </span>
-          </h2>
-
-          {/* Subtitle */}
-          <p className="max-w-xl mx-auto text-base sm:text-lg text-white/50 leading-relaxed">
-            Your stores load in milliseconds from anywhere on the planet. Built on redundant infrastructure
-            with automatic failover and real-time traffic optimization.
-          </p>
         </div>
 
-        {/* Stats Grid - Above map */}
-        <div
-          className={`grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8 transition-all duration-1000 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
-          style={{ transitionDelay: '0.15s' }}
+        {/* Bottom trust line */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 1.2 }}
+          className="text-center mt-16"
         >
-          {statsData.map((stat, index) => (
-            <StatCard key={stat.id} stat={stat} isVisible={isVisible} index={index} />
-          ))}
-        </div>
-
-        {/* World Map */}
-        <div
-          className={`transition-all duration-1000 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-          }`}
-          style={{ transitionDelay: '0.3s' }}
-        >
-          <div
-            className="relative rounded-2xl overflow-hidden p-[1px]"
-            style={{
-              background: 'linear-gradient(135deg, rgba(255,145,0,0.2) 0%, rgba(255,145,0,0.05) 50%, rgba(255,145,0,0.1) 100%)',
-            }}
-          >
-            <div
-              className="relative rounded-[15px] overflow-hidden"
-              style={{
-                background: 'linear-gradient(180deg, rgba(10,10,15,0.98) 0%, rgba(5,5,10,0.99) 100%)',
-              }}
-            >
-              <WorldMapVisualization isVisible={isVisible} />
-            </div>
-          </div>
-
-          {/* Live metrics under map */}
-          <div className="mt-5 flex justify-center">
-            <LiveMetricsTicker isVisible={isVisible} />
-          </div>
-        </div>
-
-        {/* Bottom CTA */}
-        <div
-          className={`text-center mt-10 transition-all duration-700 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}
-          style={{ transitionDelay: '0.8s' }}
-        >
-          <p className="text-sm text-white/40">
+          <p className="text-sm text-white/30">
             Trusted by 10,000+ businesses worldwide — Powered by{' '}
-            <span className="text-primary font-medium">Rendrix Edge Network</span>
+            <span className="text-cyan-400/70 font-medium">Rendrix Edge Network</span>
           </p>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Inline styles for complex animations */}
+      {/* CSS Animations */}
       <style jsx>{`
-        @keyframes floatParticle {
+        @keyframes twinkle {
           0%, 100% {
-            transform: translate(0, 0) scale(1);
-            opacity: var(--particle-opacity, 0.3);
-          }
-          25% {
-            transform: translate(10px, -15px) scale(1.1);
+            opacity: var(--star-opacity, 0.5);
+            transform: scale(1);
           }
           50% {
-            transform: translate(-5px, -25px) scale(0.9);
-            opacity: calc(var(--particle-opacity, 0.3) * 0.5);
-          }
-          75% {
-            transform: translate(-15px, -10px) scale(1.05);
-          }
-        }
-
-        .stat-card {
-          transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.7s ease;
-        }
-
-        .stat-card:hover {
-          transform: translateY(-2px);
-          box-shadow:
-            0 0 0 1px rgba(255,255,255,0.08) inset,
-            0 15px 40px rgba(0,0,0,0.4),
-            0 0 40px rgba(255,145,0,0.1);
-        }
-
-        .server-node {
-          transition: opacity 0.5s ease;
-        }
-
-        .tooltip-group {
-          animation: fadeIn 0.2s ease;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(2px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
+            opacity: calc(var(--star-opacity, 0.5) * 0.3);
+            transform: scale(0.8);
           }
         }
       `}</style>
