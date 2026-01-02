@@ -11,8 +11,10 @@ import {
   BookOpen,
   MessageSquare,
   X,
+  Command,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { SearchModal, useSearchModal } from './search-modal';
 
 interface SharedHeaderProps {
   activeNav?: 'features' | 'pricing' | 'resources' | null;
@@ -22,6 +24,7 @@ export function SharedHeader({ activeNav = null }: SharedHeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const { isOpen: isSearchOpen, openSearch, closeSearch } = useSearchModal();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -165,7 +168,7 @@ export function SharedHeader({ activeNav = null }: SharedHeaderProps) {
                           boxShadow: '0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,145,0,0.05)',
                         }}
                       >
-                        {item.items.map((subItem, idx) => (
+                        {item.items.map((subItem) => (
                           <Link
                             key={subItem.label}
                             href={subItem.href}
@@ -201,10 +204,14 @@ export function SharedHeader({ activeNav = null }: SharedHeaderProps) {
             <div className="hidden lg:flex items-center gap-2">
               {/* Search Button */}
               <button
-                className="w-10 h-10 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/5 transition-all duration-300 group"
+                onClick={openSearch}
+                className="flex items-center gap-2 h-10 px-3 rounded-lg text-white/50 hover:text-white hover:bg-white/5 transition-all duration-300 group"
                 aria-label="Search"
               >
                 <Search className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
+                <kbd className="hidden xl:flex items-center gap-1 px-2 py-1 rounded-md bg-white/[0.06] border border-white/[0.08] text-xs font-medium text-white/40">
+                  <Command className="w-3 h-3" />K
+                </kbd>
               </button>
 
               {/* Login */}
@@ -384,6 +391,9 @@ export function SharedHeader({ activeNav = null }: SharedHeaderProps) {
           </>
         )}
       </AnimatePresence>
+
+      {/* Search Modal */}
+      <SearchModal isOpen={isSearchOpen} onClose={closeSearch} />
     </>
   );
 }
