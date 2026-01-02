@@ -126,16 +126,13 @@ export function Header({ storeName = 'Store', logo, categories = [] }: HeaderPro
   ];
 
   return (
-    <motion.header
+    <header
       className={cn(
         'sticky top-0 z-50 w-full theme-transition',
         scrolled
           ? 'border-b border-[var(--theme-border)] bg-[var(--theme-background)]/90 shadow-sm backdrop-blur-xl dark:bg-[var(--theme-background)]/80 dark:shadow-none dark:border-[var(--theme-border)]'
           : 'border-b border-transparent bg-[var(--theme-background)]'
       )}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
       <nav className="container-theme">
         {/* Main header row */}
@@ -154,40 +151,30 @@ export function Header({ storeName = 'Store', logo, categories = [] }: HeaderPro
             </motion.button>
 
             {/* Logo */}
-            <motion.div variants={logoVariants} initial="hidden" animate="visible">
+            <div>
               <Link href="/" className="group flex items-center gap-2">
                 {logo ? (
-                  <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
-                    <Image
-                      src={logo}
-                      alt={storeName}
-                      width={120}
-                      height={40}
-                      className="h-8 w-auto object-contain"
-                    />
-                  </motion.div>
+                  <Image
+                    src={logo}
+                    alt={storeName}
+                    width={120}
+                    height={40}
+                    className="h-8 w-auto object-contain transition-transform hover:scale-[1.02]"
+                  />
                 ) : (
-                  <motion.span
-                    className="text-xl font-bold tracking-tight text-[var(--theme-foreground)]"
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
-                  >
+                  <span className="text-xl font-bold tracking-tight text-[var(--theme-foreground)] transition-transform hover:scale-[1.02]">
                     {storeName}
-                  </motion.span>
+                  </span>
                 )}
               </Link>
-            </motion.div>
+            </div>
           </div>
 
           {/* Center: Desktop navigation */}
           <div className="hidden lg:flex lg:items-center lg:gap-1">
             {navItems.map((item, index) => (
-              <motion.div
+              <div
                 key={item.id}
-                custom={index}
-                variants={navItemVariants}
-                initial="hidden"
-                animate="visible"
                 onMouseEnter={() => setHoveredNav(item.id)}
                 onMouseLeave={() => setHoveredNav(null)}
               >
@@ -215,19 +202,14 @@ export function Header({ storeName = 'Store', logo, categories = [] }: HeaderPro
                     )}
                   </AnimatePresence>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
 
           {/* Right: Actions */}
           <div className="flex items-center gap-1">
             {/* Desktop Search */}
-            <motion.div
-              className="hidden lg:block"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            >
+            <div className="hidden lg:block">
               <div className="relative group">
                 <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--theme-secondary)] transition-colors group-focus-within:text-[var(--theme-primary)]" />
                 <Input
@@ -236,7 +218,7 @@ export function Header({ storeName = 'Store', logo, categories = [] }: HeaderPro
                   className="h-10 w-56 rounded-xl border-transparent bg-[var(--theme-muted)]/60 pl-10 text-sm text-[var(--theme-foreground)] placeholder:text-[var(--theme-secondary)]/60 transition-all duration-300 focus:w-72 focus:border-[var(--theme-primary)]/30 focus:bg-white focus:shadow-lg focus:shadow-[var(--theme-primary)]/5"
                 />
               </div>
-            </motion.div>
+            </div>
 
             {/* Mobile search button */}
             <motion.button
@@ -250,21 +232,12 @@ export function Header({ storeName = 'Store', logo, categories = [] }: HeaderPro
             </motion.button>
 
             {/* Theme Toggle - Desktop */}
-            <motion.div
-              className="hidden sm:block"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            >
+            <div className="hidden sm:block">
               <ThemeToggle variant="switch" />
-            </motion.div>
+            </div>
 
             {/* Account */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            >
+            <div>
               <Link
                 href="/account"
                 className="hidden sm:flex h-10 w-10 items-center justify-center rounded-xl text-[var(--theme-foreground)] transition-all duration-300 hover:bg-[var(--theme-muted)] hover:scale-105"
@@ -272,39 +245,24 @@ export function Header({ storeName = 'Store', logo, categories = [] }: HeaderPro
                 <User className="h-5 w-5" aria-hidden="true" />
                 <span className="sr-only">Account</span>
               </Link>
-            </motion.div>
+            </div>
 
             {/* Cart */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <motion.button
+            <div>
+              <button
                 type="button"
-                className="group relative flex h-10 w-10 items-center justify-center rounded-xl text-[var(--theme-foreground)] transition-all duration-300 hover:bg-[var(--theme-muted)]"
+                className="group relative flex h-10 w-10 items-center justify-center rounded-xl text-[var(--theme-foreground)] transition-all duration-300 hover:bg-[var(--theme-muted)] hover:scale-105"
                 onClick={openCart}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
               >
                 <ShoppingBag className="h-5 w-5 transition-transform group-hover:scale-110" />
-                <AnimatePresence mode="wait">
-                  {itemCount > 0 && (
-                    <motion.span
-                      key={itemCount}
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
-                      transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                      className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--theme-primary)] text-[10px] font-bold text-white shadow-lg shadow-[var(--theme-primary)]/30 ring-2 ring-[var(--theme-background)]"
-                    >
-                      {itemCount > 99 ? '99+' : itemCount}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
+                {itemCount > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--theme-primary)] text-[10px] font-bold text-white shadow-lg shadow-[var(--theme-primary)]/30 ring-2 ring-[var(--theme-background)]">
+                    {itemCount > 99 ? '99+' : itemCount}
+                  </span>
+                )}
                 <span className="sr-only">Cart</span>
-              </motion.button>
-            </motion.div>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -443,6 +401,6 @@ export function Header({ storeName = 'Store', logo, categories = [] }: HeaderPro
           </div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </header>
   );
 }
