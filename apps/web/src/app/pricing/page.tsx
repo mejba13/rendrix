@@ -278,10 +278,9 @@ export default function PricingPage() {
             <span className="text-xl font-semibold tracking-tight">Rendrix</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <Link href="/#features" className="text-sm text-white/60 hover:text-white transition-colors">Features</Link>
+            <Link href="/features" className="text-sm text-white/60 hover:text-white transition-colors">Features</Link>
             <Link href="/pricing" className="text-sm text-primary">Pricing</Link>
-            <Link href="/about" className="text-sm text-white/60 hover:text-white transition-colors">About</Link>
-            <Link href="/contact" className="text-sm text-white/60 hover:text-white transition-colors">Contact</Link>
+            <Link href="/help" className="text-sm text-white/60 hover:text-white transition-colors">Resources</Link>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-sm text-white/70 hover:text-white transition-colors">

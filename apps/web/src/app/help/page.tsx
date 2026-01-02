@@ -708,10 +708,9 @@ export default function HelpCenterPage() {
             <span className="text-xl font-semibold tracking-tight">Rendrix</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <Link href="/#features" className="text-sm text-white/60 hover:text-white transition-colors">Features</Link>
-            <Link href="/#pricing" className="text-sm text-white/60 hover:text-white transition-colors">Pricing</Link>
-            <Link href="/about" className="text-sm text-white/60 hover:text-white transition-colors">About</Link>
-            <Link href="/help" className="text-sm text-primary">Help Center</Link>
+            <Link href="/features" className="text-sm text-white/60 hover:text-white transition-colors">Features</Link>
+            <Link href="/pricing" className="text-sm text-white/60 hover:text-white transition-colors">Pricing</Link>
+            <Link href="/help" className="text-sm text-primary">Resources</Link>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-sm text-white/70 hover:text-white transition-colors">

@@ -83,7 +83,7 @@ function useInView(options?: IntersectionObserverInit) {
 // ============================================================================
 
 const navLinks = [
-  { label: 'Features', href: '#features' },
+  { label: 'Features', href: '/features' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Resources', href: '#resources' },
 ];
@@ -121,7 +121,7 @@ function Header() {
 
   // Navigation with dropdowns - Simplified for conversion focus
   const navigation = [
-    { label: 'Features', href: '#features', hasDropdown: false },
+    { label: 'Features', href: '/features', hasDropdown: false },
     { label: 'Pricing', href: '/pricing', hasDropdown: false },
     {
       label: 'Resources',
