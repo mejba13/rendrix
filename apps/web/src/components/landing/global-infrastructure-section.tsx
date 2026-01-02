@@ -700,17 +700,61 @@ export function GlobalInfrastructureSection() {
 
       {/* Content */}
       <div className="relative max-w-7xl mx-auto px-6">
-        {/* Main grid */}
+        {/* ===== SECTION HEADER ===== */}
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.06] mb-6"
+          >
+            <svg className="w-4 h-4 text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+            <span className="text-sm text-white/60">Global Infrastructure</span>
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="text-4xl sm:text-5xl font-medium tracking-tight mb-4"
+          >
+            Global reach,{' '}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{
+                background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                WebkitBackgroundClip: 'text',
+              }}
+            >
+              local speed
+            </span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="text-lg text-white/50 max-w-2xl mx-auto"
+          >
+            Every millisecond counts at checkout. Rendrix delivers your store in under 50ms to shoppers
+            worldwide—no abandoned carts from slow loading, just more completed purchases.
+          </motion.p>
+        </div>
+
+        {/* ===== MAIN CONTENT GRID ===== */}
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left: Globe visualization */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="relative order-2 lg:order-1"
+            transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
+            className="relative"
           >
             {/* Globe container with proper padding */}
-            <div className="relative max-w-[520px] mx-auto lg:mx-0">
+            <div className="relative max-w-[520px] mx-auto">
               <Globe3D isVisible={isInView} />
 
               {/* Info cards positioned inside the container */}
@@ -746,87 +790,44 @@ export function GlobalInfrastructureSection() {
             </div>
           </motion.div>
 
-          {/* Right: Content */}
-          <div className="order-1 lg:order-2">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              {/* Eyebrow */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] mb-6">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-xs text-white/50 font-medium uppercase tracking-wider">Global Infrastructure</span>
-              </div>
-
-              {/* Headline - Updated content */}
-              <h2
-                className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6"
-                style={{
-                  fontFamily: "'SF Pro Display', 'Inter', system-ui, sans-serif",
-                }}
-              >
-                <span
-                  className="block"
-                  style={{
-                    background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(255,255,255,0.7) 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }}
-                >
-                  Global reach,
-                </span>
-                <span
-                  className="block"
-                  style={{
-                    background: 'linear-gradient(135deg, #FFFFFF 0%, #FF9100 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }}
-                >
-                  local speed
-                </span>
-              </h2>
-
-              {/* Description - Updated content */}
-              <p className="text-lg text-white/50 leading-relaxed max-w-lg mb-8">
-                Every millisecond counts at checkout. Rendrix delivers your store in under 50ms to shoppers
-                worldwide—no abandoned carts from slow loading, just more completed purchases.
-              </p>
-
-              {/* Stats grid - Updated content */}
-              <div className="grid grid-cols-2 gap-3">
-                <StatCard
-                  value="300+"
-                  label="Edge Locations"
-                  sublabel="Your store, everywhere"
-                  delay={0.4}
-                  position="left"
-                />
-                <StatCard
-                  value="<50ms"
-                  label="Lightning Checkout"
-                  sublabel="Globally, every time"
-                  delay={0.5}
-                  position="right"
-                />
-                <StatCard
-                  value="99.99%"
-                  label="Never Miss a Sale"
-                  sublabel="Enterprise uptime SLA"
-                  delay={0.6}
-                  position="left"
-                />
-                <StatCard
-                  value="10M+"
-                  label="Flash Sale Ready"
-                  sublabel="Requests per second"
-                  delay={0.7}
-                  position="right"
-                />
-              </div>
-            </motion.div>
-          </div>
+          {/* Right: Stats Grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            {/* Stats grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <StatCard
+                value="300+"
+                label="Edge Locations"
+                sublabel="Your store, everywhere"
+                delay={0.5}
+                position="left"
+              />
+              <StatCard
+                value="<50ms"
+                label="Lightning Checkout"
+                sublabel="Globally, every time"
+                delay={0.6}
+                position="right"
+              />
+              <StatCard
+                value="99.99%"
+                label="Never Miss a Sale"
+                sublabel="Enterprise uptime SLA"
+                delay={0.7}
+                position="left"
+              />
+              <StatCard
+                value="10M+"
+                label="Flash Sale Ready"
+                sublabel="Requests per second"
+                delay={0.8}
+                position="right"
+              />
+            </div>
+          </motion.div>
         </div>
 
         {/* Bottom trust line - Updated */}
