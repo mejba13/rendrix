@@ -29,7 +29,18 @@ export async function storefrontStoreRoutes(app: FastifyInstance) {
           subdomain: true,
           description: true,
           logoUrl: true,
+          faviconUrl: true,
           settings: true,
+          themeSettings: true,
+          customCss: true,
+          theme: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              settingsSchema: true,
+            },
+          },
         },
       });
 
@@ -40,7 +51,15 @@ export async function storefrontStoreRoutes(app: FastifyInstance) {
         });
       }
 
-      const settings = (store.settings as any) || {};
+      const settings = (store.settings as Record<string, unknown>) || {};
+      const themeDefaults = (store.theme?.settingsSchema as Record<string, unknown>) || {};
+      const themeSettings = (store.themeSettings as Record<string, unknown>) || {};
+
+      // Merge theme defaults with store's custom settings
+      const mergedThemeSettings = {
+        ...themeDefaults,
+        ...themeSettings,
+      };
 
       return {
         success: true,
@@ -51,8 +70,15 @@ export async function storefrontStoreRoutes(app: FastifyInstance) {
           subdomain: store.subdomain,
           description: store.description,
           logo: store.logoUrl,
-          currency: settings.currency || 'USD',
-          theme: settings.theme || {},
+          favicon: store.faviconUrl,
+          currency: (settings.currency as string) || 'USD',
+          theme: {
+            id: store.theme?.id || null,
+            name: store.theme?.name || 'Minimal',
+            slug: store.theme?.slug || 'minimal-store',
+          },
+          themeSettings: mergedThemeSettings,
+          customCss: store.customCss || null,
         },
       };
     }

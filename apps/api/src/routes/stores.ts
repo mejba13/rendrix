@@ -158,9 +158,18 @@ export async function storeRoutes(app: FastifyInstance) {
           });
 
           if (currentStores >= limits.maxStores) {
-            throw new ForbiddenError(
-              `Your plan allows a maximum of ${limits.maxStores} stores. Upgrade to add more.`
-            );
+            return reply.status(403).send({
+              success: false,
+              error: {
+                code: 'STORE_LIMIT_EXCEEDED',
+                message: `Your plan allows a maximum of ${limits.maxStores} stores. Upgrade to add more.`,
+                details: {
+                  currentStores,
+                  maxStores: limits.maxStores,
+                  planName: subscription.plan.name,
+                },
+              },
+            });
           }
         }
       }

@@ -102,8 +102,12 @@ export async function storefrontProductRoutes(app: FastifyInstance) {
             sku: true,
             categories: {
               select: {
-                id: true,
-                name: true,
+                category: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
               },
             },
             variants: {
@@ -113,7 +117,7 @@ export async function storefrontProductRoutes(app: FastifyInstance) {
                 sku: true,
                 price: true,
                 quantity: true,
-                options: true,
+                attributes: true,
               },
             },
           },
@@ -121,9 +125,20 @@ export async function storefrontProductRoutes(app: FastifyInstance) {
         prisma.product.count({ where }),
       ]);
 
+      // Transform products: flatten categories, convert images to URLs, and prices to numbers
+      const transformedProducts = products.map((product) => ({
+        ...product,
+        price: product.price ? Number(product.price) : 0,
+        compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null,
+        images: Array.isArray(product.images)
+          ? product.images.map((img: any) => typeof img === 'string' ? img : img.url).filter(Boolean)
+          : [],
+        categories: product.categories.map((pc) => pc.category),
+      }));
+
       return {
         success: true,
-        data: products,
+        data: transformedProducts,
         meta: {
           total,
           page,
@@ -153,9 +168,13 @@ export async function storefrontProductRoutes(app: FastifyInstance) {
         include: {
           categories: {
             select: {
-              id: true,
-              name: true,
-              slug: true,
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                },
+              },
             },
           },
           variants: {
@@ -178,7 +197,18 @@ export async function storefrontProductRoutes(app: FastifyInstance) {
         };
       }
 
-      return { success: true, data: product };
+      // Transform product: flatten categories, convert images to URLs, and prices to numbers
+      const transformedProduct = {
+        ...product,
+        price: product.price ? Number(product.price) : 0,
+        compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null,
+        images: Array.isArray(product.images)
+          ? product.images.map((img: any) => typeof img === 'string' ? img : img.url).filter(Boolean)
+          : [],
+        categories: product.categories.map((pc) => pc.category),
+      };
+
+      return { success: true, data: transformedProduct };
     }
   );
 
@@ -201,9 +231,13 @@ export async function storefrontProductRoutes(app: FastifyInstance) {
         include: {
           categories: {
             select: {
-              id: true,
-              name: true,
-              slug: true,
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                },
+              },
             },
           },
           variants: {
@@ -226,7 +260,18 @@ export async function storefrontProductRoutes(app: FastifyInstance) {
         };
       }
 
-      return { success: true, data: product };
+      // Transform product: flatten categories, convert images to URLs, and prices to numbers
+      const transformedProduct = {
+        ...product,
+        price: product.price ? Number(product.price) : 0,
+        compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null,
+        images: Array.isArray(product.images)
+          ? product.images.map((img: any) => typeof img === 'string' ? img : img.url).filter(Boolean)
+          : [],
+        categories: product.categories.map((pc) => pc.category),
+      };
+
+      return { success: true, data: transformedProduct };
     }
   );
 }

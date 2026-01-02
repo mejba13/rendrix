@@ -151,15 +151,61 @@ export async function getCategories(
   return fetcher<Category[]>(`/api/v1/storefront/${storeId}/categories`);
 }
 
+// Theme settings structure
+export interface ThemeSettings {
+  colors?: {
+    primary?: string;
+    secondary?: string;
+    accent?: string;
+    background?: string;
+    foreground?: string;
+    muted?: string;
+  };
+  typography?: {
+    headingFont?: string;
+    bodyFont?: string;
+    baseFontSize?: number;
+    headingWeight?: number;
+    bodyWeight?: number;
+  };
+  layout?: {
+    containerWidth?: 'narrow' | 'medium' | 'wide';
+    headerStyle?: 'minimal' | 'centered' | 'expanded';
+    footerStyle?: 'minimal' | 'standard' | 'expanded';
+    productGridColumns?: number;
+  };
+  components?: {
+    buttonStyle?: 'square' | 'rounded' | 'pill';
+    cardStyle?: 'flat' | 'bordered' | 'elevated';
+    imageStyle?: 'square' | 'rounded';
+  };
+  effects?: {
+    enableAnimations?: boolean;
+    enableHoverEffects?: boolean;
+    enableParallax?: boolean;
+  };
+}
+
+// Store theme info
+export interface StoreTheme {
+  id: string | null;
+  name: string;
+  slug: string;
+}
+
 // Store info
 export interface StoreInfo {
   id: string;
   name: string;
   slug: string;
+  subdomain?: string | null;
   description: string | null;
   logo: string | null;
+  favicon?: string | null;
   currency: string;
-  theme: Record<string, unknown>;
+  theme: StoreTheme;
+  themeSettings: ThemeSettings;
+  customCss?: string | null;
 }
 
 export async function getStoreInfo(slug: string): Promise<ApiResponse<StoreInfo>> {

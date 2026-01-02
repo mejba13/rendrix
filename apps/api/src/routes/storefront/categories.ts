@@ -23,17 +23,17 @@ export async function storefrontCategoryRoutes(app: FastifyInstance) {
 
       const categories = await prisma.category.findMany({
         where: { storeId },
-        orderBy: { position: 'asc' },
+        orderBy: { sortOrder: 'asc' },
         select: {
           id: true,
           name: true,
           slug: true,
           description: true,
-          image: true,
-          _count: {
+          imageUrl: true,
+          products: {
             select: {
-              products: {
-                where: { status: 'active' },
+              product: {
+                select: { status: true },
               },
             },
           },
@@ -47,8 +47,8 @@ export async function storefrontCategoryRoutes(app: FastifyInstance) {
           name: cat.name,
           slug: cat.slug,
           description: cat.description,
-          image: cat.image,
-          productCount: cat._count.products,
+          image: cat.imageUrl,
+          productCount: cat.products.filter((p) => p.product.status === 'active').length,
         })),
       };
     }

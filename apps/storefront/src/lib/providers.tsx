@@ -3,13 +3,16 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { StoreProvider } from './store-context';
-import type { StoreInfo, Category } from './api';
+import { ThemeStyleProvider } from './theme-provider';
+import type { StoreInfo, Category, ThemeSettings } from './api';
 
 interface ProvidersProps {
   children: React.ReactNode;
   initialStore?: StoreInfo | null;
   initialCategories?: Category[];
   storeIdentifier?: string | null;
+  themeSettings?: ThemeSettings;
+  customCss?: string | null;
 }
 
 export function Providers({
@@ -17,6 +20,8 @@ export function Providers({
   initialStore,
   initialCategories = [],
   storeIdentifier,
+  themeSettings = {},
+  customCss,
 }: ProvidersProps) {
   const [queryClient] = useState(
     () =>
@@ -37,7 +42,9 @@ export function Providers({
         initialCategories={initialCategories}
         storeIdentifier={storeIdentifier}
       >
-        {children}
+        <ThemeStyleProvider themeSettings={themeSettings} customCss={customCss}>
+          {children}
+        </ThemeStyleProvider>
       </StoreProvider>
     </QueryClientProvider>
   );

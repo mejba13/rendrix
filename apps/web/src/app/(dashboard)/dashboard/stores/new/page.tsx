@@ -40,6 +40,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { StoreLimitModal } from '@/components/store-limit-modal';
 import { useToast } from '@/hooks/use-toast';
 import { api, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -428,6 +429,12 @@ export default function NewStorePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+  const [limitInfo, setLimitInfo] = useState<{
+    currentStores: number;
+    maxStores: number;
+    planName: string;
+  } | null>(null);
 
   const {
     register,
@@ -544,7 +551,25 @@ export default function NewStorePage() {
       }, 2500);
     } catch (error) {
       let errorMessage = 'Please try again';
+
       if (error instanceof ApiError) {
+        // Check for store limit exceeded error
+        if (error.code === 'STORE_LIMIT_EXCEEDED' && error.details) {
+          const details = error.details as {
+            currentStores?: number;
+            maxStores?: number;
+            planName?: string;
+          };
+          setLimitInfo({
+            currentStores: details.currentStores ?? 3,
+            maxStores: details.maxStores ?? 3,
+            planName: details.planName ?? 'Current',
+          });
+          setShowLimitModal(true);
+          setIsSubmitting(false);
+          return;
+        }
+
         errorMessage = error.message;
         // Log additional details for debugging
         console.error('Store creation error:', {
@@ -1057,6 +1082,15 @@ export default function NewStorePage() {
           </div>
         </form>
       </div>
+
+      {/* Store Limit Modal */}
+      <StoreLimitModal
+        isOpen={showLimitModal}
+        onClose={() => setShowLimitModal(false)}
+        currentStores={limitInfo?.currentStores || 3}
+        maxStores={limitInfo?.maxStores || 3}
+        planName={limitInfo?.planName || 'Pro'}
+      />
     </div>
   );
 }
