@@ -58,6 +58,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { SharedHeader } from '@/components/landing/shared-header';
+import { SharedFooter } from '@/components/landing/shared-footer';
 
 // Animation variants
 const fadeInUp = {
@@ -625,7 +627,7 @@ export default function DocsCategoryPage() {
         <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: `linear-gradient(rgba(255,145,0,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,145,0,0.4) 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
       </div>
 
-      <Header />
+      <SharedHeader activeNav="resources" />
 
       <main className="relative pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -761,7 +763,7 @@ export default function DocsCategoryPage() {
         </div>
       </main>
 
-      <Footer />
+      <SharedFooter />
     </div>
   );
 }

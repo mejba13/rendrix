@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
+import { SharedHeader } from '@/components/landing/shared-header';
+import { SharedFooter } from '@/components/landing/shared-footer';
 import {
   Send,
   Mail,
@@ -467,33 +469,7 @@ export default function ContactPage() {
       </div>
 
       {/* Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-black/80 backdrop-blur-xl">
-        <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center">
-              <span className="text-sm font-bold text-black">R</span>
-            </div>
-            <span className="text-xl font-semibold tracking-tight">Rendrix</span>
-          </Link>
-          <div className="hidden md:flex items-center gap-8">
-            <Link href="/#features" className="text-sm text-white/60 hover:text-white transition-colors">Features</Link>
-            <Link href="/#pricing" className="text-sm text-white/60 hover:text-white transition-colors">Pricing</Link>
-            <Link href="/about" className="text-sm text-white/60 hover:text-white transition-colors">About</Link>
-            <Link href="/contact" className="text-sm text-primary">Contact</Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm text-white/70 hover:text-white transition-colors">
-              Sign In
-            </Link>
-            <Link
-              href="/register"
-              className="px-4 py-2 text-sm font-medium text-black bg-gradient-to-r from-primary to-orange-500 rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300"
-            >
-              Get Started
-            </Link>
-          </div>
-        </nav>
-      </header>
+      <SharedHeader activeNav={null} />
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-16 px-6">
@@ -830,22 +806,7 @@ export default function ContactPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative py-12 px-6 border-t border-white/[0.06]">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center">
-              <span className="text-xs font-bold text-black">R</span>
-            </div>
-            <span className="text-sm text-white/60">© 2025 Rendrix. All rights reserved.</span>
-          </div>
-          <div className="flex items-center gap-6">
-            <Link href="/privacy" className="text-sm text-white/40 hover:text-white transition-colors">Privacy</Link>
-            <Link href="/terms" className="text-sm text-white/40 hover:text-white transition-colors">Terms</Link>
-            <Link href="/about" className="text-sm text-white/40 hover:text-white transition-colors">About</Link>
-            <Link href="/help" className="text-sm text-white/40 hover:text-white transition-colors">Help</Link>
-          </div>
-        </div>
-      </footer>
+      <SharedFooter />
     </div>
   );
 }

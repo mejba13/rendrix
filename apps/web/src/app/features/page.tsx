@@ -47,6 +47,8 @@ import {
   Mail,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { SharedHeader } from '@/components/landing/shared-header';
+import { SharedFooter } from '@/components/landing/shared-footer';
 
 // Animation variants
 const fadeInUp: Variants = {
@@ -1056,7 +1058,7 @@ export default function FeaturesPage() {
       </div>
 
       {/* Header */}
-      <Header />
+      <SharedHeader activeNav="features" />
 
       {/* Hero Section */}
       <section ref={heroRef} className="relative pt-32 pb-20 px-6">
@@ -1527,7 +1529,7 @@ console.log(products);`}</code>
       </section>
 
       {/* Footer */}
-      <Footer />
+      <SharedFooter />
     </div>
   );
 }

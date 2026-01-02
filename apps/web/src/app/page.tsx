@@ -39,6 +39,8 @@ import {
 } from 'lucide-react';
 import { GlobalInfrastructureSection } from '@/components/landing/global-infrastructure-section';
 import { SearchModal, useSearchModal } from '@/components/landing/search-modal';
+import { SharedHeader } from '@/components/landing/shared-header';
+import { SharedFooter } from '@/components/landing/shared-footer';
 
 // ============================================================================
 // HOOKS
@@ -4180,7 +4182,7 @@ function Footer() {
 export default function LandingPage() {
   return (
     <main className="min-h-screen bg-black text-white overflow-hidden" suppressHydrationWarning>
-      <Header />
+      <SharedHeader activeNav={null} />
       <HeroSection />
       <SocialProofSection />
       <PlatformSection />
@@ -4191,7 +4193,7 @@ export default function LandingPage() {
       <GlobalInfrastructureSection />
       <PricingSection />
       <CTASection />
-      <Footer />
+      <SharedFooter />
     </main>
   );
 }

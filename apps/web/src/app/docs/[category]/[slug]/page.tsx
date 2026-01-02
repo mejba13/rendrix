@@ -48,6 +48,8 @@ import {
   Edit3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { SharedHeader } from '@/components/landing/shared-header';
+import { SharedFooter } from '@/components/landing/shared-footer';
 
 // Category data with articles - same structure as category page
 const categoryData: Record<string, {
@@ -926,7 +928,7 @@ export default function DocsArticlePage() {
         <div className="absolute inset-0 opacity-[0.012]" style={{ backgroundImage: `linear-gradient(rgba(255,145,0,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,145,0,0.4) 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
       </div>
 
-      <Header />
+      <SharedHeader activeNav="resources" />
 
       {/* Mobile sidebar toggle */}
       <button
@@ -1201,24 +1203,7 @@ export default function DocsArticlePage() {
       </main>
 
       {/* Footer */}
-      <footer className="relative border-t border-white/[0.06] mt-16">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)' }}>
-                <Store className="w-4 h-4 text-black" />
-              </div>
-              <span className="font-semibold">Rendrix</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-white/40">
-              <Link href="/docs" className="hover:text-white transition-colors">Documentation</Link>
-              <Link href="/help" className="hover:text-white transition-colors">Help Center</Link>
-              <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
-            </div>
-            <p className="text-sm text-white/30">&copy; {new Date().getFullYear()} Rendrix</p>
-          </div>
-        </div>
-      </footer>
+      <SharedFooter />
     </div>
   );
 }

@@ -26,6 +26,8 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { SharedHeader } from '@/components/landing/shared-header';
+import { SharedFooter } from '@/components/landing/shared-footer';
 
 // Animation variants
 const fadeInUp: Variants = {
@@ -206,100 +208,6 @@ function BulletPoint({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Header Component
-function Header() {
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled ? 'py-3' : 'py-5'
-      }`}
-    >
-      <div
-        className={`absolute inset-0 transition-all duration-500 ${
-          isScrolled ? 'bg-black/80 backdrop-blur-2xl' : 'bg-transparent'
-        }`}
-      />
-      <div
-        className={`absolute bottom-0 left-0 right-0 h-[1px] transition-opacity duration-500 ${
-          isScrolled ? 'opacity-100' : 'opacity-0'
-        }`}
-        style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255,145,0,0.3) 50%, transparent 100%)',
-        }}
-      />
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
-              style={{
-                background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
-                boxShadow: '0 4px 20px rgba(255,145,0,0.35)',
-              }}
-            >
-              <Store className="w-5 h-5 text-black" />
-            </div>
-            <span className="text-xl font-bold text-white">Rendrix</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/terms" className="text-sm text-white/60 hover:text-white transition-colors">
-              Terms of Service
-            </Link>
-            <Link href="/">
-              <Button
-                className="text-black font-semibold h-10 px-5 rounded-xl"
-                style={{
-                  background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
-                }}
-              >
-                Back to Home
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-}
-
-// Footer Component
-function Footer() {
-  return (
-    <footer className="relative border-t border-white/[0.06] bg-black/50">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)' }}
-            >
-              <Store className="w-4 h-4 text-black" />
-            </div>
-            <span className="text-lg font-semibold text-white">Rendrix</span>
-          </div>
-          <div className="flex items-center gap-6 text-sm text-white/50">
-            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-            <Link href="/privacy" className="text-primary">Privacy</Link>
-            <Link href="/cookies" className="hover:text-white transition-colors">Cookies</Link>
-            <Link href="/security" className="hover:text-white transition-colors">Security</Link>
-          </div>
-          <p className="text-sm text-white/40">
-            &copy; {new Date().getFullYear()} Rendrix. All rights reserved.
-          </p>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 // Back to top button
 function BackToTop() {
@@ -361,7 +269,7 @@ export default function PrivacyPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <Header />
+      <SharedHeader activeNav={null} />
       <BackToTop />
 
       {/* Hero Section */}
@@ -976,7 +884,7 @@ export default function PrivacyPage() {
         </div>
       </section>
 
-      <Footer />
+      <SharedFooter />
     </div>
   );
 }
