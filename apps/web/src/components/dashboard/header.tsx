@@ -88,11 +88,17 @@ export function DashboardHeader() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-white/[0.08]" />
-            <DropdownMenuItem className="text-white/80 hover:text-white hover:bg-white/[0.04] cursor-pointer">
+            <DropdownMenuItem
+              onClick={() => router.push('/settings/account')}
+              className="text-white/80 hover:text-white hover:bg-white/[0.04] cursor-pointer"
+            >
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-white/80 hover:text-white hover:bg-white/[0.04] cursor-pointer">
+            <DropdownMenuItem
+              onClick={() => router.push('/settings')}
+              className="text-white/80 hover:text-white hover:bg-white/[0.04] cursor-pointer"
+            >
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </DropdownMenuItem>

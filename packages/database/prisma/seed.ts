@@ -85,12 +85,12 @@ async function main() {
       },
     }),
     prisma.plan.upsert({
-      where: { slug: 'premium' },
+      where: { slug: 'business' },
       update: {},
       create: {
-        name: 'Premium',
-        slug: 'premium',
-        description: 'For scaling businesses',
+        name: 'Business',
+        slug: 'business',
+        description: 'For scaling brands',
         priceMonthly: 79,
         priceYearly: 790,
         features: {
@@ -109,10 +109,10 @@ async function main() {
         },
         limits: {
           maxStores: 10,
-          maxProducts: 5000,
-          maxBandwidthGb: 100,
+          maxProducts: null, // Unlimited
+          maxBandwidthGb: 50,
           maxTeamMembers: 15,
-          maxCustomDomains: 10,
+          maxCustomDomains: 5,
         },
         sortOrder: 2,
       },

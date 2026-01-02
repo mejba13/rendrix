@@ -3166,52 +3166,59 @@ function DeveloperSection() {
 function PricingSection() {
   const { ref, isInView } = useInView();
 
+  // Standardized pricing from shared config - showing Free, Pro, Business for landing page
   const plans = [
     {
-      name: 'Starter',
-      price: 29,
-      description: 'Perfect for new businesses',
+      name: 'Free',
+      tagline: 'Forever free',
+      price: 0,
+      description: 'Perfect for getting started',
       features: [
-        '1 online store',
-        'Unlimited products',
-        '2.9% + 30¢ per transaction',
-        'Email support',
-        'Basic analytics',
-        'SSL certificate',
+        '1 Online Store',
+        'Up to 50 Products',
+        '1 Team Member',
+        '5% Transaction Fee',
+        'Basic Analytics',
+        'Email Support',
       ],
       popular: false,
+      color: 'emerald',
     },
     {
-      name: 'Growth',
-      price: 99,
-      description: 'For scaling businesses',
+      name: 'Pro',
+      tagline: 'Most Popular',
+      price: 29,
+      description: 'For growing businesses',
       features: [
-        '5 online stores',
-        'Unlimited products',
-        '2.5% + 30¢ per transaction',
-        'Priority support',
-        'Advanced analytics',
-        'Marketing automation',
-        'API access',
-        'Custom domains',
+        '3 Online Stores',
+        'Up to 500 Products',
+        '5 Team Members',
+        '2.9% Transaction Fee',
+        'Advanced Analytics',
+        'Priority Support',
+        'Custom Domain',
+        'AI Features',
       ],
       popular: true,
+      color: 'primary',
     },
     {
-      name: 'Enterprise',
-      price: null,
-      description: 'Custom solutions',
+      name: 'Business',
+      tagline: 'For scaling brands',
+      price: 79,
+      description: 'Advanced tools for growth',
       features: [
-        'Unlimited stores',
-        'Unlimited products',
-        'Custom rates',
-        'Dedicated support',
-        'Custom integrations',
-        'SLA guarantee',
-        'Advanced security',
-        'Onboarding specialist',
+        '10 Online Stores',
+        'Unlimited Products',
+        '15 Team Members',
+        '2.5% Transaction Fee',
+        'Advanced Analytics + Reports',
+        'Priority Chat & Email',
+        '5 Custom Domains',
+        'API Access',
       ],
       popular: false,
+      color: 'blue',
     },
   ];
 
@@ -3305,7 +3312,7 @@ function PricingSection() {
 
                 {/* Price */}
                 <div className="mb-6 pb-6 border-b border-white/[0.06]">
-                  {plan.price ? (
+                  {plan.price !== null ? (
                     <div className="flex items-baseline">
                       <span className="text-4xl font-bold">${plan.price}</span>
                       <span className="text-white/50 ml-2">/month</span>
@@ -3328,7 +3335,7 @@ function PricingSection() {
                 </ul>
 
                 {/* CTA */}
-                <Link href={plan.price ? '/register' : '/contact'} className="block">
+                <Link href={plan.price !== null ? '/register' : '/contact'} className="block">
                   <Button
                     className={`w-full h-12 font-semibold rounded-xl ${
                       plan.popular ? 'text-black' : 'text-white'
@@ -3340,7 +3347,7 @@ function PricingSection() {
                       border: plan.popular ? 'none' : '1px solid rgba(255,255,255,0.1)',
                     }}
                   >
-                    {plan.price ? 'Start Free Trial' : 'Contact Sales'}
+                    {plan.price === null ? 'Contact Sales' : plan.price === 0 ? 'Get Started' : 'Start Free Trial'}
                   </Button>
                 </Link>
               </div>

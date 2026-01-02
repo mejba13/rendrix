@@ -66,6 +66,13 @@ const planConfig: Record<string, { icon: React.ElementType; color: string; gradi
     gradient: 'from-blue-500/20 to-cyan-500/10',
     iconColor: 'text-blue-500',
   },
+  // Backwards compatibility for existing databases with "premium" plan
+  premium: {
+    icon: Building2,
+    color: 'blue',
+    gradient: 'from-blue-500/20 to-cyan-500/10',
+    iconColor: 'text-blue-500',
+  },
   enterprise: {
     icon: Crown,
     color: 'purple',
