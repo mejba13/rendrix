@@ -37,6 +37,7 @@ import {
   Award,
   FileBarChart,
   Bot,
+  Menu,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StoreSelector } from './store-selector';
@@ -57,6 +58,7 @@ const navigation: NavItem[] = [
   { name: 'Coupons', href: '/dashboard/coupons', icon: Tag },
   { name: 'Blog', href: '/dashboard/blog', icon: BookOpen },
   { name: 'Pages', href: '/dashboard/pages', icon: FileText },
+  { name: 'Menus', href: '/dashboard/menus', icon: Menu },
   { name: 'Media', href: '/dashboard/media', icon: Image },
   {
     name: 'Analytics',

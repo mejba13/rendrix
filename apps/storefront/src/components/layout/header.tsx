@@ -11,10 +11,25 @@ import { ThemeToggle, ThemeToggleCompact } from '@/components/ui/theme-toggle';
 import { useCartStore } from '@/store/cart';
 import { cn } from '@/lib/utils';
 
+interface MenuItem {
+  id: string;
+  type: string;
+  title: string;
+  url: string | null;
+  target: '_self' | '_blank';
+  highlight: boolean;
+  badge: string | null;
+  page?: { slug: string; title: string } | null;
+  category?: { slug: string; name: string } | null;
+  product?: { slug: string; name: string } | null;
+  children: MenuItem[];
+}
+
 interface HeaderProps {
   storeName?: string;
   logo?: string | null;
   categories?: Array<{ id: string; name: string; slug: string }>;
+  menuItems?: MenuItem[];
 }
 
 // Animation easing curve
@@ -87,7 +102,16 @@ const searchVariants = {
   },
 };
 
-export function Header({ storeName = 'Store', logo, categories = [] }: HeaderProps) {
+// Helper to get href from menu item
+function getMenuItemHref(item: MenuItem): string {
+  if (item.url) return item.url;
+  if (item.page) return `/${item.page.slug}`;
+  if (item.category) return `/products?category=${item.category.slug}`;
+  if (item.product) return `/products/${item.product.slug}`;
+  return '#';
+}
+
+export function Header({ storeName = 'Store', logo, categories = [], menuItems }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -116,14 +140,29 @@ export function Header({ storeName = 'Store', logo, categories = [] }: HeaderPro
     };
   }, [mobileMenuOpen]);
 
-  const navItems = [
-    { name: 'All Products', href: '/products', id: 'all' },
-    ...categories.slice(0, 5).map((cat) => ({
-      name: cat.name,
-      href: `/products?category=${cat.slug}`,
-      id: cat.id,
-    })),
-  ];
+  // Use dynamic menu items if provided, otherwise fallback to categories
+  const navItems = menuItems && menuItems.length > 0
+    ? menuItems.map((item) => ({
+        name: item.title,
+        href: getMenuItemHref(item),
+        id: item.id,
+        target: item.target,
+        highlight: item.highlight,
+        badge: item.badge,
+        children: item.children,
+      }))
+    : [
+        { name: 'All Products', href: '/products', id: 'all', target: '_self' as const, highlight: false, badge: null, children: [] },
+        ...categories.slice(0, 5).map((cat) => ({
+          name: cat.name,
+          href: `/products?category=${cat.slug}`,
+          id: cat.id,
+          target: '_self' as const,
+          highlight: false,
+          badge: null,
+          children: [],
+        })),
+      ];
 
   return (
     <header
@@ -180,14 +219,22 @@ export function Header({ storeName = 'Store', logo, categories = [] }: HeaderPro
               >
                 <Link
                   href={item.href}
+                  target={item.target}
                   className={cn(
-                    'relative rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300',
-                    index === 0
-                      ? 'text-[var(--theme-foreground)]'
-                      : 'text-[var(--theme-secondary)] hover:text-[var(--theme-foreground)]'
+                    'relative flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300',
+                    item.highlight
+                      ? 'text-[var(--theme-primary)]'
+                      : index === 0
+                        ? 'text-[var(--theme-foreground)]'
+                        : 'text-[var(--theme-secondary)] hover:text-[var(--theme-foreground)]'
                   )}
                 >
                   {item.name}
+                  {item.badge && (
+                    <span className="rounded-full bg-[var(--theme-accent)] px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      {item.badge}
+                    </span>
+                  )}
                   {/* Hover indicator */}
                   <AnimatePresence>
                     {hoveredNav === item.id && (
@@ -354,17 +401,25 @@ export function Header({ storeName = 'Store', logo, categories = [] }: HeaderPro
                     >
                       <Link
                         href={item.href}
+                        target={item.target}
                         className={cn(
                           'flex items-center justify-between rounded-xl px-4 py-4 text-base font-medium transition-all duration-300',
-                          index === 0
+                          item.highlight
                             ? 'bg-[var(--theme-primary)]/5 text-[var(--theme-primary)]'
-                            : 'text-[var(--theme-secondary)] hover:bg-[var(--theme-muted)] hover:text-[var(--theme-foreground)]'
+                            : index === 0
+                              ? 'bg-[var(--theme-primary)]/5 text-[var(--theme-primary)]'
+                              : 'text-[var(--theme-secondary)] hover:bg-[var(--theme-muted)] hover:text-[var(--theme-foreground)]'
                         )}
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         <span className="flex items-center gap-3">
-                          {index === 0 && <Sparkles className="h-4 w-4" />}
+                          {(item.highlight || index === 0) && <Sparkles className="h-4 w-4" />}
                           {item.name}
+                          {item.badge && (
+                            <span className="rounded-full bg-[var(--theme-accent)] px-2 py-0.5 text-xs font-bold text-white">
+                              {item.badge}
+                            </span>
+                          )}
                         </span>
                         <ChevronRight className="h-4 w-4 text-[var(--theme-secondary)]" />
                       </Link>

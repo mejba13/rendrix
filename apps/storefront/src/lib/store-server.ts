@@ -1,5 +1,5 @@
 import { headers, cookies } from 'next/headers';
-import { StoreInfo, Category } from './api';
+import { StoreInfo, Category, MenusByLocation } from './api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -133,26 +133,53 @@ export async function fetchProduct(storeId: string, slug: string): Promise<any |
 }
 
 /**
+ * Fetch menus for a store (server-side)
+ */
+export async function fetchMenus(storeId: string): Promise<MenusByLocation> {
+  try {
+    const response = await fetch(`${API_URL}/api/v1/storefront/${storeId}/menus`, {
+      next: { revalidate: 60 }, // Cache for 60 seconds
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch menus for store ${storeId}: ${response.status}`);
+      return {};
+    }
+
+    const data = await response.json();
+    return data.success ? data.data : {};
+  } catch (error) {
+    console.error('Error fetching menus:', error);
+    return {};
+  }
+}
+
+/**
  * Get complete store data for layout (server-side)
  */
 export async function getStoreData(): Promise<{
   store: StoreInfo | null;
   categories: Category[];
+  menus: MenusByLocation;
   storeIdentifier: string | null;
 }> {
   const storeIdentifier = await getStoreIdentifier();
 
   if (!storeIdentifier) {
-    return { store: null, categories: [], storeIdentifier: null };
+    return { store: null, categories: [], menus: {}, storeIdentifier: null };
   }
 
   const store = await fetchStoreInfo(storeIdentifier);
 
   if (!store) {
-    return { store: null, categories: [], storeIdentifier };
+    return { store: null, categories: [], menus: {}, storeIdentifier };
   }
 
-  const categories = await fetchCategories(store.id);
+  // Fetch categories and menus in parallel
+  const [categories, menus] = await Promise.all([
+    fetchCategories(store.id),
+    fetchMenus(store.id),
+  ]);
 
-  return { store, categories, storeIdentifier };
+  return { store, categories, menus, storeIdentifier };
 }

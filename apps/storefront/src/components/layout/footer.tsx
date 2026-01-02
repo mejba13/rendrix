@@ -8,8 +8,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
+interface MenuItem {
+  id: string;
+  type: string;
+  title: string;
+  url: string | null;
+  target: '_self' | '_blank';
+  page?: { slug: string; title: string } | null;
+  category?: { slug: string; name: string } | null;
+  product?: { slug: string; name: string } | null;
+  children: MenuItem[];
+}
+
 interface FooterProps {
   storeName?: string;
+  menuItems?: MenuItem[];
 }
 
 const footerLinks = {
@@ -82,7 +95,16 @@ const linkVariants = {
   }),
 };
 
-export function Footer({ storeName = 'Store' }: FooterProps) {
+// Helper to get href from menu item
+function getMenuItemHref(item: MenuItem): string {
+  if (item.url) return item.url;
+  if (item.page) return `/${item.page.slug}`;
+  if (item.category) return `/products?category=${item.category.slug}`;
+  if (item.product) return `/products/${item.product.slug}`;
+  return '#';
+}
+
+export function Footer({ storeName = 'Store', menuItems }: FooterProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
   const [email, setEmail] = useState('');
@@ -96,6 +118,15 @@ export function Footer({ storeName = 'Store' }: FooterProps) {
       setTimeout(() => setSubscribed(false), 3000);
     }
   };
+
+  // Use dynamic menu items if provided
+  const dynamicLinks = menuItems && menuItems.length > 0
+    ? menuItems.map((item) => ({
+        name: item.title,
+        href: getMenuItemHref(item),
+        target: item.target,
+      }))
+    : null;
 
   return (
     <footer ref={ref} className="relative overflow-hidden border-t border-[var(--theme-border)] bg-[var(--theme-surface)] theme-transition">

@@ -416,3 +416,48 @@ export async function getCustomerOrders(
     },
   });
 }
+
+// Menus
+export type MenuItemType = 'link' | 'page' | 'category' | 'product' | 'divider';
+export type MenuLocation = 'header' | 'footer' | 'mobile' | 'utility';
+
+export interface MenuItem {
+  id: string;
+  type: MenuItemType;
+  title: string;
+  url: string | null;
+  target: '_self' | '_blank';
+  icon: string | null;
+  highlight: boolean;
+  badge: string | null;
+  cssClass: string | null;
+  page?: { slug: string; title: string } | null;
+  category?: { slug: string; name: string } | null;
+  product?: { slug: string; name: string } | null;
+  children: MenuItem[];
+}
+
+export interface Menu {
+  id: string;
+  name: string;
+  location: MenuLocation;
+  items: MenuItem[];
+}
+
+export interface MenusByLocation {
+  header?: Menu;
+  footer?: Menu;
+  mobile?: Menu;
+  utility?: Menu;
+}
+
+export async function getMenus(storeId: string): Promise<ApiResponse<MenusByLocation>> {
+  return fetcher<MenusByLocation>(`/api/v1/storefront/${storeId}/menus`);
+}
+
+export async function getMenuByLocation(
+  storeId: string,
+  location: MenuLocation
+): Promise<ApiResponse<Menu | null>> {
+  return fetcher<Menu | null>(`/api/v1/storefront/${storeId}/menus/${location}`);
+}

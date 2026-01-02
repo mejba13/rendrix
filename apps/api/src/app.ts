@@ -27,6 +27,7 @@ import { subscriptionRoutes } from './routes/subscriptions';
 import { healthRoutes } from './routes/health';
 import { blogRoutes } from './routes/blogs';
 import { pageRoutes } from './routes/pages';
+import { menuRoutes } from './routes/menus';
 import { themeRoutes } from './routes/themes';
 import { themeManagementRoutes } from './routes/theme-management';
 
@@ -36,6 +37,7 @@ import { storefrontCategoryRoutes } from './routes/storefront/categories';
 import { storefrontCheckoutRoutes } from './routes/storefront/checkout';
 import { storefrontStoreRoutes } from './routes/storefront/store';
 import { storefrontAuthRoutes } from './routes/storefront/auth';
+import { storefrontMenuRoutes } from './routes/storefront/menus';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({
@@ -95,6 +97,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(subscriptionRoutes, { prefix: '/api/v1/subscriptions' });
   await app.register(blogRoutes, { prefix: '/api/v1/stores/:storeId/blogs' });
   await app.register(pageRoutes, { prefix: '/api/v1/stores/:storeId/pages' });
+  await app.register(menuRoutes, { prefix: '/api/v1/stores/:storeId/menus' });
   await app.register(themeRoutes, { prefix: '/api/v1/themes' });
   await app.register(themeManagementRoutes, { prefix: '/api/v1/themes/manage' });
 
@@ -104,6 +107,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(storefrontCategoryRoutes, { prefix: '/api/v1/storefront/:storeId/categories' });
   await app.register(storefrontCheckoutRoutes, { prefix: '/api/v1/storefront/:storeId/checkout' });
   await app.register(storefrontAuthRoutes, { prefix: '/api/v1/storefront' });
+  await app.register(storefrontMenuRoutes, { prefix: '/api/v1/storefront' });
 
   return app;
 }

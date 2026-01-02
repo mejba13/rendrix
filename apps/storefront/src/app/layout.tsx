@@ -41,11 +41,15 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { store, categories, storeIdentifier } = await getStoreData();
+  const { store, categories, menus, storeIdentifier } = await getStoreData();
 
   // Get theme settings for CSS variables
   const themeSettings = (store?.themeSettings || {}) as ThemeSettings;
   const customCss = store?.customCss || null;
+
+  // Get menu items for header and footer
+  const headerMenuItems = menus?.header?.items || [];
+  const footerMenuItems = menus?.footer?.items || [];
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -65,9 +69,10 @@ export default async function RootLayout({
               storeName={store?.name}
               logo={store?.logo}
               categories={categories}
+              menuItems={headerMenuItems}
             />
             <main className="flex-1">{children}</main>
-            <Footer storeName={store?.name} />
+            <Footer storeName={store?.name} menuItems={footerMenuItems} />
           </div>
           <CartDrawer />
         </Providers>
