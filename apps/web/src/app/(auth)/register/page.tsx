@@ -6,14 +6,12 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { motion } from 'framer-motion';
 import {
   Loader2,
   ArrowRight,
-  Mail,
-  Lock,
   Eye,
   EyeOff,
-  User,
   Check,
   Store,
   Quote,
@@ -21,6 +19,9 @@ import {
   Star,
   Users,
   TrendingUp,
+  Sparkles,
+  Rocket,
+  Shield,
   Zap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -48,6 +49,34 @@ const registerSchema = z.object({
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
+// Animation variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (delay: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] as const },
+  }),
+};
+
+const fadeInScale = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: (delay: number) => ({
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] as const },
+  }),
+};
+
+const slideInLeft = {
+  hidden: { opacity: 0, x: -30 },
+  visible: (delay: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] as const },
+  }),
+};
+
 export default function RegisterPage() {
   const router = useRouter();
   const { register: registerUser } = useAuthStore();
@@ -58,10 +87,20 @@ export default function RegisterPage() {
   const [mounted, setMounted] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Video fade-in effect
+  useEffect(() => {
+    if (!mounted) return;
+    const videoTimer = setTimeout(() => setVideoReady(true), 1500);
+    return () => clearTimeout(videoTimer);
+  }, [mounted]);
+
+  const youtubeVideoId = 'oP9fPjf0_Wk';
 
   const {
     register,
@@ -115,717 +154,665 @@ export default function RegisterPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen flex">
-      {/* ===== LEFT SIDE - Form Section ===== */}
-      <div className="w-full lg:w-1/2 flex flex-col relative bg-black">
-        {/* Subtle gradient overlay */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse 80% 50% at 70% 50%, rgba(255,145,0,0.03) 0%, transparent 50%)',
-          }}
-        />
+  const benefits = [
+    { icon: Rocket, text: 'Launch in minutes' },
+    { icon: Shield, text: 'Enterprise security' },
+    { icon: Zap, text: '14-day free trial' },
+  ];
 
-        {/* Logo Section */}
-        <div
-          className={`p-6 lg:p-10 transition-all duration-700 ${
-            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-          }`}
-        >
-          <Link href="/" className="inline-flex items-center gap-3 group">
-            <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center relative transition-transform duration-300 group-hover:scale-105"
+  return (
+    <div className="min-h-screen flex bg-[#f8f8f8]">
+      {/* ===== LEFT SIDE - Testimonial Panel ===== */}
+      <div className="hidden lg:flex lg:w-[45%] xl:w-[50%] relative overflow-hidden">
+        {/* Background with YouTube Video */}
+        <div className="absolute inset-0">
+          {/* Base Dark Background */}
+          <div className="absolute inset-0 bg-black" />
+
+          {/* YouTube Video Background */}
+          <div
+            className={`absolute inset-0 overflow-hidden transition-opacity duration-[2000ms] ${
+              videoReady ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <iframe
+              src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1&loop=1&playlist=${youtubeVideoId}&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
+              title="Background Video"
+              allow="autoplay; encrypted-media"
+              allowFullScreen={false}
+              className="absolute top-1/2 left-1/2 w-[100vw] h-[100vh] min-w-[177.77vh] min-h-[56.25vw] border-0"
               style={{
-                background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
-                boxShadow: '0 0 40px rgba(255,145,0,0.3)',
+                transform: 'translate(-50%, -50%)',
+                filter: 'brightness(0.5) saturate(1.3) contrast(1.1)',
+                pointerEvents: 'none',
+              }}
+            />
+          </div>
+
+          {/* Cinematic Overlay Layer 1 - Deep Black Gradient */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.8) 100%)',
+            }}
+          />
+
+          {/* Cinematic Overlay Layer 2 - Orange Radial Glow */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `
+                radial-gradient(ellipse 100% 80% at 30% 90%, rgba(255,145,0,0.25) 0%, transparent 60%),
+                radial-gradient(ellipse 70% 50% at 90% 10%, rgba(255,107,0,0.15) 0%, transparent 50%)
+              `,
+            }}
+          />
+
+          {/* Cinematic Overlay Layer 3 - Vignette */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 0%, rgba(0,0,0,0.6) 100%)',
+            }}
+          />
+
+          {/* Cinematic Overlay Layer 4 - Diagonal Light Streak */}
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              background: 'linear-gradient(45deg, transparent 30%, rgba(255,145,0,0.1) 50%, transparent 70%)',
+            }}
+          />
+
+          {/* Cinematic Overlay Layer 5 - Bottom Fade */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 40%)',
+            }}
+          />
+
+          {/* Cinematic Overlay Layer 6 - Film Grain */}
+          <div
+            className="absolute inset-0 opacity-[0.04] mix-blend-overlay"
+            style={{
+              backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")',
+            }}
+          />
+
+          {/* Cinematic Overlay Layer 7 - Subtle Orange Tint */}
+          <div
+            className="absolute inset-0 mix-blend-color opacity-10"
+            style={{ background: '#FF9100' }}
+          />
+
+          {/* Cinematic Overlay Layer 8 - Depth Gradient */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.5) 100%)',
+            }}
+          />
+
+          {/* Floating Particles */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(20)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1 h-1 rounded-full bg-primary/40"
+                initial={{
+                  x: Math.random() * 100 + '%',
+                  y: Math.random() * 100 + '%',
+                  opacity: 0,
+                }}
+                animate={{
+                  y: [null, '-20%'],
+                  opacity: [0, 0.6, 0],
+                }}
+                transition={{
+                  duration: Math.random() * 8 + 6,
+                  repeat: Infinity,
+                  delay: Math.random() * 5,
+                  ease: 'linear',
+                }}
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${50 + Math.random() * 50}%`,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col w-full h-full p-10 xl:p-14">
+          {/* Logo */}
+          <motion.div
+            initial="hidden"
+            animate={mounted ? 'visible' : 'hidden'}
+            variants={fadeInUp}
+            custom={0}
+          >
+            <Link href="/" className="inline-flex items-center gap-3 group">
+              <div
+                className="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-105"
+                style={{
+                  background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                  boxShadow: '0 8px 32px rgba(255,145,0,0.35)',
+                }}
+              >
+                <Store className="w-5 h-5 text-black" />
+              </div>
+              <span className="text-2xl font-bold text-white tracking-tight">Rendrix</span>
+            </Link>
+          </motion.div>
+
+          {/* Stats Badges */}
+          <div className="flex gap-3 mt-8">
+            <motion.div
+              initial="hidden"
+              animate={mounted ? 'visible' : 'hidden'}
+              variants={fadeInScale}
+              custom={0.2}
+              className="flex items-center gap-2 px-4 py-2 rounded-full"
+              style={{
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(10px)',
               }}
             >
-              <Store className="w-6 h-6 text-black" />
+              <Users className="w-4 h-4 text-primary" />
+              <span className="text-sm text-white/90 font-medium">50K+ Active Stores</span>
+            </motion.div>
+            <motion.div
+              initial="hidden"
+              animate={mounted ? 'visible' : 'hidden'}
+              variants={fadeInScale}
+              custom={0.3}
+              className="flex items-center gap-2 px-4 py-2 rounded-full"
+              style={{
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              <TrendingUp className="w-4 h-4 text-emerald-400" />
+              <span className="text-sm text-white/90 font-medium">$2B+ Processed</span>
+            </motion.div>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col justify-center max-w-lg">
+            {/* Quote Icon */}
+            <motion.div
+              initial="hidden"
+              animate={mounted ? 'visible' : 'hidden'}
+              variants={fadeInScale}
+              custom={0.4}
+              className="mb-6"
+            >
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,145,0,0.2) 0%, rgba(255,145,0,0.05) 100%)',
+                  border: '1px solid rgba(255,145,0,0.3)',
+                }}
+              >
+                <Quote className="w-8 h-8 text-primary" />
+              </div>
+            </motion.div>
+
+            {/* Testimonial */}
+            <motion.blockquote
+              initial="hidden"
+              animate={mounted ? 'visible' : 'hidden'}
+              variants={slideInLeft}
+              custom={0.5}
+              className="text-2xl xl:text-3xl text-white leading-relaxed font-light mb-8"
+              style={{ fontFamily: 'Georgia, serif' }}
+            >
+              &ldquo;We went from idea to{' '}
+              <span className="text-primary font-medium">$1M in revenue</span>{' '}
+              in just 6 months using Rendrix.&rdquo;
+            </motion.blockquote>
+
+            {/* Author */}
+            <motion.div
+              initial="hidden"
+              animate={mounted ? 'visible' : 'hidden'}
+              variants={fadeInUp}
+              custom={0.6}
+              className="flex items-center gap-4"
+            >
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center text-lg font-bold text-black"
+                style={{
+                  background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                  boxShadow: '0 8px 24px rgba(255,145,0,0.3)',
+                }}
+              >
+                MJ
+              </div>
+              <div>
+                <p className="text-white font-semibold text-lg">Marcus Johnson</p>
+                <p className="text-white/50 text-sm">Founder, TechStyle Co.</p>
+              </div>
+            </motion.div>
+
+            {/* Rating */}
+            <motion.div
+              initial="hidden"
+              animate={mounted ? 'visible' : 'hidden'}
+              variants={fadeInUp}
+              custom={0.7}
+              className="flex items-center gap-6 mt-8 pt-8 border-t border-white/10"
+            >
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-primary fill-primary" />
+                ))}
+              </div>
+              <div className="h-5 w-px bg-white/20" />
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-white/40" />
+                <span className="text-sm text-white/50">150+ countries</span>
+              </div>
+            </motion.div>
+
+            {/* Benefits */}
+            <motion.div
+              initial="hidden"
+              animate={mounted ? 'visible' : 'hidden'}
+              variants={fadeInUp}
+              custom={0.8}
+              className="mt-10 flex gap-4"
+            >
+              {benefits.map((benefit, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
+                  style={{
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                  }}
+                >
+                  <benefit.icon className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-white/80">{benefit.text}</span>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Floating Dashboard Preview */}
+          <div className="absolute bottom-14 right-14">
+            <motion.div
+              initial="hidden"
+              animate={mounted ? 'visible' : 'hidden'}
+              variants={fadeInScale}
+              custom={0.9}
+            >
+              <div
+                className="w-52 rounded-2xl overflow-hidden"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  backdropFilter: 'blur(20px)',
+                  boxShadow: '0 24px 48px rgba(0,0,0,0.4)',
+                }}
+              >
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    <span className="text-xs text-white/60 font-medium">Quick Setup</span>
+                  </div>
+                  <div className="space-y-2">
+                    {['Create store', 'Add products', 'Go live!'].map((step, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <div
+                          className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
+                          style={{
+                            background: i === 0 ? '#FF9100' : 'rgba(255,255,255,0.1)',
+                            color: i === 0 ? 'black' : 'rgba(255,255,255,0.5)',
+                          }}
+                        >
+                          {i + 1}
+                        </div>
+                        <span className={`text-sm ${i === 0 ? 'text-white' : 'text-white/40'}`}>
+                          {step}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* ===== RIGHT SIDE - Register Form ===== */}
+      <div className="w-full lg:w-[55%] xl:w-[50%] flex flex-col relative bg-white overflow-y-auto">
+        {/* Mobile Logo */}
+        <div className="lg:hidden p-6">
+          <Link href="/" className="inline-flex items-center gap-3">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+              }}
+            >
+              <Store className="w-5 h-5 text-black" />
             </div>
-            <span className="text-2xl font-bold text-white">Rendrix</span>
+            <span className="text-xl font-bold text-gray-900">Rendrix</span>
           </Link>
         </div>
 
-        {/* Form Container - Centered */}
-        <div className="flex-1 flex items-center justify-center px-6 lg:px-12 pb-6">
+        {/* Form Container */}
+        <div className="flex-1 flex items-center justify-center px-6 sm:px-12 lg:px-16 xl:px-20 py-8 lg:py-12">
           <div className="w-full max-w-md">
             {/* Header */}
-            <div
-              className={`mb-6 transition-all duration-700 delay-100 ${
-                mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
+            <motion.div
+              initial="hidden"
+              animate={mounted ? 'visible' : 'hidden'}
+              variants={fadeInUp}
+              custom={0.1}
+              className="mb-6"
             >
-              <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-                <span className="text-white">Start your </span>
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 tracking-tight">
+                Create your{' '}
                 <span
                   className="bg-clip-text text-transparent"
                   style={{
                     backgroundImage: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
                   }}
                 >
-                  journey
+                  account
                 </span>
               </h1>
-              <p className="text-white/50 text-sm">
-                Create your account and launch your store today
+              <p className="text-gray-500">
+                Start your 14-day free trial. No credit card required.
               </p>
-            </div>
+            </motion.div>
 
-            {/* Form Card */}
-            <div
-              className={`relative transition-all duration-700 delay-200 ${
-                mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
+            {/* Social Login */}
+            <motion.div
+              initial="hidden"
+              animate={mounted ? 'visible' : 'hidden'}
+              variants={fadeInUp}
+              custom={0.15}
+              className="mb-6"
             >
-              {/* Card Glow */}
-              <div
-                className="absolute -inset-[1px] rounded-2xl opacity-40 blur-sm"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,145,0,0.2) 0%, transparent 50%, rgba(255,145,0,0.1) 100%)',
-                }}
-              />
+              <button
+                type="button"
+                className="w-full h-11 flex items-center justify-center gap-3 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-medium hover:border-gray-300 hover:bg-gray-50 transition-all duration-300"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+                Sign up with Google
+              </button>
 
-              <div
-                className="relative rounded-2xl p-5 sm:p-6 backdrop-blur-xl"
+              {/* Divider */}
+              <div className="relative my-5">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="px-4 text-sm text-gray-400 bg-white">or continue with email</span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Form */}
+            <motion.form
+              initial="hidden"
+              animate={mounted ? 'visible' : 'hidden'}
+              variants={fadeInUp}
+              custom={0.2}
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-4"
+            >
+              {/* Name Fields */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                    First name
+                  </Label>
+                  <Input
+                    id="firstName"
+                    placeholder="John"
+                    className={`h-11 px-4 rounded-xl text-gray-900 placeholder:text-gray-400 border-2 transition-all duration-300 focus:ring-0 focus:ring-offset-0 ${
+                      focusedField === 'firstName'
+                        ? 'border-primary shadow-[0_0_0_3px_rgba(255,145,0,0.1)]'
+                        : 'border-gray-200 hover:border-gray-300'
+                    } ${errors.firstName ? 'border-red-400' : ''}`}
+                    {...register('firstName')}
+                    onFocus={() => setFocusedField('firstName')}
+                    onBlur={() => setFocusedField(null)}
+                  />
+                  {errors.firstName && (
+                    <p className="text-xs text-red-500">{errors.firstName.message}</p>
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+                    Last name
+                  </Label>
+                  <Input
+                    id="lastName"
+                    placeholder="Doe"
+                    className={`h-11 px-4 rounded-xl text-gray-900 placeholder:text-gray-400 border-2 transition-all duration-300 focus:ring-0 focus:ring-offset-0 ${
+                      focusedField === 'lastName'
+                        ? 'border-primary shadow-[0_0_0_3px_rgba(255,145,0,0.1)]'
+                        : 'border-gray-200 hover:border-gray-300'
+                    } ${errors.lastName ? 'border-red-400' : ''}`}
+                    {...register('lastName')}
+                    onFocus={() => setFocusedField('lastName')}
+                    onBlur={() => setFocusedField(null)}
+                  />
+                  {errors.lastName && (
+                    <p className="text-xs text-red-500">{errors.lastName.message}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  Work email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@company.com"
+                  className={`h-11 px-4 rounded-xl text-gray-900 placeholder:text-gray-400 border-2 transition-all duration-300 focus:ring-0 focus:ring-offset-0 ${
+                    focusedField === 'email'
+                      ? 'border-primary shadow-[0_0_0_3px_rgba(255,145,0,0.1)]'
+                      : 'border-gray-200 hover:border-gray-300'
+                  } ${errors.email ? 'border-red-400' : ''}`}
+                  {...register('email')}
+                  onFocus={() => setFocusedField('email')}
+                  onBlur={() => setFocusedField(null)}
+                />
+                {errors.email && (
+                  <p className="text-xs text-red-500">{errors.email.message}</p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div className="space-y-1.5">
+                <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Create a strong password"
+                    className={`h-11 px-4 pr-11 rounded-xl text-gray-900 placeholder:text-gray-400 border-2 transition-all duration-300 focus:ring-0 focus:ring-offset-0 ${
+                      focusedField === 'password'
+                        ? 'border-primary shadow-[0_0_0_3px_rgba(255,145,0,0.1)]'
+                        : 'border-gray-200 hover:border-gray-300'
+                    } ${errors.password ? 'border-red-400' : ''}`}
+                    {...register('password')}
+                    onFocus={() => setFocusedField('password')}
+                    onBlur={() => setFocusedField(null)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+
+                {/* Password Strength */}
+                {password && (
+                  <div className="space-y-2 pt-1">
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-1 flex-1">
+                        {[1, 2, 3, 4, 5].map((level) => (
+                          <div
+                            key={level}
+                            className="h-1.5 flex-1 rounded-full transition-all duration-500"
+                            style={{
+                              background: strengthScore >= level ? strengthColor : '#e5e7eb',
+                            }}
+                          />
+                        ))}
+                      </div>
+                      <span
+                        className="text-xs font-medium"
+                        style={{ color: strengthColor }}
+                      >
+                        {strengthLabel}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {passwordRequirements.map((req) => (
+                        <div
+                          key={req.label}
+                          className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs transition-all duration-300 ${
+                            req.met
+                              ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                              : 'bg-gray-50 text-gray-400 border border-gray-200'
+                          }`}
+                        >
+                          {req.met && <Check className="w-3 h-3" />}
+                          {req.label}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Confirm Password */}
+              <div className="space-y-1.5">
+                <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+                  Confirm password
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Confirm your password"
+                    className={`h-11 px-4 pr-11 rounded-xl text-gray-900 placeholder:text-gray-400 border-2 transition-all duration-300 focus:ring-0 focus:ring-offset-0 ${
+                      focusedField === 'confirmPassword'
+                        ? 'border-primary shadow-[0_0_0_3px_rgba(255,145,0,0.1)]'
+                        : 'border-gray-200 hover:border-gray-300'
+                    } ${errors.confirmPassword ? 'border-red-400' : ''}`}
+                    {...register('confirmPassword')}
+                    onFocus={() => setFocusedField('confirmPassword')}
+                    onBlur={() => setFocusedField(null)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>
+                )}
+              </div>
+
+              {/* Terms */}
+              <div className="flex items-start gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setAgreedToTerms(!agreedToTerms)}
+                  className={`relative flex-shrink-0 w-5 h-5 rounded-md transition-all duration-300 mt-0.5 ${
+                    agreedToTerms
+                      ? 'bg-primary'
+                      : 'bg-white border-2 border-gray-300 hover:border-gray-400'
+                  }`}
+                >
+                  {agreedToTerms && (
+                    <Check className="w-3 h-3 text-black absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                  )}
+                </button>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  I agree to the{' '}
+                  <Link href="/terms" className="text-primary hover:text-primary/80 font-medium transition-colors">
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/privacy" className="text-primary hover:text-primary/80 font-medium transition-colors">
+                    Privacy Policy
+                  </Link>
+                </p>
+              </div>
+
+              {/* Submit */}
+              <Button
+                type="submit"
+                className="w-full h-12 rounded-xl text-base font-semibold relative overflow-hidden group"
+                disabled={isLoading}
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                  boxShadow: '0 4px 20px rgba(255,145,0,0.25)',
                 }}
               >
-                {/* Social Login */}
-                <div className="grid grid-cols-2 gap-3 mb-5">
-                  <button
-                    type="button"
-                    className="flex items-center justify-center gap-2 h-10 rounded-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-                    style={{
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                    }}
-                  >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                    </svg>
-                    <span className="text-sm font-medium text-white/80">Google</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="flex items-center justify-center gap-2 h-10 rounded-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-                    style={{
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                    }}
-                  >
-                    <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                    </svg>
-                    <span className="text-sm font-medium text-white/80">GitHub</span>
-                  </button>
-                </div>
-
-                {/* Divider */}
-                <div className="relative mb-5">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-white/[0.06]" />
-                  </div>
-                  <div className="relative flex justify-center">
-                    <span className="px-3 text-xs text-white/30 bg-transparent">or continue with email</span>
-                  </div>
-                </div>
-
-                {/* Form */}
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-                  {/* Name Fields */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <Label htmlFor="firstName" className="text-xs text-white/70">First name</Label>
-                      <div className="relative">
-                        <User
-                          className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-300 ${
-                            focusedField === 'firstName' ? 'text-primary' : 'text-white/30'
-                          }`}
-                        />
-                        <Input
-                          id="firstName"
-                          placeholder="John"
-                          className="h-10 pl-9 rounded-xl text-white placeholder:text-white/30 text-sm transition-all duration-300 focus:ring-0 focus:ring-offset-0"
-                          style={{
-                            background: 'rgba(255,255,255,0.03)',
-                            border: focusedField === 'firstName' ? '1px solid rgba(255,145,0,0.5)' : '1px solid rgba(255,255,255,0.08)',
-                            boxShadow: focusedField === 'firstName' ? '0 0 15px rgba(255,145,0,0.1)' : 'none',
-                          }}
-                          {...register('firstName')}
-                          onFocus={() => setFocusedField('firstName')}
-                          onBlur={() => setFocusedField(null)}
-                        />
-                      </div>
-                      {errors.firstName && (
-                        <p className="text-[10px] text-red-400">{errors.firstName.message}</p>
-                      )}
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="lastName" className="text-xs text-white/70">Last name</Label>
-                      <div className="relative">
-                        <User
-                          className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-300 ${
-                            focusedField === 'lastName' ? 'text-primary' : 'text-white/30'
-                          }`}
-                        />
-                        <Input
-                          id="lastName"
-                          placeholder="Doe"
-                          className="h-10 pl-9 rounded-xl text-white placeholder:text-white/30 text-sm transition-all duration-300 focus:ring-0 focus:ring-offset-0"
-                          style={{
-                            background: 'rgba(255,255,255,0.03)',
-                            border: focusedField === 'lastName' ? '1px solid rgba(255,145,0,0.5)' : '1px solid rgba(255,255,255,0.08)',
-                            boxShadow: focusedField === 'lastName' ? '0 0 15px rgba(255,145,0,0.1)' : 'none',
-                          }}
-                          {...register('lastName')}
-                          onFocus={() => setFocusedField('lastName')}
-                          onBlur={() => setFocusedField(null)}
-                        />
-                      </div>
-                      {errors.lastName && (
-                        <p className="text-[10px] text-red-400">{errors.lastName.message}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Email */}
-                  <div className="space-y-1">
-                    <Label htmlFor="email" className="text-xs text-white/70">Email address</Label>
-                    <div className="relative">
-                      <Mail
-                        className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-300 ${
-                          focusedField === 'email' ? 'text-primary' : 'text-white/30'
-                        }`}
-                      />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="you@company.com"
-                        className="h-10 pl-9 rounded-xl text-white placeholder:text-white/30 text-sm transition-all duration-300 focus:ring-0 focus:ring-offset-0"
-                        style={{
-                          background: 'rgba(255,255,255,0.03)',
-                          border: focusedField === 'email' ? '1px solid rgba(255,145,0,0.5)' : '1px solid rgba(255,255,255,0.08)',
-                          boxShadow: focusedField === 'email' ? '0 0 15px rgba(255,145,0,0.1)' : 'none',
-                        }}
-                        {...register('email')}
-                        onFocus={() => setFocusedField('email')}
-                        onBlur={() => setFocusedField(null)}
-                      />
-                    </div>
-                    {errors.email && (
-                      <p className="text-[10px] text-red-400">{errors.email.message}</p>
-                    )}
-                  </div>
-
-                  {/* Password */}
-                  <div className="space-y-1">
-                    <Label htmlFor="password" className="text-xs text-white/70">Password</Label>
-                    <div className="relative">
-                      <Lock
-                        className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-300 ${
-                          focusedField === 'password' ? 'text-primary' : 'text-white/30'
-                        }`}
-                      />
-                      <Input
-                        id="password"
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="Create a strong password"
-                        className="h-10 pl-9 pr-9 rounded-xl text-white placeholder:text-white/30 text-sm transition-all duration-300 focus:ring-0 focus:ring-offset-0"
-                        style={{
-                          background: 'rgba(255,255,255,0.03)',
-                          border: focusedField === 'password' ? '1px solid rgba(255,145,0,0.5)' : '1px solid rgba(255,255,255,0.08)',
-                          boxShadow: focusedField === 'password' ? '0 0 15px rgba(255,145,0,0.1)' : 'none',
-                        }}
-                        {...register('password')}
-                        onFocus={() => setFocusedField('password')}
-                        onBlur={() => setFocusedField(null)}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-
-                    {/* Password Strength Indicator */}
-                    {password && (
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex items-center gap-2">
-                          <div className="flex gap-0.5 flex-1">
-                            {[1, 2, 3, 4, 5].map((level) => (
-                              <div
-                                key={level}
-                                className="h-1 flex-1 rounded-full transition-all duration-500"
-                                style={{
-                                  background: strengthScore >= level ? strengthColor : 'rgba(255,255,255,0.1)',
-                                }}
-                              />
-                            ))}
-                          </div>
-                          <span
-                            className="text-[10px] font-medium"
-                            style={{ color: strengthColor }}
-                          >
-                            {strengthLabel}
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap gap-1">
-                          {passwordRequirements.map((req) => (
-                            <div
-                              key={req.label}
-                              className="flex items-center gap-1 px-1.5 py-0.5 rounded transition-all duration-300"
-                              style={{
-                                background: req.met ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.03)',
-                                border: req.met ? '1px solid rgba(34,197,94,0.25)' : '1px solid rgba(255,255,255,0.05)',
-                              }}
-                            >
-                              {req.met && <Check className="w-2.5 h-2.5 text-green-400" />}
-                              <span className={`text-[9px] font-medium ${req.met ? 'text-green-400' : 'text-white/30'}`}>
-                                {req.label}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Confirm Password */}
-                  <div className="space-y-1">
-                    <Label htmlFor="confirmPassword" className="text-xs text-white/70">Confirm password</Label>
-                    <div className="relative">
-                      <Lock
-                        className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-300 ${
-                          focusedField === 'confirmPassword' ? 'text-primary' : 'text-white/30'
-                        }`}
-                      />
-                      <Input
-                        id="confirmPassword"
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        placeholder="Confirm your password"
-                        className="h-10 pl-9 pr-9 rounded-xl text-white placeholder:text-white/30 text-sm transition-all duration-300 focus:ring-0 focus:ring-offset-0"
-                        style={{
-                          background: 'rgba(255,255,255,0.03)',
-                          border: focusedField === 'confirmPassword' ? '1px solid rgba(255,145,0,0.5)' : '1px solid rgba(255,255,255,0.08)',
-                          boxShadow: focusedField === 'confirmPassword' ? '0 0 15px rgba(255,145,0,0.1)' : 'none',
-                        }}
-                        {...register('confirmPassword')}
-                        onFocus={() => setFocusedField('confirmPassword')}
-                        onBlur={() => setFocusedField(null)}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
-                      >
-                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                    {errors.confirmPassword && (
-                      <p className="text-[10px] text-red-400">{errors.confirmPassword.message}</p>
-                    )}
-                  </div>
-
-                  {/* Terms Checkbox */}
-                  <div className="flex items-start gap-2.5 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setAgreedToTerms(!agreedToTerms)}
-                      className="relative flex-shrink-0 w-4 h-4 rounded transition-all duration-300 mt-0.5"
-                      style={{
-                        background: agreedToTerms ? 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)' : 'rgba(255,255,255,0.03)',
-                        border: agreedToTerms ? 'none' : '1px solid rgba(255,255,255,0.15)',
-                      }}
-                    >
-                      {agreedToTerms && <Check className="w-3 h-3 text-black absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />}
-                    </button>
-                    <p className="text-[11px] text-white/50 leading-relaxed">
-                      I agree to the{' '}
-                      <Link href="/terms" className="text-primary hover:text-primary/80 transition-colors">
-                        Terms of Service
-                      </Link>{' '}
-                      and{' '}
-                      <Link href="/privacy" className="text-primary hover:text-primary/80 transition-colors">
-                        Privacy Policy
-                      </Link>
-                    </p>
-                  </div>
-
-                  {/* Submit Button */}
-                  <Button
-                    type="submit"
-                    className="w-full h-11 rounded-xl text-sm font-semibold relative overflow-hidden group"
-                    disabled={isLoading}
-                    style={{
-                      background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
-                      boxShadow: '0 0 30px rgba(255,145,0,0.2), 0 8px 20px rgba(255,145,0,0.15)',
-                    }}
-                  >
-                    {/* Shine Effect */}
-                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                    {isLoading ? (
-                      <Loader2 className="h-5 w-5 animate-spin text-black" />
-                    ) : (
-                      <span className="relative flex items-center justify-center gap-2 text-black">
-                        Create Account
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </span>
-                    )}
-                  </Button>
-                </form>
-              </div>
-            </div>
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                {isLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin text-black" />
+                ) : (
+                  <span className="relative flex items-center justify-center gap-2 text-black">
+                    Create account
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                )}
+              </Button>
+            </motion.form>
 
             {/* Sign In Link */}
-            <p
-              className={`text-center text-white/50 text-sm mt-5 transition-all duration-700 delay-300 ${
-                mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
+            <motion.p
+              initial="hidden"
+              animate={mounted ? 'visible' : 'hidden'}
+              variants={fadeInUp}
+              custom={0.4}
+              className="text-center text-gray-500 mt-6"
             >
               Already have an account?{' '}
-              <Link href="/login" className="text-primary hover:text-primary/80 font-medium transition-colors">
+              <Link href="/login" className="text-primary hover:text-primary/80 font-semibold transition-colors">
                 Sign in
               </Link>
-            </p>
+            </motion.p>
           </div>
         </div>
 
         {/* Footer */}
-        <div
-          className={`p-6 text-center lg:text-left transition-all duration-700 delay-400 ${
-            mounted ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <p className="text-xs text-white/30">&copy; 2025 Rendrix. All rights reserved.</p>
+        <div className="p-4 text-center lg:text-right lg:pr-16">
+          <p className="text-xs text-gray-400">&copy; 2025 Rendrix. All rights reserved.</p>
         </div>
       </div>
-
-      {/* ===== RIGHT SIDE - Brand Theater ===== */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        {/* Cinematic Background Layers */}
-        <div className="absolute inset-0">
-          {/* Layer 1: Base gradient */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)',
-            }}
-          />
-
-          {/* Layer 2: Orange ambient glow from bottom */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'radial-gradient(ellipse 80% 50% at 50% 100%, rgba(255,145,0,0.2) 0%, transparent 60%)',
-            }}
-          />
-
-          {/* Layer 3: Top glow */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'radial-gradient(ellipse 60% 30% at 50% 0%, rgba(255,145,0,0.1) 0%, transparent 50%)',
-            }}
-          />
-
-          {/* Layer 4: Center glow */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'radial-gradient(circle at 50% 50%, rgba(255,145,0,0.05) 0%, transparent 40%)',
-            }}
-          />
-
-          {/* Layer 5: Noise texture */}
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")',
-            }}
-          />
-
-          {/* Layer 6: Vignette */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'radial-gradient(ellipse 70% 50% at 50% 50%, transparent 0%, rgba(0,0,0,0.4) 100%)',
-            }}
-          />
-        </div>
-
-        {/* Floating Particles */}
-        {mounted && (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {[...Array(15)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full"
-                style={{
-                  width: Math.random() * 3 + 1,
-                  height: Math.random() * 3 + 1,
-                  left: `${10 + (i * 6)}%`,
-                  top: `${15 + (i * 5) % 70}%`,
-                  background: i % 3 === 0 ? 'rgba(255,145,0,0.6)' : 'rgba(255,255,255,0.4)',
-                  animation: `floatParticle ${12 + (i * 2)}s ease-in-out infinite`,
-                  animationDelay: `${i * 0.3}s`,
-                }}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col justify-center items-center w-full p-10 xl:p-14">
-          {/* Stats Badges - Top */}
-          <div
-            className={`absolute top-10 left-10 transition-all duration-1000 delay-500 ${
-              mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'
-            }`}
-          >
-            <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <Users className="w-3.5 h-3.5 text-primary" />
-              <span className="text-xs text-white/80 font-medium">50K+ Active Stores</span>
-            </div>
-          </div>
-
-          <div
-            className={`absolute top-10 right-10 transition-all duration-1000 delay-600 ${
-              mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'
-            }`}
-          >
-            <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <TrendingUp className="w-3.5 h-3.5 text-green-400" />
-              <span className="text-xs text-white/80 font-medium">$2B+ Processed</span>
-            </div>
-          </div>
-
-          {/* Feature Badge - Middle Left */}
-          <div
-            className={`absolute left-10 top-1/2 -translate-y-1/2 transition-all duration-1000 delay-700 ${
-              mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
-            }`}
-          >
-            <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{
-                background: 'rgba(255,145,0,0.1)',
-                border: '1px solid rgba(255,145,0,0.2)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <Zap className="w-3.5 h-3.5 text-primary" />
-              <span className="text-xs text-primary font-medium">14-day free trial</span>
-            </div>
-          </div>
-
-          {/* Main Testimonial Content */}
-          <div className="max-w-md text-center">
-            {/* Quote Icon */}
-            <div
-              className={`mb-6 transition-all duration-1000 delay-300 ${
-                mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-              }`}
-            >
-              <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,145,0,0.2) 0%, rgba(255,145,0,0.05) 100%)',
-                  border: '1px solid rgba(255,145,0,0.3)',
-                }}
-              >
-                <Quote className="w-7 h-7 text-primary" />
-              </div>
-            </div>
-
-            {/* Quote Text */}
-            <blockquote
-              className={`text-lg xl:text-xl text-white/90 leading-relaxed mb-6 font-light transition-all duration-1000 delay-400 ${
-                mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-            >
-              &ldquo;Rendrix transformed our e-commerce operations. We scaled from{' '}
-              <span className="text-primary font-medium">$10K to $2M</span> monthly revenue in just 8 months.
-              The platform is incredibly intuitive and powerful.&rdquo;
-            </blockquote>
-
-            {/* Author */}
-            <div
-              className={`flex items-center justify-center gap-3 mb-6 transition-all duration-1000 delay-500 ${
-                mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-            >
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-black"
-                style={{
-                  background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
-                  boxShadow: '0 0 20px rgba(255,145,0,0.3)',
-                }}
-              >
-                SK
-              </div>
-              <div className="text-left">
-                <p className="text-white font-semibold text-sm">Sarah Kim</p>
-                <p className="text-white/50 text-xs">CEO, StyleVault</p>
-              </div>
-            </div>
-
-            {/* Bottom Stats */}
-            <div
-              className={`flex items-center justify-center gap-5 transition-all duration-1000 delay-600 ${
-                mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-            >
-              <div className="flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5 text-primary/60" />
-                <span className="text-xs text-white/50">150+ countries</span>
-              </div>
-              <div className="w-px h-3 bg-white/20" />
-              <div className="flex items-center gap-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 text-primary fill-primary" />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Floating Dashboard Preview - Bottom Right */}
-          <div
-            className={`absolute bottom-10 right-10 transition-all duration-1000 delay-700 ${
-              mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-            }`}
-          >
-            <div
-              className="w-44 h-28 rounded-xl overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(10px)',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
-              }}
-            >
-              {/* Mini Dashboard Preview */}
-              <div className="p-2.5">
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                  <span className="text-[9px] text-white/60">Revenue Today</span>
-                </div>
-                <div className="text-base font-bold text-white mb-1.5">$12,847</div>
-                <div className="flex gap-0.5">
-                  {[40, 65, 45, 80, 55, 90, 70].map((h, i) => (
-                    <div
-                      key={i}
-                      className="flex-1 rounded-sm"
-                      style={{
-                        height: `${h * 0.25}px`,
-                        background: i === 5 ? '#FF9100' : 'rgba(255,145,0,0.3)',
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Orders Preview - Bottom Left */}
-          <div
-            className={`absolute bottom-10 left-10 transition-all duration-1000 delay-800 ${
-              mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-            }`}
-          >
-            <div
-              className="w-40 rounded-xl overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(10px)',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
-              }}
-            >
-              <div className="p-2.5">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  <span className="text-[9px] text-white/60">New Orders</span>
-                </div>
-                <div className="space-y-1.5">
-                  {[
-                    { name: 'Order #2847', amount: '$127.00' },
-                    { name: 'Order #2846', amount: '$89.50' },
-                  ].map((order, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between p-1.5 rounded-lg"
-                      style={{ background: 'rgba(255,255,255,0.03)' }}
-                    >
-                      <span className="text-[9px] text-white/70">{order.name}</span>
-                      <span className="text-[9px] text-primary font-medium">{order.amount}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* CSS Animations */}
-      <style jsx>{`
-        @keyframes floatParticle {
-          0%, 100% {
-            transform: translateY(0px) translateX(0px);
-            opacity: 0.6;
-          }
-          25% {
-            transform: translateY(-20px) translateX(10px);
-            opacity: 1;
-          }
-          50% {
-            transform: translateY(-10px) translateX(-5px);
-            opacity: 0.8;
-          }
-          75% {
-            transform: translateY(-30px) translateX(5px);
-            opacity: 0.6;
-          }
-        }
-      `}</style>
     </div>
   );
 }
