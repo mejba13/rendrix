@@ -208,16 +208,12 @@ export default function ProductsPage() {
   }
 
   return (
-    <motion.div
+    <div
       className="min-h-screen bg-[var(--theme-background)]"
-      variants={pageVariants}
-      initial="hidden"
-      animate="visible"
     >
       {/* Page Header */}
-      <motion.div
+      <div
         className="relative overflow-hidden border-b border-[var(--theme-muted)] bg-gradient-to-br from-[var(--theme-muted)]/30 via-transparent to-[var(--theme-primary)]/5"
-        variants={headerVariants}
       >
         {/* Decorative elements */}
         <div className="pointer-events-none absolute inset-0">
@@ -226,43 +222,31 @@ export default function ProductsPage() {
         </div>
 
         <div className="container-theme relative py-12 sm:py-16">
-          <motion.span
+          <span
             className="inline-flex items-center gap-2 rounded-full bg-[var(--theme-primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--theme-primary)]"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
           >
             <Sparkles className="h-3 w-3" />
             {currentCategory ? 'Category' : 'Collection'}
-          </motion.span>
-          <motion.h1
+          </span>
+          <h1
             className="mt-3 text-3xl font-bold tracking-tight text-[var(--theme-foreground)] sm:text-4xl lg:text-5xl"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
           >
             {currentCategory?.name || 'All Products'}
-          </motion.h1>
+          </h1>
           {currentCategory?.description && (
-            <motion.p
+            <p
               className="mt-4 max-w-2xl text-lg text-[var(--theme-secondary)]"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
             >
               {currentCategory.description}
-            </motion.p>
+            </p>
           )}
         </div>
-      </motion.div>
+      </div>
 
       <div className="container-theme py-8">
         {/* Toolbar */}
-        <motion.div
+        <div
           className="flex items-center justify-between gap-4 rounded-2xl bg-[var(--theme-surface)] p-4 shadow-sm ring-1 ring-[var(--theme-muted)]"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
         >
           <div className="flex items-center gap-4">
             {/* Filter toggle - Mobile */}
@@ -395,7 +379,7 @@ export default function ProductsPage() {
               </AnimatePresence>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Active filters */}
         <AnimatePresence>
@@ -756,20 +740,17 @@ export default function ProductsPage() {
           </AnimatePresence>
 
           {/* Product grid */}
-          <motion.div
+          <div
             className="lg:col-span-3"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
           >
             <ProductGrid
               products={products}
               loading={loading}
               className={gridView === 'compact' ? 'lg:grid-cols-4' : ''}
             />
-          </motion.div>
+          </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

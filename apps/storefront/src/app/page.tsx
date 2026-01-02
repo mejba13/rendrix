@@ -143,17 +143,12 @@ export default function HomePage() {
         <div className="pointer-events-none absolute inset-0 bg-gradient-mesh opacity-50" />
 
         <div className="container-theme relative z-10">
-          <motion.div
+          <div
             className="grid gap-4 lg:grid-cols-12 lg:gap-6"
-            style={{ opacity: heroOpacity, scale: heroScale }}
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
           >
             {/* Main Hero Card - Large */}
-            <motion.div
+            <div
               className="relative flex min-h-[480px] flex-col justify-between overflow-hidden rounded-[var(--theme-radius-xl)] bg-[var(--theme-muted)] p-8 lg:col-span-7 lg:min-h-[600px] lg:p-12"
-              variants={slideInLeft}
             >
               {/* Animated Background Elements */}
               <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -185,30 +180,27 @@ export default function HomePage() {
               </div>
 
               {/* Badge */}
-              <motion.div variants={fadeInUp}>
+              <div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--theme-foreground)] shadow-sm backdrop-blur-sm">
                   <Sparkles className="h-3.5 w-3.5 text-[var(--theme-accent)]" />
                   {new Date().getFullYear()} Collection
                 </span>
-              </motion.div>
+              </div>
 
               {/* Main Content */}
               <div className="relative z-10 max-w-xl">
-                <motion.h1
+                <h1
                   className="text-4xl font-extrabold leading-[1.1] tracking-tight text-[var(--theme-foreground)] sm:text-5xl lg:text-6xl"
-                  variants={fadeInUp}
                 >
                   {storeName}
-                </motion.h1>
-                <motion.p
+                </h1>
+                <p
                   className="mt-6 text-lg leading-relaxed text-[var(--theme-secondary)] lg:text-xl"
-                  variants={fadeInUp}
                 >
                   {storeDescription}
-                </motion.p>
-                <motion.div
+                </p>
+                <div
                   className="mt-10 flex flex-wrap gap-4"
-                  variants={fadeInUp}
                 >
                   <Button
                     asChild
@@ -228,14 +220,14 @@ export default function HomePage() {
                   >
                     <Link href="/products?sort=newest">New Arrivals</Link>
                   </Button>
-                </motion.div>
+                </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Right Column - Stacked Bento Cards */}
             <div className="flex flex-col gap-4 lg:col-span-5 lg:gap-6">
               {/* Featured Category Card */}
-              <motion.div variants={slideInRight}>
+              <div>
                 <Link
                   href={displayCategories[0]?.href || '/products'}
                   className="group relative flex min-h-[240px] flex-col justify-end overflow-hidden rounded-[var(--theme-radius-xl)] bg-gradient-to-br from-slate-800 to-slate-900 p-6 transition-all duration-500 hover:shadow-2xl lg:min-h-[280px] lg:p-8"
@@ -281,19 +273,16 @@ export default function HomePage() {
                     <ArrowUpRight className="h-5 w-5 text-white transition-colors group-hover:text-[var(--theme-foreground)]" />
                   </div>
                 </Link>
-              </motion.div>
+              </div>
 
               {/* Stats Row */}
-              <motion.div
+              <div
                 className="grid grid-cols-3 gap-4 lg:gap-6"
-                variants={staggerContainer}
               >
                 {stats.map((stat, index) => (
-                  <motion.div
+                  <div
                     key={stat.label}
-                    className="group relative flex flex-col items-center justify-center overflow-hidden rounded-[var(--theme-radius-lg)] bg-[var(--theme-foreground)] p-4 text-center text-[var(--theme-background)] transition-all duration-500 hover:scale-[1.02] lg:p-6 dark:bg-[var(--theme-surface)] dark:text-[var(--theme-foreground)] dark:ring-1 dark:ring-[var(--theme-border)] dark:hover:shadow-glow"
-                    variants={scaleIn}
-                    whileHover={{ y: -4 }}
+                    className="group relative flex flex-col items-center justify-center overflow-hidden rounded-[var(--theme-radius-lg)] bg-[var(--theme-foreground)] p-4 text-center text-[var(--theme-background)] transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 lg:p-6 dark:bg-[var(--theme-surface)] dark:text-[var(--theme-foreground)] dark:ring-1 dark:ring-[var(--theme-border)] dark:hover:shadow-glow"
                   >
                     <stat.icon className="mb-2 h-5 w-5 text-[var(--theme-accent)]" />
                     <p className="text-2xl font-bold tracking-tight lg:text-3xl">
@@ -302,15 +291,13 @@ export default function HomePage() {
                     <p className="mt-1 text-[10px] uppercase tracking-wider text-[var(--theme-background)]/60 dark:text-[var(--theme-foreground)]/60 lg:text-xs">
                       {stat.label}
                     </p>
-                  </motion.div>
+                  </div>
                 ))}
-              </motion.div>
+              </div>
 
               {/* Accent Card */}
-              <motion.div
-                className="relative flex flex-1 items-center justify-center overflow-hidden rounded-[var(--theme-radius-xl)] bg-gradient-to-br from-[var(--theme-accent)] to-orange-600 p-6 text-white lg:p-8"
-                variants={scaleIn}
-                whileHover={{ scale: 1.02 }}
+              <div
+                className="relative flex flex-1 items-center justify-center overflow-hidden rounded-[var(--theme-radius-xl)] bg-gradient-to-br from-[var(--theme-accent)] to-orange-600 p-6 text-white lg:p-8 transition-transform duration-300 hover:scale-[1.02]"
               >
                 {/* Background Pattern */}
                 <div className="pointer-events-none absolute inset-0 opacity-20">
@@ -336,32 +323,24 @@ export default function HomePage() {
                   <p className="text-xl font-bold lg:text-2xl">Flash Sale</p>
                   <p className="mt-1 text-sm text-white/80">Up to 50% off</p>
                 </div>
-              </motion.div>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
           TRUST FEATURES - Premium Horizontal Strip
           ═══════════════════════════════════════════════════════════ */}
-      <motion.section
+      <section
         className="border-y border-[var(--theme-border)] bg-[var(--theme-background)] py-2 theme-transition"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.5 }}
       >
         <div className="container-theme">
           <div className="grid grid-cols-2 divide-x divide-[var(--theme-border)] lg:grid-cols-4">
             {features.map((feature, index) => (
-              <motion.div
+              <div
                 key={feature.title}
                 className="group flex items-center gap-4 px-4 py-6 transition-colors hover:bg-[var(--theme-muted)]/50 sm:px-6 lg:px-8"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1, duration: 0.4 }}
               >
                 <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[var(--theme-muted)] transition-all duration-300 group-hover:bg-[var(--theme-primary)] group-hover:text-white group-hover:scale-110">
                   <feature.icon className="h-5 w-5" strokeWidth={1.5} />
@@ -374,11 +353,11 @@ export default function HomePage() {
                     {feature.description}
                   </p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* ═══════════════════════════════════════════════════════════
           CATEGORIES - Premium Bento Grid
@@ -386,11 +365,8 @@ export default function HomePage() {
       <section className="section-padding bg-[var(--theme-background)] theme-transition">
         <div className="container-theme">
           {/* Section Header */}
-          <motion.div
+          <div
             className="mb-12 flex items-end justify-between"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
           >
             <div>
               <span className="text-xs font-semibold uppercase tracking-widest text-[var(--theme-accent)]">
@@ -407,20 +383,15 @@ export default function HomePage() {
               View All
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
-          </motion.div>
+          </div>
 
           {/* Category Bento Grid */}
-          <motion.div
+          <div
             className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-100px' }}
-            variants={staggerContainer}
           >
             {displayCategories.map((category, index) => (
-              <motion.div
+              <div
                 key={category.slug || category.name}
-                variants={scaleIn}
                 className={index === 0 ? 'sm:col-span-2 sm:row-span-2' : ''}
               >
                 <Link
@@ -491,9 +462,9 @@ export default function HomePage() {
                   {/* Hover Border */}
                   <div className="pointer-events-none absolute inset-0 rounded-[var(--theme-radius-xl)] ring-2 ring-inset ring-transparent transition-all duration-300 group-hover:ring-white/30" />
                 </Link>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
 
           {/* Mobile CTA */}
           <Link
@@ -512,11 +483,8 @@ export default function HomePage() {
       <section className="section-padding bg-[var(--theme-surface)] theme-transition">
         <div className="container-theme">
           {/* Section Header */}
-          <motion.div
+          <div
             className="mb-12 flex items-end justify-between"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
           >
             <div>
               <span className="text-xs font-semibold uppercase tracking-widest text-[var(--theme-accent)]">
@@ -533,7 +501,7 @@ export default function HomePage() {
               View All
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
-          </motion.div>
+          </div>
 
           {/* Product Grid */}
           {featuredProducts.length > 0 ? (
@@ -543,10 +511,8 @@ export default function HomePage() {
               ))}
             </div>
           ) : (
-            <motion.div
+            <div
               className="flex min-h-[300px] items-center justify-center rounded-[var(--theme-radius-xl)] border-2 border-dashed border-[var(--theme-border)]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
             >
               <div className="text-center">
                 <p className="text-lg font-medium text-[var(--theme-secondary)]">
@@ -556,15 +522,12 @@ export default function HomePage() {
                   Check back soon for new arrivals
                 </p>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {/* CTA */}
-          <motion.div
+          <div
             className="mt-16 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
           >
             <Button
               asChild
@@ -576,7 +539,7 @@ export default function HomePage() {
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -585,12 +548,8 @@ export default function HomePage() {
           ═══════════════════════════════════════════════════════════ */}
       <section className="section-padding bg-[var(--theme-background)] theme-transition">
         <div className="container-theme">
-          <motion.div
+          <div
             className="relative overflow-hidden rounded-[var(--theme-radius-2xl)] bg-gradient-premium p-10 text-white lg:p-16 dark:ring-1 dark:ring-[var(--theme-accent)]/20 dark:shadow-glow"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.6 }}
           >
             {/* Background Effects */}
             <div className="pointer-events-none absolute inset-0">
@@ -622,42 +581,27 @@ export default function HomePage() {
             </div>
 
             <div className="relative z-10 mx-auto max-w-2xl text-center">
-              <motion.span
+              <span
                 className="inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-2 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
               >
                 <Sparkles className="h-3.5 w-3.5" />
                 Stay Connected
-              </motion.span>
+              </span>
 
-              <motion.h2
+              <h2
                 className="mt-8 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
               >
                 Join Our Newsletter
-              </motion.h2>
-              <motion.p
+              </h2>
+              <p
                 className="mt-4 text-lg text-white/70"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
               >
                 Be the first to know about new arrivals, exclusive offers, and style inspiration.
-              </motion.p>
+              </p>
 
               {/* Form */}
-              <motion.form
+              <form
                 className="mt-10"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
               >
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <input
@@ -678,9 +622,9 @@ export default function HomePage() {
                 <p className="mt-4 text-xs text-white/50">
                   By subscribing, you agree to our Privacy Policy. Unsubscribe anytime.
                 </p>
-              </motion.form>
+              </form>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -691,12 +635,8 @@ export default function HomePage() {
         <div className="container-theme">
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
             {/* Text Content */}
-            <motion.div
+            <div
               className="order-2 lg:order-1"
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
             >
               <span className="text-xs font-semibold uppercase tracking-widest text-[var(--theme-accent)]">
                 Our Philosophy
@@ -722,39 +662,27 @@ export default function HomePage() {
                   </Link>
                 </Button>
               </div>
-            </motion.div>
+            </div>
 
             {/* Visual Element */}
-            <motion.div
+            <div
               className="order-1 lg:order-2"
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
             >
               <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--theme-radius-2xl)] bg-[var(--theme-muted)]">
                 {/* Large Initial */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <motion.span
+                  <span
                     className="text-[12rem] font-extrabold text-[var(--theme-foreground)]/5 lg:text-[16rem]"
-                    animate={{
-                      scale: [1, 1.05, 1],
-                    }}
-                    transition={{
-                      duration: 6,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }}
                   >
                     {storeName.charAt(0)}
-                  </motion.span>
+                  </span>
                 </div>
 
                 {/* Decorative Lines */}
                 <div className="absolute inset-4 rounded-[var(--theme-radius-xl)] border border-[var(--theme-foreground)]/10" />
                 <div className="absolute inset-8 rounded-[var(--theme-radius-lg)] border border-[var(--theme-foreground)]/5" />
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>

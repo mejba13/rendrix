@@ -105,12 +105,8 @@ export function ProductCard({ product, priority = false, className, index = 0 }:
   };
 
   return (
-    <motion.article
+    <article
       className={cn('group relative theme-transition', className)}
-      variants={cardVariants}
-      initial="hidden"
-      animate="visible"
-      custom={index}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -403,6 +399,6 @@ export function ProductCard({ product, priority = false, className, index = 0 }:
           )}
         </motion.div>
       </Link>
-    </motion.article>
+    </article>
   );
 }
