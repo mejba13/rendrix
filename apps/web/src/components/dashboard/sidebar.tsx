@@ -38,6 +38,8 @@ import {
   FileBarChart,
   Bot,
   Menu,
+  FolderTree,
+  Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StoreSelector } from './store-selector';
@@ -52,7 +54,15 @@ interface NavItem {
 const navigation: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'My Stores', href: '/dashboard/stores', icon: Building2 },
-  { name: 'Products', href: '/dashboard/products', icon: Package },
+  {
+    name: 'Products',
+    href: '/dashboard/products',
+    icon: Package,
+    children: [
+      { name: 'All Products', href: '/dashboard/products', icon: Layers },
+      { name: 'Categories', href: '/dashboard/categories', icon: FolderTree },
+    ],
+  },
   { name: 'Orders', href: '/dashboard/orders', icon: ShoppingCart },
   { name: 'Customers', href: '/dashboard/customers', icon: Users },
   { name: 'Coupons', href: '/dashboard/coupons', icon: Tag },
