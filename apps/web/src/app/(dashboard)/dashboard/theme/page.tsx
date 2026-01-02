@@ -36,10 +36,15 @@ import {
   Eye,
   Zap,
   Store,
-  ArrowRight,
   Grid3X3,
   SlidersHorizontal,
+  Upload,
+  Layers,
+  Code2,
+  Archive,
+  FolderOpen,
 } from 'lucide-react';
+import Link from 'next/link';
 
 // Industry categories for filtering
 const INDUSTRIES = [
@@ -465,7 +470,6 @@ function ThemePreviewModal({
 
   const colors = theme.settingsSchema?.colors || {};
   const typography = theme.settingsSchema?.typography || {};
-  const layout = theme.settingsSchema?.layout || {};
   const features = theme.features || [];
 
   const deviceConfig = {
@@ -892,6 +896,17 @@ export default function ThemeStudioPage() {
 
           {/* Search and Filter Controls */}
           <div className="flex items-center gap-3">
+            {/* Upload Theme Button */}
+            <Link href="/dashboard/theme/upload">
+              <Button
+                variant="outline"
+                className="border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Theme
+              </Button>
+            </Link>
+
             {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
@@ -951,6 +966,61 @@ export default function ThemeStudioPage() {
             onChange={scrollToGallery}
           />
         ) : null}
+
+        {/* Quick Action Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <Link
+            href="/dashboard/theme/my-themes"
+            className="group p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-amber-500/30 hover:bg-white/[0.04] transition-all"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 group-hover:bg-amber-500/20 flex items-center justify-center transition-colors">
+                <FolderOpen className="w-5 h-5 text-amber-400" />
+              </div>
+              <h3 className="font-medium text-white group-hover:text-amber-400 transition-colors">My Themes</h3>
+            </div>
+            <p className="text-sm text-white/40">Manage your custom uploaded themes</p>
+          </Link>
+
+          <Link
+            href="/dashboard/theme/sections"
+            className="group p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-blue-500/30 hover:bg-white/[0.04] transition-all"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/10 group-hover:bg-blue-500/20 flex items-center justify-center transition-colors">
+                <Layers className="w-5 h-5 text-blue-400" />
+              </div>
+              <h3 className="font-medium text-white group-hover:text-blue-400 transition-colors">Sections</h3>
+            </div>
+            <p className="text-sm text-white/40">Drag and drop page sections</p>
+          </Link>
+
+          <Link
+            href="/dashboard/theme/css"
+            className="group p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-purple-500/30 hover:bg-white/[0.04] transition-all"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 group-hover:bg-purple-500/20 flex items-center justify-center transition-colors">
+                <Code2 className="w-5 h-5 text-purple-400" />
+              </div>
+              <h3 className="font-medium text-white group-hover:text-purple-400 transition-colors">Custom CSS</h3>
+            </div>
+            <p className="text-sm text-white/40">Write custom styles with Monaco</p>
+          </Link>
+
+          <Link
+            href="/dashboard/theme/backups"
+            className="group p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-green-500/30 hover:bg-white/[0.04] transition-all"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-green-500/10 group-hover:bg-green-500/20 flex items-center justify-center transition-colors">
+                <Archive className="w-5 h-5 text-green-400" />
+              </div>
+              <h3 className="font-medium text-white group-hover:text-green-400 transition-colors">Backups</h3>
+            </div>
+            <p className="text-sm text-white/40">Backup and restore configurations</p>
+          </Link>
+        </div>
 
         {/* Industry Filter Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide" ref={galleryRef}>

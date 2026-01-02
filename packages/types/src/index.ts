@@ -7,3 +7,4 @@ export * from './store';
 export * from './product';
 export * from './order';
 export * from './common';
+export * from './theme';

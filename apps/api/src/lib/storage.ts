@@ -230,6 +230,49 @@ export function isAllowedFileType(mimeType: string): boolean {
 }
 
 /**
+ * Upload a theme asset to storage with custom key
+ */
+export interface ThemeUploadOptions {
+  key: string;
+  body: Buffer;
+  contentType: string;
+}
+
+export async function uploadThemeAsset(options: ThemeUploadOptions): Promise<UploadResult> {
+  const { key, body, contentType } = options;
+
+  if (!s3Client) {
+    // Fallback for development without S3
+    const localUrl = `${env.API_URL}/media/${key}`;
+    return {
+      key,
+      url: localUrl,
+      size: body.length,
+    };
+  }
+
+  await s3Client.send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: body,
+      ContentType: contentType,
+      ACL: 'public-read',
+    })
+  );
+
+  const url = env.AWS_S3_ENDPOINT
+    ? `${env.AWS_S3_ENDPOINT}/${bucket}/${key}` // MinIO
+    : `https://${bucket}.s3.${env.AWS_REGION}.amazonaws.com/${key}`; // AWS S3
+
+  return {
+    key,
+    url,
+    size: body.length,
+  };
+}
+
+/**
  * Get max file size by type (in bytes)
  */
 export function getMaxFileSize(mimeType: string): number {

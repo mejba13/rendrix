@@ -83,6 +83,10 @@ export interface Store extends AuditableEntity {
   seoSettings: StoreSeoSettings;
   settings: StoreSettings;
   status: StoreStatus;
+  // Enhanced Theme System Fields
+  themeVersion: string | null;
+  customCss: string | null;
+  sections: Json;
 }
 
 export interface StoreSettings {
@@ -105,6 +109,9 @@ export interface StoreSeoSettings {
 }
 
 // Theme entity
+export type ThemeType = 'platform' | 'custom';
+export type ThemeSourceType = 'system' | 'upload' | 'clone';
+
 export interface Theme extends AuditableEntity {
   name: string;
   slug: string;
@@ -119,4 +126,13 @@ export interface Theme extends AuditableEntity {
   price: number | null;
   settingsSchema: Json;
   isActive: boolean;
+  // Enhanced Theme System Fields
+  organizationId: ID | null;
+  type: ThemeType;
+  sourceType: ThemeSourceType;
+  parentThemeId: ID | null;
+  manifest: Json;
+  sections: Json;
+  supportUrl: string | null;
+  documentationUrl: string | null;
 }

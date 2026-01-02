@@ -39,6 +39,12 @@ export class ConflictError extends AppError {
   }
 }
 
+export class BadRequestError extends AppError {
+  constructor(message: string = 'Bad request') {
+    super(400, 'BAD_REQUEST', message);
+  }
+}
+
 export class ValidationError extends AppError {
   constructor(details: Record<string, string[]>) {
     super(400, 'VALIDATION_ERROR', 'Validation failed', details);

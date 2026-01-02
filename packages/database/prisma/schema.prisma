@@ -33,6 +33,7 @@ model User {
   oauthAccounts      OAuthAccount[]
   passwordResets     PasswordReset[]
   auditLogs          AuditLog[]
+  uploadedThemes     ThemePackage[]
 
   @@map("users")
 }
@@ -114,6 +115,8 @@ model Organization {
   invites      OrganizationInvite[]
   stores       Store[]
   auditLogs    AuditLog[]
+  themes       Theme[]
+  themePackages ThemePackage[]
 
   @@index([ownerId])
   @@map("organizations")
@@ -222,6 +225,11 @@ model Store {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
+  // Enhanced Theme System Fields
+  themeVersion   String?  @map("theme_version") @db.VarChar(20)
+  customCss      String?  @map("custom_css")
+  sections       Json     @default("[]") @map("store_sections")
+
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   theme        Theme?       @relation(fields: [themeId], references: [id])
 
@@ -235,6 +243,7 @@ model Store {
   blogPosts      BlogPost[]
   blogCategories BlogCategory[]
   pages          Page[]
+  themeBackups   StoreThemeBackup[]
 
   @@unique([organizationId, slug])
   @@index([organizationId])
@@ -243,25 +252,148 @@ model Store {
 }
 
 model Theme {
+  id               String   @id @default(uuid()) @db.Uuid
+  name             String   @db.VarChar(255)
+  slug             String   @unique @db.VarChar(100)
+  description      String?
+  previewUrl       String?  @map("preview_url")
+  thumbnailUrl     String?  @map("thumbnail_url")
+  version          String   @default("1.0.0") @db.VarChar(20)
+  author           String?  @db.VarChar(255)
+  industries       Json     @default("[]")
+  features         Json     @default("[]")
+  isPremium        Boolean  @default(false) @map("is_premium")
+  price            Decimal? @db.Decimal(10, 2)
+  settingsSchema   Json     @default("{}") @map("settings_schema")
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  // Enhanced Theme System Fields
+  organizationId   String?  @map("organization_id") @db.Uuid
+  type             String   @default("platform") @db.VarChar(50) // 'platform', 'custom'
+  sourceType       String   @default("system") @map("source_type") @db.VarChar(50) // 'system', 'upload', 'clone'
+  parentThemeId    String?  @map("parent_theme_id") @db.Uuid
+  manifest         Json     @default("{}")
+  sections         Json     @default("[]")
+  supportUrl       String?  @map("support_url")
+  documentationUrl String?  @map("documentation_url")
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at")
+
+  // Relations
+  stores           Store[]
+  organization     Organization?  @relation(fields: [organizationId], references: [id])
+  parentTheme      Theme?         @relation("ThemeHierarchy", fields: [parentThemeId], references: [id])
+  childThemes      Theme[]        @relation("ThemeHierarchy")
+  versions         ThemeVersion[]
+  themeSections    ThemeSection[]
+  assets           ThemeAsset[]
+  packages         ThemePackage[]
+
+  @@index([organizationId])
+  @@index([type])
+  @@index([isActive])
+  @@map("themes")
+}
+
+// Theme Version - version history for themes
+model ThemeVersion {
   id             String   @id @default(uuid()) @db.Uuid
-  name           String   @db.VarChar(255)
-  slug           String   @unique @db.VarChar(100)
-  description    String?
-  previewUrl     String?  @map("preview_url")
-  thumbnailUrl   String?  @map("thumbnail_url")
-  version        String   @default("1.0.0") @db.VarChar(20)
-  author         String?  @db.VarChar(255)
-  industries     Json     @default("[]")
-  features       Json     @default("[]")
-  isPremium      Boolean  @default(false) @map("is_premium")
-  price          Decimal? @db.Decimal(10, 2)
+  themeId        String   @map("theme_id") @db.Uuid
+  version        String   @db.VarChar(20)
+  changelog      String?
+  packageUrl     String?  @map("package_url")
   settingsSchema Json     @default("{}") @map("settings_schema")
-  isActive       Boolean  @default(true) @map("is_active")
+  sections       Json     @default("[]")
+  isLatest       Boolean  @default(false) @map("is_latest")
+  publishedAt    DateTime @default(now()) @map("published_at")
   createdAt      DateTime @default(now()) @map("created_at")
 
-  stores Store[]
+  theme Theme @relation(fields: [themeId], references: [id], onDelete: Cascade)
 
-  @@map("themes")
+  @@unique([themeId, version])
+  @@index([themeId])
+  @@index([isLatest])
+  @@map("theme_versions")
+}
+
+// Theme Section - reusable section definitions within themes
+model ThemeSection {
+  id         String   @id @default(uuid()) @db.Uuid
+  themeId    String   @map("theme_id") @db.Uuid
+  name       String   @db.VarChar(255)
+  slug       String   @db.VarChar(100)
+  type       String   @db.VarChar(50) // 'header', 'hero', 'products', 'footer', etc.
+  component  String   @db.VarChar(100) // React component name
+  schema     Json     @default("{}") // Customization schema
+  defaults   Json     @default("{}") // Default values
+  previewUrl String?  @map("preview_url")
+  sortOrder  Int      @default(0) @map("sort_order")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  theme Theme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@unique([themeId, slug])
+  @@index([themeId])
+  @@map("theme_sections")
+}
+
+// Theme Asset - uploaded theme files (CSS, images, fonts)
+model ThemeAsset {
+  id        String   @id @default(uuid()) @db.Uuid
+  themeId   String   @map("theme_id") @db.Uuid
+  path      String   @db.VarChar(500) // e.g., "assets/css/main.css"
+  type      String   @db.VarChar(50) // 'css', 'js', 'image', 'font'
+  url       String
+  size      Int
+  checksum  String   @db.VarChar(64) // SHA-256 hash
+  createdAt DateTime @default(now()) @map("created_at")
+
+  theme Theme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@unique([themeId, path])
+  @@index([themeId])
+  @@index([type])
+  @@map("theme_assets")
+}
+
+// Theme Package - stores uploaded ZIP metadata
+model ThemePackage {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String?  @map("organization_id") @db.Uuid
+  themeId        String   @map("theme_id") @db.Uuid
+  filename       String   @db.VarChar(255)
+  fileUrl        String   @map("file_url")
+  fileSize       Int      @map("file_size")
+  checksum       String   @db.VarChar(64) // SHA-256 hash
+  uploadedBy     String   @map("uploaded_by") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  theme          Theme         @relation(fields: [themeId], references: [id], onDelete: Cascade)
+  uploadedByUser User          @relation(fields: [uploadedBy], references: [id])
+
+  @@index([organizationId])
+  @@index([themeId])
+  @@map("theme_packages")
+}
+
+// Store Theme Backup - for rollback capability
+model StoreThemeBackup {
+  id            String   @id @default(uuid()) @db.Uuid
+  storeId       String   @map("store_id") @db.Uuid
+  themeId       String   @map("theme_id") @db.Uuid
+  themeVersion  String   @map("theme_version") @db.VarChar(20)
+  themeSettings Json     @default("{}") @map("theme_settings")
+  customCss     String?  @map("custom_css")
+  sections      Json     @default("[]")
+  reason        String?  @db.VarChar(255) // 'manual', 'auto_upgrade', 'rollback'
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([createdAt])
+  @@map("store_theme_backups")
 }
 
 // ==================== PRODUCTS ====================
