@@ -144,7 +144,7 @@ function ConnectionArc({
         />
       </path>
       {/* Traveling pulse */}
-      <circle r="4" fill="#00D4FF" opacity="0">
+      <circle r="4" fill="#FF9100" opacity="0">
         <animateMotion
           dur={`${2 + index * 0.2}s`}
           repeatCount="indefinite"
@@ -199,11 +199,11 @@ function DataCenterNode({
       onMouseLeave={() => onHover(null)}
     >
       {/* Outer pulse rings */}
-      <circle cx={pos.x} cy={pos.y} r={14 * scale} fill="none" stroke="#FF9500" strokeWidth="1.5" opacity="0">
+      <circle cx={pos.x} cy={pos.y} r={14 * scale} fill="none" stroke="#FF9100" strokeWidth="1.5" opacity="0">
         <animate attributeName="r" values={`${8 * scale};${22 * scale};${22 * scale}`} dur="2s" repeatCount="indefinite" />
         <animate attributeName="opacity" values="0.6;0;0" dur="2s" repeatCount="indefinite" />
       </circle>
-      <circle cx={pos.x} cy={pos.y} r={10 * scale} fill="none" stroke="#FF9500" strokeWidth="1" opacity="0">
+      <circle cx={pos.x} cy={pos.y} r={10 * scale} fill="none" stroke="#FF9100" strokeWidth="1" opacity="0">
         <animate attributeName="r" values={`${6 * scale};${18 * scale};${18 * scale}`} dur="2s" repeatCount="indefinite" begin="0.5s" />
         <animate attributeName="opacity" values="0.4;0;0" dur="2s" repeatCount="indefinite" begin="0.5s" />
       </circle>
@@ -222,7 +222,7 @@ function DataCenterNode({
         cx={pos.x}
         cy={pos.y}
         r={6 * scale}
-        fill="#FF9500"
+        fill="#FF9100"
         filter="url(#nodeBlur)"
       />
 
@@ -249,13 +249,13 @@ function DataCenterNode({
               height="50"
               rx="10"
               fill="rgba(0,0,0,0.95)"
-              stroke="rgba(255,149,0,0.4)"
+              stroke="rgba(255,145,0,0.4)"
               strokeWidth="1.5"
             />
             <text x={pos.x + 26} y={pos.y - 8} fill="white" fontSize="14" fontWeight="600" fontFamily="system-ui">
               {server.name}
             </text>
-            <text x={pos.x + 26} y={pos.y + 10} fill="rgba(255,149,0,0.9)" fontSize="12" fontFamily="system-ui">
+            <text x={pos.x + 26} y={pos.y + 10} fill="rgba(255,145,0,0.9)" fontSize="12" fontFamily="system-ui">
               {server.latency}ms latency
             </text>
           </motion.g>
@@ -288,7 +288,7 @@ function CityLight({
       cx={pos.x}
       cy={pos.y}
       r={size}
-      fill="#FFB347"
+      fill="#FFB84D"
       opacity={pos.depth * light.intensity * 0.9}
       filter="url(#cityGlow)"
     />
@@ -301,7 +301,7 @@ function Globe3D({ isVisible }: { isVisible: boolean }) {
   const [hoveredServer, setHoveredServer] = useState<number | null>(null);
   const [isHovering, setIsHovering] = useState(false);
   const globeRadius = 220;
-  const padding = 40; // Padding for glow effects
+  const padding = 40;
   const viewBoxSize = (globeRadius + padding) * 2;
   const animationRef = useRef<number>();
 
@@ -340,49 +340,49 @@ function Globe3D({ isVisible }: { isVisible: boolean }) {
         style={{ display: 'block' }}
       >
         <defs>
-          {/* Gradients */}
+          {/* Gradients - Updated to Rendrix orange theme */}
           <radialGradient id="globeGradient" cx="35%" cy="35%" r="65%">
-            <stop offset="0%" stopColor="#1e4a5c" />
-            <stop offset="30%" stopColor="#0f2d3d" />
-            <stop offset="60%" stopColor="#081c28" />
-            <stop offset="100%" stopColor="#030d12" />
+            <stop offset="0%" stopColor="#2a1f14" />
+            <stop offset="30%" stopColor="#1a1208" />
+            <stop offset="60%" stopColor="#100c05" />
+            <stop offset="100%" stopColor="#080602" />
           </radialGradient>
 
           <radialGradient id="atmosphereOuter" cx="50%" cy="50%" r="50%">
             <stop offset="80%" stopColor="transparent" />
-            <stop offset="90%" stopColor="rgba(0,212,255,0.2)" />
-            <stop offset="95%" stopColor="rgba(0,212,255,0.1)" />
+            <stop offset="90%" stopColor="rgba(255,145,0,0.2)" />
+            <stop offset="95%" stopColor="rgba(255,145,0,0.1)" />
             <stop offset="100%" stopColor="transparent" />
           </radialGradient>
 
           <radialGradient id="atmosphereInner" cx="30%" cy="30%" r="80%">
-            <stop offset="0%" stopColor="rgba(100,200,255,0.08)" />
-            <stop offset="50%" stopColor="rgba(0,212,255,0.03)" />
+            <stop offset="0%" stopColor="rgba(255,184,77,0.08)" />
+            <stop offset="50%" stopColor="rgba(255,145,0,0.03)" />
             <stop offset="100%" stopColor="transparent" />
           </radialGradient>
 
           <linearGradient id="arcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgba(0,212,255,0.3)" />
-            <stop offset="50%" stopColor="#00D4FF" />
-            <stop offset="100%" stopColor="rgba(0,212,255,0.3)" />
+            <stop offset="0%" stopColor="rgba(255,145,0,0.3)" />
+            <stop offset="50%" stopColor="#FF9100" />
+            <stop offset="100%" stopColor="rgba(255,145,0,0.3)" />
           </linearGradient>
 
           <linearGradient id="arcGlow" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="transparent" />
-            <stop offset="50%" stopColor="rgba(0,212,255,0.6)" />
+            <stop offset="50%" stopColor="rgba(255,145,0,0.6)" />
             <stop offset="100%" stopColor="transparent" />
           </linearGradient>
 
           <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(255,149,0,0.9)" />
-            <stop offset="60%" stopColor="rgba(255,149,0,0.3)" />
+            <stop offset="0%" stopColor="rgba(255,145,0,0.9)" />
+            <stop offset="60%" stopColor="rgba(255,145,0,0.3)" />
             <stop offset="100%" stopColor="transparent" />
           </radialGradient>
 
           <radialGradient id="globeShadowGradient" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="transparent" />
             <stop offset="70%" stopColor="transparent" />
-            <stop offset="100%" stopColor="rgba(0,212,255,0.15)" />
+            <stop offset="100%" stopColor="rgba(255,145,0,0.15)" />
           </radialGradient>
 
           {/* Filters */}
@@ -451,7 +451,7 @@ function Globe3D({ isVisible }: { isVisible: boolean }) {
           fill="url(#atmosphereInner)"
         />
 
-        {/* Grid lines */}
+        {/* Grid lines - Updated to orange */}
         <g clipPath="url(#globeClip)" opacity="0.2">
           {/* Latitude lines */}
           {[-60, -30, 0, 30, 60].map((lat) => {
@@ -465,7 +465,7 @@ function Globe3D({ isVisible }: { isVisible: boolean }) {
                 rx={radiusAtLat}
                 ry={radiusAtLat * 0.15}
                 fill="none"
-                stroke="rgba(0,212,255,0.5)"
+                stroke="rgba(255,145,0,0.5)"
                 strokeWidth="1"
                 strokeDasharray="8 6"
               />
@@ -483,7 +483,7 @@ function Globe3D({ isVisible }: { isVisible: boolean }) {
                 rx={Math.abs(Math.cos((adjustedLng * Math.PI) / 180)) * globeRadius * 0.12}
                 ry={globeRadius * 0.9}
                 fill="none"
-                stroke="rgba(0,212,255,0.4)"
+                stroke="rgba(255,145,0,0.4)"
                 strokeWidth="1"
                 strokeDasharray="8 6"
               />
@@ -538,7 +538,7 @@ function Globe3D({ isVisible }: { isVisible: boolean }) {
           cy={centerY}
           r={globeRadius}
           fill="none"
-          stroke="rgba(0,212,255,0.15)"
+          stroke="rgba(255,145,0,0.15)"
           strokeWidth="2"
         />
       </svg>
@@ -569,17 +569,17 @@ function StatCard({
       className="group"
     >
       <div
-        className="relative px-5 py-4 rounded-2xl backdrop-blur-xl border border-white/[0.08] overflow-hidden transition-all duration-500 hover:border-white/[0.15]"
+        className="relative px-5 py-4 rounded-2xl backdrop-blur-xl border border-white/[0.08] overflow-hidden transition-all duration-500 hover:border-orange-500/30"
         style={{
           background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
           boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
         }}
       >
-        {/* Hover glow */}
+        {/* Hover glow - Updated to orange */}
         <div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           style={{
-            background: 'radial-gradient(circle at 50% 0%, rgba(0,212,255,0.1) 0%, transparent 60%)',
+            background: 'radial-gradient(circle at 50% 0%, rgba(255,145,0,0.15) 0%, transparent 60%)',
           }}
         />
 
@@ -589,12 +589,12 @@ function StatCard({
           <span className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-medium">Live</span>
         </div>
 
-        {/* Value */}
+        {/* Value - Updated gradient to orange */}
         <div
           className="text-2xl sm:text-3xl font-bold tracking-tight mb-1"
           style={{
             fontFamily: "'SF Pro Display', system-ui, sans-serif",
-            background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(0,212,255,0.9) 100%)',
+            background: 'linear-gradient(135deg, #FFFFFF 0%, #FF9100 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}
@@ -674,25 +674,25 @@ export function GlobalInfrastructureSection() {
       ref={sectionRef}
       className="relative py-20 lg:py-28 overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, #000000 0%, #020508 20%, #040a10 50%, #020508 80%, #000000 100%)',
+        background: 'linear-gradient(180deg, #000000 0%, #0a0705 20%, #0d0a06 50%, #0a0705 80%, #000000 100%)',
       }}
     >
       {/* Star field */}
       <StarField />
 
-      {/* Ambient glow effects */}
+      {/* Ambient glow effects - Updated to orange */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute top-1/2 left-1/3 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2"
           style={{
-            background: 'radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 50%)',
+            background: 'radial-gradient(circle, rgba(255,145,0,0.12) 0%, transparent 50%)',
             filter: 'blur(60px)',
           }}
         />
         <div
           className="absolute top-1/3 right-1/4 w-[500px] h-[500px]"
           style={{
-            background: 'radial-gradient(circle, rgba(255,149,0,0.08) 0%, transparent 50%)',
+            background: 'radial-gradient(circle, rgba(255,107,0,0.1) 0%, transparent 50%)',
             filter: 'blur(80px)',
           }}
         />
@@ -721,9 +721,9 @@ export function GlobalInfrastructureSection() {
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   <div>
-                    <div className="text-xs font-bold text-white tracking-wide">250 POINTS OF PRESENCE</div>
-                    <div className="text-[10px] text-emerald-400 uppercase tracking-wider">
-                      So your store loads instantly everywhere
+                    <div className="text-xs font-bold text-white tracking-wide">+7% CONVERSION BOOST</div>
+                    <div className="text-[10px] text-orange-400 uppercase tracking-wider">
+                      From faster page loads worldwide
                     </div>
                   </div>
                 </div>
@@ -734,12 +734,12 @@ export function GlobalInfrastructureSection() {
                 delay={1}
               >
                 <div className="text-right">
-                  <div className="text-lg font-bold text-white">$4,200,000</div>
+                  <div className="text-lg font-bold text-white">Zero Downtime</div>
                   <div className="text-[10px] text-white/50 uppercase tracking-wider">
-                    Sales per minute during
+                    Even during
                   </div>
-                  <div className="text-[10px] text-cyan-400 uppercase tracking-wider">
-                    Peak sales times
+                  <div className="text-[10px] text-orange-400 uppercase tracking-wider">
+                    Black Friday traffic spikes
                   </div>
                 </div>
               </FloatingInfoCard>
@@ -759,7 +759,7 @@ export function GlobalInfrastructureSection() {
                 <span className="text-xs text-white/50 font-medium uppercase tracking-wider">Global Infrastructure</span>
               </div>
 
-              {/* Headline */}
+              {/* Headline - Updated content */}
               <h2
                 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6"
                 style={{
@@ -774,53 +774,53 @@ export function GlobalInfrastructureSection() {
                     WebkitTextFillColor: 'transparent',
                   }}
                 >
-                  Rock steady
+                  Global reach,
                 </span>
                 <span
                   className="block"
                   style={{
-                    background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(0,212,255,0.8) 100%)',
+                    background: 'linear-gradient(135deg, #FFFFFF 0%, #FF9100 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                   }}
                 >
-                  and blazing fast
+                  local speed
                 </span>
               </h2>
 
-              {/* Description */}
+              {/* Description - Updated content */}
               <p className="text-lg text-white/50 leading-relaxed max-w-lg mb-8">
-                Rendrix puts your store within 50 milliseconds of every shopper on the planet,
-                with the capacity to handle even the most epic product drops.
+                Every millisecond counts at checkout. Rendrix delivers your store in under 50ms to shoppers
+                worldwide—no abandoned carts from slow loading, just more completed purchases.
               </p>
 
-              {/* Stats grid */}
+              {/* Stats grid - Updated content */}
               <div className="grid grid-cols-2 gap-3">
                 <StatCard
-                  value="250+"
+                  value="300+"
                   label="Edge Locations"
-                  sublabel="Global Points of Presence"
+                  sublabel="Your store, everywhere"
                   delay={0.4}
                   position="left"
                 />
                 <StatCard
                   value="<50ms"
-                  label="Response Time"
-                  sublabel="P99 Global Latency"
+                  label="Lightning Checkout"
+                  sublabel="Globally, every time"
                   delay={0.5}
                   position="right"
                 />
                 <StatCard
                   value="99.99%"
-                  label="Uptime SLA"
-                  sublabel="Enterprise Guarantee"
+                  label="Never Miss a Sale"
+                  sublabel="Enterprise uptime SLA"
                   delay={0.6}
                   position="left"
                 />
                 <StatCard
                   value="10M+"
-                  label="Requests/Sec"
-                  sublabel="Peak Throughput"
+                  label="Flash Sale Ready"
+                  sublabel="Requests per second"
                   delay={0.7}
                   position="right"
                 />
@@ -829,7 +829,7 @@ export function GlobalInfrastructureSection() {
           </div>
         </div>
 
-        {/* Bottom trust line */}
+        {/* Bottom trust line - Updated */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -837,8 +837,8 @@ export function GlobalInfrastructureSection() {
           className="text-center mt-16"
         >
           <p className="text-sm text-white/30">
-            Trusted by 10,000+ businesses worldwide — Powered by{' '}
-            <span className="text-cyan-400/70 font-medium">Rendrix Edge Network</span>
+            Powering $2B+ in annual sales — Built on{' '}
+            <span className="text-orange-400/70 font-medium">Rendrix Edge Network</span>
           </p>
         </motion.div>
       </div>
