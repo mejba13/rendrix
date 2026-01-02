@@ -364,12 +364,12 @@ function ThemeUploader({
             disabled={isUploading}
           />
 
-          <div className="relative p-10 text-center">
+          <div className="relative p-6 text-center">
             {/* Animated Icon */}
             <motion.div
               variants={floatVariants}
               animate="animate"
-              className={`relative w-24 h-24 mx-auto mb-6 rounded-2xl flex items-center justify-center transition-all duration-500 ${
+              className={`relative w-20 h-20 mx-auto mb-4 rounded-2xl flex items-center justify-center transition-all duration-500 ${
                 isDragOver
                   ? 'bg-gradient-to-br from-amber-500/30 to-orange-500/20 scale-110'
                   : selectedFile
@@ -401,7 +401,7 @@ function ThemeUploader({
                     exit={{ scale: 0, rotate: 180 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                   >
-                    <FileArchive className="w-12 h-12 text-emerald-400" />
+                    <FileArchive className="w-10 h-10 text-emerald-400" />
                   </motion.div>
                 ) : fileError ? (
                   <motion.div
@@ -410,7 +410,7 @@ function ThemeUploader({
                     animate={{ scale: 1 }}
                     exit={{ scale: 0 }}
                   >
-                    <XCircle className="w-12 h-12 text-red-400" />
+                    <XCircle className="w-10 h-10 text-red-400" />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -420,7 +420,7 @@ function ThemeUploader({
                     exit={{ scale: 0 }}
                     className="relative"
                   >
-                    <Upload className={`w-12 h-12 transition-colors duration-300 ${
+                    <Upload className={`w-10 h-10 transition-colors duration-300 ${
                       isDragOver ? 'text-amber-400' : 'text-white/40 group-hover:text-white/60'
                     }`} />
                     {/* Upload arrow animation */}
@@ -452,10 +452,10 @@ function ThemeUploader({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="space-y-2"
+                  className="space-y-1"
                 >
-                  <p className="text-xl font-semibold text-white">{selectedFile.name}</p>
-                  <div className="flex items-center justify-center gap-3 text-sm">
+                  <p className="text-lg font-semibold text-white">{selectedFile.name}</p>
+                  <div className="flex items-center justify-center gap-2 text-sm">
                     <span className="text-emerald-400 font-medium">{formatFileSize(selectedFile.size)}</span>
                     <span className="w-1 h-1 rounded-full bg-white/20" />
                     <span className="text-white/50">Ready to upload</span>
@@ -467,9 +467,9 @@ function ThemeUploader({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="space-y-2"
+                  className="space-y-1"
                 >
-                  <p className="text-xl font-semibold text-red-400">{fileError}</p>
+                  <p className="text-lg font-semibold text-red-400">{fileError}</p>
                   <p className="text-sm text-white/50">Please select a valid theme package</p>
                 </motion.div>
               ) : (
@@ -478,9 +478,9 @@ function ThemeUploader({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="space-y-3"
+                  className="space-y-2"
                 >
-                  <p className="text-xl font-semibold text-white">
+                  <p className="text-lg font-semibold text-white">
                     {isDragOver ? (
                       <motion.span
                         initial={{ opacity: 0 }}
@@ -497,9 +497,9 @@ function ThemeUploader({
                   </p>
 
                   {/* Format hints */}
-                  <div className="flex items-center justify-center gap-2 pt-2">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06]">
-                      <FileArchive className="w-3.5 h-3.5 text-amber-400/70" />
+                  <div className="flex items-center justify-center gap-2 pt-1">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.03] border border-white/[0.06]">
+                      <FileArchive className="w-3 h-3 text-amber-400/70" />
                       <span className="text-xs text-white/40">.zip</span>
                     </div>
                   </div>
@@ -636,38 +636,29 @@ function AnimatedFileTree() {
 
 // ==================== REQUIREMENTS ====================
 
-function RequirementsList() {
+function RequirementsCompact() {
   const requirements = [
-    { icon: HardDrive, text: 'ZIP file up to 50MB', color: 'text-blue-400' },
-    { icon: FileJson, text: 'Valid manifest.json with theme metadata', color: 'text-yellow-400' },
-    { icon: ImageIcon, text: 'Desktop preview image (PNG)', color: 'text-green-400' },
-    { icon: Shield, text: 'No executable files (.js, .exe, .sh)', color: 'text-red-400' },
-    { icon: Code2, text: 'CSS-only styling (no inline JavaScript)', color: 'text-cyan-400' },
+    { icon: HardDrive, text: 'ZIP up to 50MB', color: 'text-blue-400' },
+    { icon: FileJson, text: 'manifest.json', color: 'text-yellow-400' },
+    { icon: ImageIcon, text: 'Preview PNG', color: 'text-green-400' },
+    { icon: Shield, text: 'No executables', color: 'text-red-400' },
+    { icon: Code2, text: 'CSS only', color: 'text-cyan-400' },
   ];
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-wrap gap-2">
       {requirements.map((req, index) => (
         <motion.div
           key={index}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 + index * 0.08 }}
-          whileHover={{ x: 4 }}
-          className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-all group"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 + index * 0.05 }}
+          whileHover={{ scale: 1.02 }}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.1] transition-all group"
         >
-          <div className={`w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center ${req.color} group-hover:scale-110 transition-transform`}>
-            <req.icon className="w-4 h-4" />
-          </div>
-          <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">{req.text}</span>
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.5 + index * 0.1 }}
-            className="ml-auto"
-          >
-            <CheckCircle2 className="w-4 h-4 text-emerald-500/50" />
-          </motion.div>
+          <req.icon className={`w-3.5 h-3.5 ${req.color}`} />
+          <span className="text-xs text-white/50 group-hover:text-white/70 transition-colors">{req.text}</span>
+          <CheckCircle2 className="w-3 h-3 text-emerald-500/40" />
         </motion.div>
       ))}
     </div>
@@ -1005,30 +996,30 @@ export default function ThemeUploadPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="relative space-y-8 max-w-6xl mx-auto"
+        className="relative space-y-5 max-w-6xl mx-auto"
       >
         {/* Header */}
         <motion.div variants={itemVariants}>
           <Link
             href="/dashboard/theme"
-            className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors mb-6 group"
+            className="inline-flex items-center gap-2 text-xs text-white/40 hover:text-white transition-colors mb-4 group"
           >
             <motion.div whileHover={{ x: -4 }} transition={{ type: 'spring', stiffness: 400 }}>
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-3.5 h-3.5" />
             </motion.div>
             <span>Back to Theme Studio</span>
           </Link>
 
-          <div className="flex items-start gap-5">
+          <div className="flex items-center gap-4">
             <motion.div
               whileHover={{ scale: 1.05, rotate: 5 }}
-              className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 flex items-center justify-center border border-amber-500/20 shadow-lg shadow-amber-500/10"
+              className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 flex items-center justify-center border border-amber-500/20 shadow-lg shadow-amber-500/10"
             >
-              <Upload className="w-8 h-8 text-amber-400" />
+              <Upload className="w-6 h-6 text-amber-400" />
             </motion.div>
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2">Upload Custom Theme</h1>
-              <p className="text-white/50 text-lg">Import your own theme package to customize your storefront</p>
+              <h1 className="text-2xl font-bold text-white">Upload Custom Theme</h1>
+              <p className="text-white/50 text-sm">Import your own theme package to customize your storefront</p>
             </div>
           </div>
         </motion.div>
@@ -1052,65 +1043,79 @@ export default function ThemeUploadPage() {
             </div>
           </motion.div>
         ) : (
-          <div className="grid gap-5 lg:grid-cols-12">
-            {/* Upload Zone - Large card spanning 7 columns */}
-            <motion.div variants={itemVariants} className="lg:col-span-7">
-              <div className="h-full rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 backdrop-blur-sm">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                    <Package className="w-5 h-5 text-amber-400" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-white">Theme Package</h2>
-                    <p className="text-sm text-white/40">Upload your custom theme ZIP file</p>
-                  </div>
-                </div>
-
-                <ThemeUploader
-                  onUpload={handleUpload}
-                  isUploading={uploadState === 'uploading'}
-                />
-
-                {/* Validation Errors */}
-                <AnimatePresence>
-                  {uploadState === 'error' && validationErrors && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="mt-6"
-                    >
-                      <ValidationResult
-                        errors={validationErrors.errors}
-                        warnings={validationErrors.warnings}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
-
-            {/* Right column - 5 columns with stacked cards */}
-            <div className="lg:col-span-5 space-y-5">
-              {/* File Structure Card */}
+          <div className="grid gap-4 lg:grid-cols-12">
+            {/* Left column - Upload Zone + Requirements */}
+            <div className="lg:col-span-7 space-y-4">
+              {/* Upload Zone */}
               <motion.div variants={itemVariants}>
-                <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 backdrop-blur-sm">
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
-                      <Layers className="w-5 h-5 text-violet-400" />
+                <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-5 backdrop-blur-sm">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                      <Package className="w-4 h-4 text-amber-400" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-white">Package Structure</h3>
+                      <h2 className="text-base font-semibold text-white">Theme Package</h2>
+                      <p className="text-xs text-white/40">Upload your custom theme ZIP file</p>
+                    </div>
+                  </div>
+
+                  <ThemeUploader
+                    onUpload={handleUpload}
+                    isUploading={uploadState === 'uploading'}
+                  />
+
+                  {/* Validation Errors */}
+                  <AnimatePresence>
+                    {uploadState === 'error' && validationErrors && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-4"
+                      >
+                        <ValidationResult
+                          errors={validationErrors.errors}
+                          warnings={validationErrors.warnings}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+
+              {/* Requirements Card */}
+              <motion.div variants={itemVariants}>
+                <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-4 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Shield className="w-4 h-4 text-emerald-400" />
+                    <h3 className="text-sm font-medium text-white">Requirements</h3>
+                  </div>
+                  <RequirementsCompact />
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Right column - Package Structure + Pro Tip */}
+            <div className="lg:col-span-5 space-y-4">
+              {/* File Structure Card */}
+              <motion.div variants={itemVariants}>
+                <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-5 backdrop-blur-sm">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-9 h-9 rounded-xl bg-violet-500/10 flex items-center justify-center">
+                      <Layers className="w-4 h-4 text-violet-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-white">Package Structure</h3>
                       <p className="text-xs text-white/40">Required file organization</p>
                     </div>
                   </div>
 
-                  <div className="bg-black/40 rounded-xl p-4 border border-white/[0.04]">
+                  <div className="bg-black/40 rounded-xl p-3 border border-white/[0.04]">
                     <AnimatedFileTree />
                   </div>
 
-                  <div className="mt-4 flex items-center gap-2 text-sm text-white/40">
-                    <Terminal className="w-4 h-4" />
+                  <div className="mt-3 flex items-center gap-2 text-xs text-white/40">
+                    <Terminal className="w-3.5 h-3.5" />
                     <span>View the</span>
                     <a href="#" className="text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors">
                       theme development guide
@@ -1120,33 +1125,19 @@ export default function ThemeUploadPage() {
                 </div>
               </motion.div>
 
-              {/* Requirements Card */}
-              <motion.div variants={itemVariants}>
-                <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 backdrop-blur-sm">
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                      <Shield className="w-5 h-5 text-emerald-400" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-white">Requirements</h3>
-                  </div>
-
-                  <RequirementsList />
-                </div>
-              </motion.div>
-
               {/* Pro Tip Card */}
               <motion.div variants={itemVariants}>
-                <div className="rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/20 p-5 backdrop-blur-sm">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-                      <Cpu className="w-5 h-5 text-amber-400" />
+                <div className="rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/20 p-4 backdrop-blur-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                      <Cpu className="w-4 h-4 text-amber-400" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-amber-400 mb-1">Pro Tip</h4>
-                      <p className="text-sm text-white/50 leading-relaxed">
-                        Use our CLI tool for faster theme development with hot reload and instant validation.
+                      <h4 className="text-sm font-semibold text-amber-400 mb-1">Pro Tip</h4>
+                      <p className="text-xs text-white/50 leading-relaxed">
+                        Use our CLI tool for faster theme development with hot reload.
                       </p>
-                      <a href="#" className="inline-flex items-center gap-1 text-sm text-amber-400 hover:text-amber-300 mt-2 transition-colors">
+                      <a href="#" className="inline-flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 mt-1.5 transition-colors">
                         Learn more <ChevronRight className="w-3 h-3" />
                       </a>
                     </div>
