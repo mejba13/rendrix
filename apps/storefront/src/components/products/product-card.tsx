@@ -17,6 +17,9 @@ interface ProductCardProps {
   index?: number;
 }
 
+// Animation easing curve
+const easeOut = [0.22, 1, 0.36, 1] as const;
+
 // Premium animation variants
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -26,7 +29,7 @@ const cardVariants = {
     transition: {
       delay: index * 0.08,
       duration: 0.5,
-      ease: [0.22, 1, 0.36, 1],
+      ease: easeOut,
     },
   }),
 };
@@ -44,7 +47,7 @@ const buttonContainerVariants = {
     y: 0,
     transition: {
       duration: 0.4,
-      ease: [0.22, 1, 0.36, 1],
+      ease: easeOut,
       staggerChildren: 0.05,
     },
   },
@@ -116,7 +119,7 @@ export function ProductCard({ product, priority = false, className, index = 0 }:
         <motion.div
           className="relative aspect-product overflow-hidden rounded-[var(--theme-card-radius)] bg-[var(--theme-muted)] theme-transition dark:bg-[var(--theme-surface)]"
           whileHover={{ y: -4 }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.4, ease: easeOut }}
           style={{
             boxShadow: isHovered
               ? 'var(--theme-card-shadow-hover)'
@@ -133,7 +136,7 @@ export function ProductCard({ product, priority = false, className, index = 0 }:
                   scale: secondImage && isHovered ? 1.08 : 1,
                   opacity: secondImage && isHovered ? 0 : 1,
                 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.6, ease: easeOut }}
               >
                 <Image
                   src={mainImage}
@@ -154,7 +157,7 @@ export function ProductCard({ product, priority = false, className, index = 0 }:
                     opacity: isHovered ? 1 : 0,
                     scale: isHovered ? 1 : 1.1,
                   }}
-                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.6, ease: easeOut }}
                 >
                   <Image
                     src={secondImage}
@@ -190,7 +193,7 @@ export function ProductCard({ product, priority = false, className, index = 0 }:
               <motion.div
                 className="relative z-10 flex h-24 w-24 items-center justify-center rounded-2xl bg-[var(--theme-background)]/80 shadow-xl ring-1 ring-[var(--theme-foreground)]/5 backdrop-blur-sm"
                 animate={{ scale: isHovered ? 1.1 : 1, rotate: isHovered ? 3 : 0 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.6, ease: easeOut }}
               >
                 <span className="text-4xl font-bold text-[var(--theme-foreground)]/20">
                   {product.name.charAt(0).toUpperCase()}
@@ -343,13 +346,12 @@ export function ProductCard({ product, priority = false, className, index = 0 }:
 
           {/* Premium Border Ring on Hover */}
           <motion.div
-            className="pointer-events-none absolute inset-0 rounded-[var(--theme-card-radius)] ring-2 ring-inset"
-            animate={{
-              opacity: isHovered ? 1 : 0,
-              ringColor: isHovered ? 'rgb(var(--theme-accent-rgb) / 0.3)' : 'transparent',
-            }}
+            className={cn(
+              'pointer-events-none absolute inset-0 rounded-[var(--theme-card-radius)] ring-2 ring-inset transition-colors duration-300',
+              isHovered ? 'ring-[rgb(var(--theme-accent-rgb)/0.3)]' : 'ring-transparent'
+            )}
+            animate={{ opacity: isHovered ? 1 : 0 }}
             transition={{ duration: 0.3 }}
-            style={{ '--tw-ring-color': 'transparent' } as any}
           />
         </motion.div>
 
@@ -357,7 +359,7 @@ export function ProductCard({ product, priority = false, className, index = 0 }:
         <motion.div
           className="mt-4 space-y-2"
           animate={{ y: isHovered ? -2 : 0 }}
-          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.3, ease: easeOut }}
         >
           {/* Category */}
           {product.categories?.[0] && (

@@ -19,12 +19,15 @@ const sortOptions = [
   { value: 'name-desc', label: 'Name: Z-A' },
 ];
 
+// Animation easing curve
+const easeOut = [0.22, 1, 0.36, 1] as const;
+
 // Animation variants
 const pageVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: easeOut },
   },
 };
 
@@ -33,7 +36,7 @@ const headerVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: easeOut },
   },
 };
 
@@ -42,7 +45,7 @@ const sidebarVariants = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, delay: 0.2, ease: easeOut },
   },
 };
 
@@ -66,7 +69,7 @@ const dropdownVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.2, ease: easeOut },
   },
   exit: {
     opacity: 0,
@@ -611,7 +614,7 @@ export default function ProductsPage() {
                   initial={{ x: '-100%' }}
                   animate={{ x: 0 }}
                   exit={{ x: '-100%' }}
-                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.3, ease: easeOut }}
                 >
                   {/* Header */}
                   <div className="flex items-center justify-between border-b border-[var(--theme-muted)] px-6 py-4">

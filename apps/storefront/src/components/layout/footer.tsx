@@ -45,6 +45,9 @@ const socialLinks = [
   { name: 'YouTube', icon: Youtube, href: '#', color: 'hover:bg-red-600' },
 ];
 
+// Animation easing curve
+const easeOut = [0.22, 1, 0.36, 1] as const;
+
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -62,7 +65,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: easeOut },
   },
 };
 
@@ -74,7 +77,7 @@ const linkVariants = {
     transition: {
       delay: i * 0.05,
       duration: 0.4,
-      ease: [0.22, 1, 0.36, 1],
+      ease: easeOut,
     },
   }),
 };

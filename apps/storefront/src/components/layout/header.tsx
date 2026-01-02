@@ -17,6 +17,9 @@ interface HeaderProps {
   categories?: Array<{ id: string; name: string; slug: string }>;
 }
 
+// Animation easing curve
+const easeOut = [0.22, 1, 0.36, 1] as const;
+
 // Animation variants
 const navItemVariants = {
   hidden: { opacity: 0, y: -10 },
@@ -26,7 +29,7 @@ const navItemVariants = {
     transition: {
       delay: i * 0.05,
       duration: 0.4,
-      ease: [0.22, 1, 0.36, 1],
+      ease: easeOut,
     },
   }),
 };
@@ -36,7 +39,7 @@ const logoVariants = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: easeOut },
   },
 };
 
@@ -48,7 +51,7 @@ const menuItemVariants = {
     transition: {
       delay: 0.1 + i * 0.08,
       duration: 0.4,
-      ease: [0.22, 1, 0.36, 1],
+      ease: easeOut,
     },
   }),
   exit: { opacity: 0, x: -20, transition: { duration: 0.2 } },
@@ -62,8 +65,8 @@ const backdropVariants = {
 
 const panelVariants = {
   hidden: { x: '-100%' },
-  visible: { x: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
-  exit: { x: '-100%', transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } },
+  visible: { x: 0, transition: { duration: 0.4, ease: easeOut } },
+  exit: { x: '-100%', transition: { duration: 0.3, ease: easeOut } },
 };
 
 const searchVariants = {
@@ -73,7 +76,7 @@ const searchVariants = {
     height: 'auto',
     marginTop: 0,
     paddingBottom: 16,
-    transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.3, ease: easeOut },
   },
   exit: {
     opacity: 0,

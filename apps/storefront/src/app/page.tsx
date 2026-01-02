@@ -23,13 +23,15 @@ import { useStore } from '@/lib/store-context';
 import { getProducts, type Product } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
-// Animation Variants
+// Animation Variants with proper typing for Framer Motion
+const easeOut = [0.22, 1, 0.36, 1] as const;
+
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: easeOut },
   },
 };
 
@@ -49,7 +51,7 @@ const scaleIn = {
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: easeOut },
   },
 };
 
@@ -58,7 +60,7 @@ const slideInLeft = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: easeOut },
   },
 };
 
@@ -67,7 +69,7 @@ const slideInRight = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: easeOut },
   },
 };
 
