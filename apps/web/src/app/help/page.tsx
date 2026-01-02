@@ -216,53 +216,225 @@ function CategoryCard({ category, index }: { category: HelpCategory; index: numb
   );
 }
 
-// Popular article card
-function ArticleCard({ article, index }: { article: Article; index: number }) {
+// Bento Article Card - Featured (Large)
+function BentoFeaturedCard({ article, index }: { article: Article; index: number }) {
   const colors = categoryColors[article.category] || categoryColors['getting-started'];
 
   return (
     <motion.div
-      variants={fadeInUp}
-      initial="hidden"
-      whileInView="visible"
+      initial={{ opacity: 0, y: 40, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true }}
-      transition={{ delay: index * 0.08 }}
-      whileHover={{ y: -4 }}
-      className="group"
+      transition={{ delay: index * 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className="group relative col-span-2 row-span-2"
     >
-      <Link href={`/help/articles/${article.id}`}>
-        <div className="relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 hover:bg-white/[0.04] transition-all duration-300">
-          {/* Trending badge */}
-          {article.trending && (
-            <div className="absolute top-3 right-3">
-              <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-primary bg-primary/10 rounded-full">
-                <Zap className="w-3 h-3" />
-                Trending
+      <Link href={`/help/articles/${article.id}`} className="block h-full">
+        {/* Animated gradient border */}
+        <div
+          className="absolute -inset-[1px] rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{
+            background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 50%, #FFB84D 100%)',
+            filter: 'blur(2px)',
+          }}
+        />
+
+        {/* Main card */}
+        <div className="relative h-full overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-br from-white/[0.05] to-white/[0.01] backdrop-blur-xl transition-all duration-500 group-hover:border-transparent">
+          {/* Background glow effect */}
+          <div
+            className="absolute top-0 right-0 w-[300px] h-[300px] opacity-30 group-hover:opacity-50 transition-opacity duration-500"
+            style={{
+              background: 'radial-gradient(circle at 100% 0%, rgba(255,145,0,0.3) 0%, transparent 60%)',
+              filter: 'blur(40px)',
+            }}
+          />
+
+          {/* Animated mesh gradient background */}
+          <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-700">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `
+                  radial-gradient(ellipse at 20% 30%, rgba(255,145,0,0.4) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 70%, rgba(255,107,0,0.3) 0%, transparent 50%)
+                `,
+              }}
+            />
+          </div>
+
+          {/* Noise texture overlay */}
+          <div
+            className="absolute inset-0 opacity-[0.03] pointer-events-none"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+            }}
+          />
+
+          {/* Content */}
+          <div className="relative z-10 h-full flex flex-col p-8">
+            {/* Top badges row */}
+            <div className="flex items-center justify-between mb-auto">
+              {/* Category badge */}
+              <span
+                className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full backdrop-blur-md border border-white/10`}
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%)',
+                }}
+              >
+                <BookOpen className="w-4 h-4 text-primary" />
+                <span className="text-white/80">{article.category.replace('-', ' ')}</span>
               </span>
+
+              {/* Trending badge with animated pulse */}
+              {article.trending && (
+                <div className="relative">
+                  <span
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full"
+                    style={{
+                      background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                      boxShadow: '0 4px 20px rgba(255,145,0,0.4)',
+                    }}
+                  >
+                    <Zap className="w-4 h-4 text-black" />
+                    <span className="text-black">Trending</span>
+                  </span>
+                  {/* Animated glow ring */}
+                  <div
+                    className="absolute -inset-1 rounded-full animate-ping opacity-30"
+                    style={{ background: 'linear-gradient(135deg, #FF9100, #FF6B00)' }}
+                  />
+                </div>
+              )}
             </div>
-          )}
 
-          {/* Category badge */}
-          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium ${colors.text} bg-white/5 rounded-full mb-3`}>
-            <BookOpen className="w-3 h-3" />
-            {article.category.replace('-', ' ')}
-          </span>
+            {/* Title & description area */}
+            <div className="mt-auto">
+              {/* Large number indicator */}
+              <div
+                className="text-[120px] font-black leading-none opacity-[0.03] absolute bottom-0 right-8 select-none"
+                style={{
+                  fontFamily: "'SF Pro Display', system-ui, sans-serif",
+                }}
+              >
+                01
+              </div>
 
-          {/* Title */}
-          <h4 className="text-white font-medium mb-3 group-hover:text-primary transition-colors line-clamp-2">
-            {article.title}
-          </h4>
+              <h3 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight group-hover:text-transparent group-hover:bg-clip-text transition-all duration-500"
+                style={{
+                  backgroundImage: 'linear-gradient(135deg, #FFFFFF 0%, #FF9100 100%)',
+                  WebkitBackgroundClip: 'text',
+                }}
+              >
+                {article.title}
+              </h3>
 
-          {/* Meta */}
-          <div className="flex items-center gap-4 text-xs text-white/40">
-            <span className="flex items-center gap-1">
-              <Eye className="w-3 h-3" />
-              {article.views.toLocaleString()} views
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {article.readTime} min read
-            </span>
+              {/* Meta row */}
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 backdrop-blur-sm">
+                  <Eye className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-white/70 font-medium">{article.views.toLocaleString()} views</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 backdrop-blur-sm">
+                  <Clock className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-white/70 font-medium">{article.readTime} min read</span>
+                </div>
+
+                {/* Read arrow */}
+                <div className="ml-auto flex items-center gap-2 text-primary opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300">
+                  <span className="text-sm font-medium">Read article</span>
+                  <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+}
+
+// Bento Article Card - Standard (Small)
+function BentoArticleCard({ article, index }: { article: Article; index: number }) {
+  const colors = categoryColors[article.category] || categoryColors['getting-started'];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: 0.2 + index * 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -8, transition: { duration: 0.3 } }}
+      className="group relative"
+    >
+      <Link href={`/help/articles/${article.id}`} className="block h-full">
+        {/* Hover gradient border */}
+        <div
+          className="absolute -inset-[1px] rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500"
+          style={{
+            background: `linear-gradient(135deg, ${colors.glow.replace('0.15', '0.6')} 0%, transparent 50%, ${colors.glow.replace('0.15', '0.4')} 100%)`,
+          }}
+        />
+
+        {/* Card */}
+        <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm transition-all duration-500 group-hover:border-transparent group-hover:bg-white/[0.04]">
+          {/* Subtle gradient background on hover */}
+          <div
+            className={`absolute inset-0 bg-gradient-to-br ${colors.bg} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+          />
+
+          {/* Glow effect */}
+          <div
+            className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-500"
+            style={{
+              background: `radial-gradient(circle, ${colors.glow.replace('0.15', '1')} 0%, transparent 70%)`,
+              filter: 'blur(30px)',
+            }}
+          />
+
+          {/* Content */}
+          <div className="relative z-10 h-full flex flex-col p-5">
+            {/* Top row - badges */}
+            <div className="flex items-center justify-between mb-4">
+              <span
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium ${colors.text} rounded-lg border ${colors.border} bg-white/[0.03] backdrop-blur-sm`}
+              >
+                <BookOpen className="w-3 h-3" />
+                {article.category.replace('-', ' ')}
+              </span>
+
+              {article.trending && (
+                <span
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(255,145,0,0.2) 0%, rgba(255,107,0,0.1) 100%)',
+                    border: '1px solid rgba(255,145,0,0.3)',
+                  }}
+                >
+                  <Zap className="w-3 h-3 text-primary" />
+                  <span className="text-primary">Trending</span>
+                </span>
+              )}
+            </div>
+
+            {/* Title */}
+            <h4 className="text-lg font-semibold text-white mb-auto leading-snug group-hover:text-white transition-colors line-clamp-2">
+              {article.title}
+            </h4>
+
+            {/* Bottom meta */}
+            <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/[0.06]">
+              <span className="flex items-center gap-1.5 text-xs text-white/50">
+                <Eye className="w-3.5 h-3.5" />
+                {article.views.toLocaleString()}
+              </span>
+              <span className="flex items-center gap-1.5 text-xs text-white/50">
+                <Clock className="w-3.5 h-3.5" />
+                {article.readTime} min
+              </span>
+
+              {/* Arrow indicator */}
+              <ArrowRight className={`w-4 h-4 ml-auto ${colors.text} opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300`} />
+            </div>
           </div>
         </div>
       </Link>
@@ -671,41 +843,119 @@ export default function HelpCenterPage() {
         </div>
       </section>
 
-      {/* Popular Articles Section */}
-      <section className="relative py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            variants={fadeInUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="flex items-center justify-between mb-10"
-          >
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                Popular Articles
+      {/* Popular Articles Section - Bento Grid */}
+      <section className="relative py-24 px-6 overflow-hidden">
+        {/* Section background effects */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute top-1/2 left-0 w-[600px] h-[600px] -translate-y-1/2"
+            style={{
+              background: 'radial-gradient(circle, rgba(255,145,0,0.06) 0%, transparent 60%)',
+              filter: 'blur(80px)',
+            }}
+          />
+          <div
+            className="absolute top-0 right-1/4 w-[400px] h-[400px]"
+            style={{
+              background: 'radial-gradient(circle, rgba(255,107,0,0.04) 0%, transparent 60%)',
+              filter: 'blur(60px)',
+            }}
+          />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto">
+          {/* Section Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              {/* Badge */}
+              <div
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,145,0,0.15) 0%, rgba(255,145,0,0.05) 100%)',
+                  border: '1px solid rgba(255,145,0,0.2)',
+                }}
+              >
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium text-primary">Most Popular</span>
+              </div>
+
+              {/* Headline */}
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">
+                Popular{' '}
+                <span
+                  className="bg-clip-text text-transparent"
+                  style={{
+                    background: 'linear-gradient(135deg, #FF9100 0%, #FFB84D 100%)',
+                    WebkitBackgroundClip: 'text',
+                  }}
+                >
+                  Articles
+                </span>
               </h2>
-              <p className="text-white/50">Most viewed help articles this week</p>
-            </div>
+              <p className="text-lg text-white/50 max-w-md">
+                Discover the most viewed guides and tutorials from this week
+              </p>
+            </motion.div>
+
+            {/* View all link */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <Link
+                href="/help/articles"
+                className="group inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-primary/30 transition-all duration-300"
+              >
+                <span className="text-white/70 group-hover:text-white transition-colors">View all articles</span>
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                  style={{
+                    background: 'linear-gradient(135deg, #FF9100 0%, #FF6B00 100%)',
+                  }}
+                >
+                  <ArrowRight className="w-4 h-4 text-black" />
+                </div>
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Bento Grid Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[minmax(180px,auto)]">
+            {/* Featured Card - spans 2 cols and 2 rows */}
+            <BentoFeaturedCard article={popularArticles[0]} index={0} />
+
+            {/* Right column cards */}
+            <BentoArticleCard article={popularArticles[1]} index={1} />
+            <BentoArticleCard article={popularArticles[2]} index={2} />
+
+            {/* Bottom row cards */}
+            <BentoArticleCard article={popularArticles[3]} index={3} />
+            <BentoArticleCard article={popularArticles[4]} index={4} />
+            <BentoArticleCard article={popularArticles[5]} index={5} />
+          </div>
+
+          {/* Mobile view all link */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5 }}
+            className="mt-8 text-center md:hidden"
+          >
             <Link
               href="/help/articles"
-              className="hidden md:flex items-center gap-2 text-primary hover:underline"
+              className="inline-flex items-center gap-2 text-primary font-medium"
             >
               View all articles
               <ArrowRight className="w-4 h-4" />
             </Link>
-          </motion.div>
-
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-          >
-            {popularArticles.map((article, index) => (
-              <ArticleCard key={article.id} article={article} index={index} />
-            ))}
           </motion.div>
         </div>
       </section>
