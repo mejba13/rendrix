@@ -646,21 +646,21 @@ function RequirementsCompact() {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
       {requirements.map((req, index) => (
         <motion.div
           key={index}
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 + index * 0.05 }}
-          whileHover={{ x: 2 }}
-          className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-all group"
+          whileHover={{ x: 3 }}
+          className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-all group"
         >
-          <div className={`w-6 h-6 rounded-md bg-white/[0.03] flex items-center justify-center flex-shrink-0 ${req.color}`}>
-            <req.icon className="w-3.5 h-3.5" />
+          <div className={`w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center flex-shrink-0 ${req.color} group-hover:scale-105 transition-transform`}>
+            <req.icon className="w-4 h-4" />
           </div>
-          <span className="text-xs text-white/50 group-hover:text-white/70 transition-colors leading-tight">{req.text}</span>
-          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500/40 ml-auto flex-shrink-0" />
+          <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors leading-tight">{req.text}</span>
+          <CheckCircle2 className="w-4 h-4 text-emerald-500/50 ml-auto flex-shrink-0" />
         </motion.div>
       ))}
     </div>
@@ -1087,10 +1087,12 @@ export default function ThemeUploadPage() {
 
               {/* Requirements Card */}
               <motion.div variants={itemVariants}>
-                <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-4 backdrop-blur-sm">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Shield className="w-4 h-4 text-emerald-400" />
-                    <h3 className="text-sm font-medium text-white">Requirements</h3>
+                <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-5 backdrop-blur-sm">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                      <Shield className="w-4.5 h-4.5 text-emerald-400" />
+                    </div>
+                    <h3 className="text-base font-semibold text-white">Requirements</h3>
                   </div>
                   <RequirementsCompact />
                 </div>
@@ -1129,18 +1131,18 @@ export default function ThemeUploadPage() {
 
               {/* Pro Tip Card */}
               <motion.div variants={itemVariants}>
-                <div className="rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/20 p-4 backdrop-blur-sm">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-                      <Cpu className="w-4 h-4 text-amber-400" />
+                <div className="rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/20 p-5 backdrop-blur-sm">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                      <Cpu className="w-5 h-5 text-amber-400" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-semibold text-amber-400 mb-1">Pro Tip</h4>
-                      <p className="text-xs text-white/50 leading-relaxed">
-                        Use our CLI tool for faster theme development with hot reload.
+                      <h4 className="text-base font-semibold text-amber-400 mb-1.5">Pro Tip</h4>
+                      <p className="text-sm text-white/60 leading-relaxed">
+                        Use our CLI tool for faster theme development with hot reload and instant validation.
                       </p>
-                      <a href="#" className="inline-flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 mt-1.5 transition-colors">
-                        Learn more <ChevronRight className="w-3 h-3" />
+                      <a href="#" className="inline-flex items-center gap-1.5 text-sm text-amber-400 hover:text-amber-300 mt-2.5 font-medium transition-colors">
+                        Learn more <ChevronRight className="w-4 h-4" />
                       </a>
                     </div>
                   </div>
