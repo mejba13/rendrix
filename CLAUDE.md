@@ -53,8 +53,8 @@ docker-compose up -d        # Start PostgreSQL, Redis, Meilisearch, MinIO, Mailh
 ```
 
 ### Demo Credentials (after seeding)
-- Email: demo@rendrix.com
-- Password: demo123456
+- Admin: admin@rendrix.com / Admin@123456
+- Demo: demo@rendrix.com / Demo@123456
 
 ## Architecture
 
