@@ -164,125 +164,123 @@ export default function RegisterPage() {
     <div className="min-h-screen flex bg-[#f8f8f8]">
       {/* ===== LEFT SIDE - Testimonial Panel ===== */}
       <div className="hidden lg:flex lg:w-[45%] xl:w-[50%] relative overflow-hidden">
-        {/* Background with YouTube Video */}
+        {/* ===== CINEMATIC VIDEO BACKGROUND ===== */}
         <div className="absolute inset-0">
-          {/* Base Dark Background */}
-          <div className="absolute inset-0 bg-black" />
-
-          {/* YouTube Video Background */}
+          {/* Layer 1: Fallback gradient background */}
           <div
-            className={`absolute inset-0 overflow-hidden transition-opacity duration-[2000ms] ${
-              videoReady ? 'opacity-100' : 'opacity-0'
-            }`}
+            className="absolute inset-0 z-0"
+            style={{
+              background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)',
+            }}
+          />
+
+          {/* Layer 2: YouTube Video Background */}
+          <div
+            className={`absolute inset-0 z-[1] overflow-hidden transition-opacity duration-1000 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            style={{ pointerEvents: 'none' }}
           >
-            <iframe
-              src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1&loop=1&playlist=${youtubeVideoId}&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
-              title="Background Video"
-              allow="autoplay; encrypted-media"
-              allowFullScreen={false}
-              className="absolute top-1/2 left-1/2 w-[100vw] h-[100vh] min-w-[177.77vh] min-h-[56.25vw] border-0"
+            <div
+              className="absolute w-full h-full"
               style={{
-                transform: 'translate(-50%, -50%)',
-                filter: 'brightness(0.5) saturate(1.3) contrast(1.1)',
-                pointerEvents: 'none',
+                transform: 'scale(1.2)',
+                transformOrigin: 'center center',
               }}
-            />
+            >
+              <iframe
+                src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1&loop=1&playlist=${youtubeVideoId}&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
+                title="Background Video"
+                allow="autoplay; encrypted-media"
+                allowFullScreen={false}
+                className="absolute top-1/2 left-1/2 w-[100vw] h-[100vh] min-w-[177.77vh] min-h-[56.25vw] border-0"
+                style={{
+                  transform: 'translate(-50%, -50%)',
+                  filter: 'brightness(0.5) saturate(1.3) contrast(1.1)',
+                  pointerEvents: 'none',
+                }}
+              />
+            </div>
           </div>
 
-          {/* Cinematic Overlay Layer 1 - Deep Black Gradient */}
+          {/* Layer 3: Cinematic overlay gradients */}
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 z-[2]"
             style={{
-              background: 'linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.8) 100%)',
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.85) 100%)',
             }}
           />
 
-          {/* Cinematic Overlay Layer 2 - Orange Radial Glow */}
+          {/* Layer 4: Side vignette */}
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 z-[3]"
             style={{
-              background: `
-                radial-gradient(ellipse 100% 80% at 30% 90%, rgba(255,145,0,0.25) 0%, transparent 60%),
-                radial-gradient(ellipse 70% 50% at 90% 10%, rgba(255,107,0,0.15) 0%, transparent 50%)
-              `,
+              background: 'radial-gradient(ellipse at 50% 50%, transparent 0%, rgba(0,0,0,0.5) 100%)',
             }}
           />
 
-          {/* Cinematic Overlay Layer 3 - Vignette */}
+          {/* Layer 5: Orange ambient glow from bottom */}
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 z-[4]"
             style={{
-              background: 'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 0%, rgba(0,0,0,0.6) 100%)',
+              background: 'radial-gradient(ellipse 80% 50% at 50% 100%, rgba(255,145,0,0.2) 0%, transparent 60%)',
             }}
           />
 
-          {/* Cinematic Overlay Layer 4 - Diagonal Light Streak */}
+          {/* Layer 6: Top glow */}
           <div
-            className="absolute inset-0 opacity-20"
+            className="absolute inset-0 z-[5]"
             style={{
-              background: 'linear-gradient(45deg, transparent 30%, rgba(255,145,0,0.1) 50%, transparent 70%)',
+              background: 'radial-gradient(ellipse 60% 30% at 50% 0%, rgba(255,145,0,0.12) 0%, transparent 50%)',
             }}
           />
 
-          {/* Cinematic Overlay Layer 5 - Bottom Fade */}
+          {/* Layer 7: Noise texture */}
           <div
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 40%)',
-            }}
-          />
-
-          {/* Cinematic Overlay Layer 6 - Film Grain */}
-          <div
-            className="absolute inset-0 opacity-[0.04] mix-blend-overlay"
+            className="absolute inset-0 z-[6] opacity-[0.03] pointer-events-none"
             style={{
               backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")',
             }}
           />
 
-          {/* Cinematic Overlay Layer 7 - Subtle Orange Tint */}
+          {/* Layer 8: Right edge fade for seamless transition */}
           <div
-            className="absolute inset-0 mix-blend-color opacity-10"
-            style={{ background: '#FF9100' }}
-          />
-
-          {/* Cinematic Overlay Layer 8 - Depth Gradient */}
-          <div
-            className="absolute inset-0"
+            className="absolute inset-0 z-[7]"
             style={{
-              background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.5) 100%)',
+              background: 'linear-gradient(90deg, transparent 0%, transparent 70%, rgba(248,248,248,0.1) 90%, rgba(248,248,248,0.3) 100%)',
             }}
           />
+        </div>
 
-          {/* Floating Particles */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {[...Array(20)].map((_, i) => (
+        {/* ===== FLOATING PARTICLES ===== */}
+        {mounted && (
+          <div className="absolute inset-0 z-[8] overflow-hidden pointer-events-none">
+            {[...Array(12)].map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-1 h-1 rounded-full bg-primary/40"
-                initial={{
-                  x: Math.random() * 100 + '%',
-                  y: Math.random() * 100 + '%',
-                  opacity: 0,
-                }}
+                className="absolute rounded-full"
+                initial={{ opacity: 0 }}
                 animate={{
-                  y: [null, '-20%'],
-                  opacity: [0, 0.6, 0],
+                  opacity: [0.3, 0.7, 0.3],
+                  y: [0, -30, 0],
+                  x: [0, Math.sin(i) * 10, 0],
                 }}
                 transition={{
-                  duration: Math.random() * 8 + 6,
+                  duration: 4 + i * 0.5,
                   repeat: Infinity,
-                  delay: Math.random() * 5,
-                  ease: 'linear',
+                  delay: i * 0.2,
+                  ease: 'easeInOut',
                 }}
                 style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${50 + Math.random() * 50}%`,
+                  width: 2 + (i % 3),
+                  height: 2 + (i % 3),
+                  left: `${10 + i * 7}%`,
+                  top: `${20 + (i * 5) % 60}%`,
+                  background: i % 3 === 0 ? '#FF9100' : 'rgba(255,255,255,0.6)',
+                  boxShadow: i % 3 === 0 ? '0 0 6px rgba(255,145,0,0.5)' : 'none',
                 }}
               />
             ))}
           </div>
-        </div>
+        )}
 
         {/* Content */}
         <div className="relative z-10 flex flex-col w-full h-full p-10 xl:p-14">
