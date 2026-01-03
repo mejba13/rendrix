@@ -9,3 +9,4 @@ export { seedCoupons } from './coupons';
 export { seedBlog } from './blog';
 export { seedPages } from './pages';
 export { seedMedia } from './media';
+export { seedMenus } from './menus';
