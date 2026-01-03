@@ -1,17 +1,13 @@
 'use client';
 
-import { use } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { ArrowLeft, FolderTree } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CategoryForm } from '@/components/categories/category-form';
 import { useCategory } from '@/hooks/use-categories';
 import { useStoreStore } from '@/store/store';
-
-interface EditCategoryPageProps {
-  params: Promise<{ categoryId: string }>;
-}
 
 function LoadingSkeleton() {
   return (
@@ -44,8 +40,9 @@ function LoadingSkeleton() {
   );
 }
 
-export default function EditCategoryPage({ params }: EditCategoryPageProps) {
-  const { categoryId } = use(params);
+export default function EditCategoryPage() {
+  const params = useParams();
+  const categoryId = params.categoryId as string;
   const { currentStore } = useStoreStore();
   const { data: category, isLoading, error } = useCategory(categoryId);
 
