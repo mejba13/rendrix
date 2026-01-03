@@ -244,6 +244,7 @@ model Store {
   blogCategories BlogCategory[]
   pages          Page[]
   menus          Menu[]
+  banners        Banner[]
   themeBackups   StoreThemeBackup[]
 
   @@unique([organizationId, slug])
@@ -863,6 +864,41 @@ model MenuItem {
   @@index([parentId])
   @@index([sortOrder])
   @@map("menu_items")
+}
+
+// ==================== BANNERS ====================
+
+model Banner {
+  id             String    @id @default(uuid()) @db.Uuid
+  storeId        String    @map("store_id") @db.Uuid
+  title          String    @db.VarChar(255)
+  description    String?
+  imageUrl       String?   @map("image_url")
+  imageUrlTablet String?   @map("image_url_tablet")
+  imageUrlMobile String?   @map("image_url_mobile")
+  ctaText        String?   @map("cta_text") @db.VarChar(100)
+  ctaUrl         String?   @map("cta_url") @db.VarChar(500)
+  ctaTarget      String    @default("_self") @map("cta_target") @db.VarChar(20) // _self, _blank
+  placement      String    @default("homepage_hero") @db.VarChar(50) // homepage_hero, section_banner, collection_banner, announcement_bar
+  status         String    @default("draft") @db.VarChar(50) // draft, active, scheduled, inactive
+  startDate      DateTime? @map("start_date")
+  endDate        DateTime? @map("end_date")
+  priority       Int       @default(0)
+  sortOrder      Int       @default(0) @map("sort_order")
+  backgroundColor String?  @map("background_color") @db.VarChar(20)
+  textColor      String?   @map("text_color") @db.VarChar(20)
+  overlayOpacity Int       @default(0) @map("overlay_opacity") // 0-100
+  metadata       Json      @default("{}")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([storeId, status])
+  @@index([storeId, placement])
+  @@index([startDate, endDate])
+  @@map("banners")
 }
 
 // ==================== AUDIT LOGS ====================
