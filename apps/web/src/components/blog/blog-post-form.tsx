@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import {
   Select,
   SelectContent,
@@ -158,11 +159,11 @@ export function BlogPostForm({ post, onSubmit, isSubmitting }: BlogPostFormProps
 
               <div className="space-y-2">
                 <Label htmlFor="content" className="text-white/70">Content</Label>
-                <Textarea
-                  id="content"
-                  {...register('content')}
-                  className="bg-white/[0.04] border-white/[0.08] text-white min-h-[400px] font-mono"
-                  placeholder="Write your blog post content here... (Markdown supported)"
+                <RichTextEditor
+                  value={watch('content') || ''}
+                  onChange={(html) => setValue('content', html)}
+                  placeholder="Write your blog post content here..."
+                  minHeight={400}
                 />
               </div>
             </CardContent>

@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import {
   Select,
   SelectContent,
@@ -233,11 +234,11 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="description">Full Description</Label>
-                <Textarea
-                  id="description"
+                <RichTextEditor
+                  value={watch('description') || ''}
+                  onChange={(html) => setValue('description', html)}
                   placeholder="Detailed product description..."
-                  rows={5}
-                  {...register('description')}
+                  minHeight={200}
                 />
               </div>
             </CardContent>
