@@ -10,6 +10,7 @@ import {
   seedPages,
   seedMedia,
   seedMenus,
+  seedBanners,
 } from './seeds';
 
 const prisma = new PrismaClient();
@@ -970,6 +971,10 @@ async function main() {
     await seedMenus(prisma, stores);
     console.log('✅ Created navigation menus for all stores');
 
+    // Seed promotional banners
+    await seedBanners(prisma, stores);
+    console.log('✅ Created promotional banners for all stores');
+
     // ========================================
     // Print Login Credentials & Summary
     // ========================================
@@ -1001,6 +1006,7 @@ async function main() {
     console.log('   - Pages: 7 per store (About, Services, Contact, FAQ, etc.)');
     console.log('   - Media: 12-15 assets per store');
     console.log('   - Menus: 4 per store (Header, Footer, Mobile, Utility)');
+    console.log('   - Banners: 12 per store (Hero, Section, Collection, Announcement)');
     console.log('\n🎁 SAMPLE COUPON CODES:');
     console.log('   --------------------------------');
     console.log('   Ramlit: TECH20, STARTUP15, DEVOPS25');
