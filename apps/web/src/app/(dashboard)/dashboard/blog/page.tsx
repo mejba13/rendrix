@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   Plus,
   Search,
@@ -15,10 +15,11 @@ import {
   Filter,
   RefreshCw,
   BookOpen,
-  TrendingUp,
   Calendar,
   ChevronLeft,
   ChevronRight,
+  FolderTree,
+  Tag,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -66,6 +67,14 @@ import {
   BlogPostStatus,
 } from '@/hooks/use-blogs';
 import { formatRelativeTime } from '@rendrix/utils';
+import { cn } from '@/lib/utils';
+
+// Blog navigation tabs
+const blogTabs = [
+  { name: 'All Posts', href: '/dashboard/blog', icon: FileText },
+  { name: 'Categories', href: '/dashboard/blog/categories', icon: FolderTree },
+  { name: 'Tags', href: '/dashboard/blog/tags', icon: Tag },
+];
 
 const statusStyles: Record<BlogPostStatus, { label: string; bg: string; text: string; dot: string }> = {
   draft: { label: 'Draft', bg: 'bg-white/[0.06]', text: 'text-white/60', dot: 'bg-white/40' },
@@ -73,40 +82,42 @@ const statusStyles: Record<BlogPostStatus, { label: string; bg: string; text: st
   scheduled: { label: 'Scheduled', bg: 'bg-blue-500/20', text: 'text-blue-400', dot: 'bg-blue-500' },
 };
 
-// Stat Card Component - Dark Theme
-function StatCard({
+// Bento Stat Card - Consistent with Categories/Tags pages
+function BentoCard({
   icon: Icon,
   label,
   value,
-  trend,
-  trendUp,
-  iconGradient,
+  subValue,
+  gradient,
+  delay = 0,
 }: {
   icon: React.ElementType;
   label: string;
   value: string | number;
-  trend?: string;
-  trendUp?: boolean;
-  iconGradient: string;
+  subValue?: string;
+  gradient: string;
+  delay?: number;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300">
-      <div className="flex items-start justify-between">
-        <div className={`w-12 h-12 rounded-xl ${iconGradient} flex items-center justify-center`}>
+    <div
+      className={cn(
+        'group relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6',
+        'hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-500',
+        'animate-in fade-in slide-in-from-bottom-4'
+      )}
+      style={{ animationDelay: `${delay}ms`, animationFillMode: 'backwards' }}
+    >
+      <div className={cn('absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 bg-gradient-to-br', gradient)} />
+
+      <div className="relative flex items-start justify-between">
+        <div className={cn('w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg', gradient)}>
           <Icon className="w-6 h-6 text-white" />
         </div>
-        {trend && (
-          <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
-            trendUp ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
-          }`}>
-            <TrendingUp className={`w-3 h-3 ${!trendUp ? 'rotate-180' : ''}`} />
-            {trend}
-          </div>
-        )}
       </div>
-      <div className="mt-4">
-        <h3 className="text-3xl font-semibold text-white tracking-tight">{value}</h3>
+      <div className="relative mt-4">
+        <h3 className="text-3xl font-bold tracking-tight text-white">{value}</h3>
         <p className="text-sm text-white/50 mt-1">{label}</p>
+        {subValue && <p className="text-xs text-white/40 mt-0.5">{subValue}</p>}
       </div>
     </div>
   );
@@ -171,6 +182,7 @@ function TableSkeleton() {
 
 export default function BlogPostsPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<BlogPostStatus | 'all'>('all');
@@ -285,33 +297,62 @@ export default function BlogPostsPage() {
         </div>
       </div>
 
+      {/* Navigation Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        {blogTabs.map((tab) => {
+          const isActive = pathname === tab.href;
+          const Icon = tab.icon;
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              className={cn(
+                'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300',
+                isActive
+                  ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                  : 'text-white/50 hover:text-white hover:bg-white/[0.04]'
+              )}
+            >
+              <Icon className="w-4 h-4" />
+              {tab.name}
+            </Link>
+          );
+        })}
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
+        <BentoCard
           icon={FileText}
           label="Total Posts"
           value={stats.total}
-          trend={stats.total > 0 ? '+12%' : undefined}
-          trendUp={true}
-          iconGradient="bg-gradient-to-br from-blue-500/20 to-indigo-500/10"
+          subValue="All blog content"
+          gradient="from-blue-500 to-indigo-500"
+          delay={0}
         />
-        <StatCard
+        <BentoCard
           icon={Eye}
           label="Published"
           value={stats.published}
-          iconGradient="bg-gradient-to-br from-emerald-500/20 to-green-500/10"
+          subValue="Live on storefront"
+          gradient="from-emerald-500 to-green-500"
+          delay={50}
         />
-        <StatCard
+        <BentoCard
           icon={Pencil}
           label="Drafts"
           value={stats.draft}
-          iconGradient="bg-gradient-to-br from-white/10 to-white/5"
+          subValue="In progress"
+          gradient="from-slate-500 to-zinc-500"
+          delay={100}
         />
-        <StatCard
+        <BentoCard
           icon={Star}
           label="Featured"
           value={stats.featured}
-          iconGradient="bg-gradient-to-br from-amber-500/20 to-yellow-500/10"
+          subValue="Highlighted content"
+          gradient="from-amber-500 to-orange-500"
+          delay={150}
         />
       </div>
 

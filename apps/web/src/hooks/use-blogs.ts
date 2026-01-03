@@ -310,3 +310,144 @@ export function useDeleteBlogCategory() {
     },
   });
 }
+
+// Blog Tags Types and Hooks
+export interface BlogTag {
+  id: string;
+  storeId: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  postsCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface BlogTagsResponse {
+  success: boolean;
+  data: BlogTag[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasMore: boolean;
+  };
+}
+
+interface BlogTagsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: 'name' | 'postsCount' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface CreateBlogTagInput {
+  name: string;
+  slug?: string;
+  description?: string;
+}
+
+export interface UpdateBlogTagInput extends Partial<CreateBlogTagInput> {}
+
+export function useBlogTags(params: BlogTagsParams = {}) {
+  const { currentStore } = useStoreStore();
+
+  return useQuery({
+    queryKey: ['blogTags', currentStore?.id, params],
+    queryFn: async () => {
+      if (!currentStore) throw new Error('No store selected');
+
+      const searchParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          searchParams.set(key, String(value));
+        }
+      });
+
+      const response = await apiClient.get<BlogTagsResponse>(
+        `/stores/${currentStore.id}/blogs/tags?${searchParams.toString()}`
+      );
+      return response;
+    },
+    enabled: !!currentStore,
+  });
+}
+
+export function useCreateBlogTag() {
+  const queryClient = useQueryClient();
+  const { currentStore } = useStoreStore();
+
+  return useMutation({
+    mutationFn: async (data: CreateBlogTagInput) => {
+      if (!currentStore) throw new Error('No store selected');
+
+      const response = await apiClient.post<{ success: boolean; data: BlogTag }>(
+        `/stores/${currentStore.id}/blogs/tags`,
+        data
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogTags', currentStore?.id] });
+    },
+  });
+}
+
+export function useUpdateBlogTag() {
+  const queryClient = useQueryClient();
+  const { currentStore } = useStoreStore();
+
+  return useMutation({
+    mutationFn: async ({ tagId, data }: { tagId: string; data: UpdateBlogTagInput }) => {
+      if (!currentStore) throw new Error('No store selected');
+
+      const response = await apiClient.patch<{ success: boolean; data: BlogTag }>(
+        `/stores/${currentStore.id}/blogs/tags/${tagId}`,
+        data
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogTags', currentStore?.id] });
+    },
+  });
+}
+
+export function useDeleteBlogTag() {
+  const queryClient = useQueryClient();
+  const { currentStore } = useStoreStore();
+
+  return useMutation({
+    mutationFn: async (tagId: string) => {
+      if (!currentStore) throw new Error('No store selected');
+
+      await apiClient.delete(`/stores/${currentStore.id}/blogs/tags/${tagId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogTags', currentStore?.id] });
+    },
+  });
+}
+
+export function useMergeBlogTags() {
+  const queryClient = useQueryClient();
+  const { currentStore } = useStoreStore();
+
+  return useMutation({
+    mutationFn: async ({ sourceTagIds, targetTagId }: { sourceTagIds: string[]; targetTagId: string }) => {
+      if (!currentStore) throw new Error('No store selected');
+
+      const response = await apiClient.post<{ success: boolean; data: { merged: number } }>(
+        `/stores/${currentStore.id}/blogs/tags/merge`,
+        { sourceTagIds, targetTagId }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogTags', currentStore?.id] });
+      queryClient.invalidateQueries({ queryKey: ['blogPosts', currentStore?.id] });
+    },
+  });
+}

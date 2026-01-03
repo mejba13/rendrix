@@ -4,20 +4,18 @@ import * as React from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import {
-  Plus,
-  ShoppingCart,
+  Clock,
   Download,
   RefreshCw,
   DollarSign,
-  Clock,
-  CheckCircle2,
   TrendingUp,
-  Package,
-  FileText,
-  XCircle,
-  RotateCcw,
   ArrowRight,
   Layers,
+  CheckCircle2,
+  RotateCcw,
+  XCircle,
+  CreditCard,
+  Package,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -57,7 +55,7 @@ function BentoCard({
   trendUp,
   gradient,
   valueColor,
-  href,
+  urgent,
   className,
   delay = 0,
 }: {
@@ -69,24 +67,30 @@ function BentoCard({
   trendUp?: boolean;
   gradient: string;
   valueColor?: string;
-  href?: string;
+  urgent?: boolean;
   className?: string;
   delay?: number;
 }) {
-  const content = (
+  return (
     <div
       className={cn(
         'group relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6',
         'hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-500',
         'animate-in fade-in slide-in-from-bottom-4',
+        urgent && 'border-amber-500/30 bg-amber-500/5',
         className
       )}
       style={{ animationDelay: `${delay}ms`, animationFillMode: 'backwards' }}
     >
-      {/* Background gradient effect */}
-      <div className={cn('absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br', gradient)} style={{ opacity: 0.03 }} />
+      {urgent && (
+        <div className="absolute top-3 right-3">
+          <span className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+          </span>
+        </div>
+      )}
 
-      {/* Floating orb */}
       <div className={cn('absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 bg-gradient-to-br', gradient)} />
 
       <div className="relative flex items-start justify-between">
@@ -106,24 +110,12 @@ function BentoCard({
         )}
       </div>
       <div className="relative mt-4">
-        <h3 className={cn('text-3xl font-bold tracking-tight', valueColor || 'text-white')}>
-          {value}
-        </h3>
+        <h3 className={cn('text-3xl font-bold tracking-tight', valueColor || 'text-white')}>{value}</h3>
         <p className="text-sm text-white/50 mt-1">{label}</p>
         {subValue && <p className="text-xs text-white/40 mt-0.5">{subValue}</p>}
       </div>
-      {href && (
-        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
-          <ArrowRight className="w-5 h-5 text-white/40" />
-        </div>
-      )}
     </div>
   );
-
-  if (href) {
-    return <Link href={href}>{content}</Link>;
-  }
-  return content;
 }
 
 // Stat Card Skeleton
@@ -149,111 +141,81 @@ function EmptyState() {
       <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent" />
       <div className="relative flex flex-col items-center justify-center py-20 px-6">
         <div className="relative mb-6">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 flex items-center justify-center">
-            <ShoppingCart className="w-10 h-10 text-amber-400" />
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500/20 to-yellow-500/10 flex items-center justify-center">
+            <Clock className="w-10 h-10 text-amber-400" />
           </div>
           <div className="absolute -top-2 -right-2 w-6 h-6 rounded-lg bg-emerald-500/20 flex items-center justify-center">
             <CheckCircle2 className="w-3 h-3 text-emerald-400" />
           </div>
-          <div className="absolute -bottom-1 -left-3 w-5 h-5 rounded-md bg-blue-500/20 flex items-center justify-center">
-            <Package className="w-2.5 h-2.5 text-blue-400" />
-          </div>
         </div>
 
-        <h3 className="text-xl font-semibold text-white mb-2">No orders yet</h3>
+        <h3 className="text-xl font-semibold text-white mb-2">No pending orders</h3>
         <p className="text-white/50 text-center max-w-md mb-6">
-          Orders will appear here once customers make purchases from your store. You can also create
-          manual orders for phone or in-person sales.
+          Great news! There are no orders requiring your attention right now. All orders have been processed.
         </p>
 
-        <div className="flex items-center gap-3">
-          <Button
-            asChild
-            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium shadow-md gap-2"
-          >
-            <Link href="/dashboard/orders/new">
-              <Plus className="w-4 h-4" />
-              Create manual order
-            </Link>
-          </Button>
-          <Button
-            variant="outline"
-            className="gap-2 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06]"
-          >
-            <FileText className="w-4 h-4" />
-            Import orders
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Error State Component
-function ErrorState({ onRetry }: { onRetry: () => void }) {
-  return (
-    <div className="rounded-2xl bg-white/[0.02] border border-red-500/20">
-      <div className="flex flex-col items-center justify-center py-16 px-6">
-        <div className="w-14 h-14 rounded-xl bg-red-500/10 flex items-center justify-center mb-4">
-          <ShoppingCart className="w-7 h-7 text-red-400" />
-        </div>
-        <h3 className="text-lg font-semibold text-white mb-1">Error loading orders</h3>
-        <p className="text-white/50 text-center max-w-sm mb-4">
-          Something went wrong while fetching your orders. Please try again.
-        </p>
-        <Button
-          onClick={onRetry}
-          className="gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Try again
+        <Button asChild variant="outline" className="gap-2 bg-transparent border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06]">
+          <Link href="/dashboard/orders">
+            <ArrowRight className="w-4 h-4 rotate-180" />
+            Back to all orders
+          </Link>
         </Button>
       </div>
     </div>
   );
 }
 
-// Quick Action Card
-function QuickActionCard({
+// Action Card
+function ActionCard({
   icon: Icon,
   title,
   description,
-  href,
+  count,
   gradient,
+  urgent,
   delay = 0,
 }: {
   icon: React.ElementType;
   title: string;
   description: string;
-  href: string;
+  count: number;
   gradient: string;
+  urgent?: boolean;
   delay?: number;
 }) {
   return (
-    <Link
-      href={href}
+    <div
       className={cn(
         'group relative overflow-hidden rounded-xl bg-white/[0.02] border border-white/[0.06] p-4',
-        'hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300',
-        'animate-in fade-in slide-in-from-bottom-2'
+        'hover:bg-white/[0.04] transition-all duration-300',
+        'animate-in fade-in slide-in-from-bottom-2',
+        urgent && 'border-amber-500/30'
       )}
       style={{ animationDelay: `${delay}ms`, animationFillMode: 'backwards' }}
     >
-      <div className="flex items-center gap-3">
-        <div className={cn('w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center', gradient)}>
+      <div className="flex items-start gap-3">
+        <div className={cn('w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center flex-shrink-0', gradient)}>
           <Icon className="w-5 h-5 text-white" />
         </div>
-        <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-medium text-white truncate">{title}</h4>
-          <p className="text-xs text-white/50 truncate">{description}</p>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <h4 className="text-sm font-medium text-white">{title}</h4>
+            {urgent && (
+              <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">Action needed</span>
+            )}
+          </div>
+          <p className="text-xs text-white/50 mt-0.5">{description}</p>
         </div>
-        <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-white/60 group-hover:translate-x-1 transition-all" />
+        <div className="text-right">
+          <span className={cn('text-xl font-bold', urgent ? 'text-amber-400' : 'text-white')}>{count}</span>
+          <p className="text-xs text-white/40">orders</p>
+        </div>
       </div>
-    </Link>
+    </div>
   );
 }
 
-export default function OrdersPage() {
+export default function PendingOrdersPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { toast } = useToast();
@@ -266,8 +228,19 @@ export default function OrdersPage() {
   });
   const [cancelOrderId, setCancelOrderId] = React.useState<string | null>(null);
 
-  const { data, isLoading, error, refetch } = useOrders(filters);
+  // Fetch pending and confirmed orders
+  const { data, isLoading, refetch } = useOrders({
+    ...filters,
+    status: undefined, // We'll filter client-side for pending + confirmed
+  });
+
   const cancelOrder = useCancelOrder();
+
+  // Filter for pending orders only
+  const pendingOrders = React.useMemo(() => {
+    if (!data?.data) return [];
+    return data.data.filter((o) => o.status === 'pending' || o.status === 'confirmed' || o.status === 'processing');
+  }, [data]);
 
   const handleCancel = async () => {
     if (!cancelOrderId) return;
@@ -294,34 +267,25 @@ export default function OrdersPage() {
 
   // Calculate stats
   const stats = React.useMemo(() => {
-    if (!data?.data) return { total: 0, revenue: 0, pending: 0, fulfilled: 0, completed: 0, refunded: 0, cancelled: 0 };
+    if (!pendingOrders.length) return { total: 0, revenue: 0, awaitingPayment: 0, awaitingFulfillment: 0 };
     return {
-      total: data.meta.total,
-      revenue: data.data.reduce((sum, o) => sum + o.total, 0),
-      pending: data.data.filter((o) => o.status === 'pending' || o.status === 'confirmed').length,
-      fulfilled: data.data.filter((o) => o.fulfillmentStatus === 'fulfilled').length,
-      completed: data.data.filter((o) => o.status === 'delivered').length,
-      refunded: data.data.filter((o) => o.paymentStatus === 'refunded').length,
-      cancelled: data.data.filter((o) => o.status === 'cancelled').length,
+      total: pendingOrders.length,
+      revenue: pendingOrders.reduce((sum, o) => sum + o.total, 0),
+      awaitingPayment: pendingOrders.filter((o) => o.paymentStatus === 'pending').length,
+      awaitingFulfillment: pendingOrders.filter((o) => o.fulfillmentStatus === 'unfulfilled' && o.paymentStatus === 'paid').length,
     };
-  }, [data]);
+  }, [pendingOrders]);
 
   if (!currentStore) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <div className="w-16 h-16 rounded-2xl bg-white/[0.06] flex items-center justify-center">
-          <ShoppingCart className="w-8 h-8 text-white/40" />
+          <Clock className="w-8 h-8 text-white/40" />
         </div>
         <div className="text-center space-y-2">
           <h3 className="text-lg font-semibold text-white">No store selected</h3>
           <p className="text-white/50 max-w-sm">Please select a store from the sidebar to view orders.</p>
         </div>
-        <Button
-          asChild
-          className="mt-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium"
-        >
-          <Link href="/dashboard/stores/new">Create a store</Link>
-        </Button>
       </div>
     );
   }
@@ -331,13 +295,23 @@ export default function OrdersPage() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 flex items-center justify-center ring-1 ring-amber-500/20">
-            <ShoppingCart className="w-6 h-6 text-amber-400" />
+          <div className="relative">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-yellow-500/10 flex items-center justify-center ring-1 ring-amber-500/20">
+              <Clock className="w-6 h-6 text-amber-400" />
+            </div>
+            {stats.total > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-5 w-5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-5 w-5 bg-amber-500 items-center justify-center text-[10px] font-bold text-black">
+                  {stats.total > 9 ? '9+' : stats.total}
+                </span>
+              </span>
+            )}
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Orders</h1>
+            <h1 className="text-2xl font-bold text-white tracking-tight">Pending Orders</h1>
             <p className="text-white/50 text-sm mt-0.5">
-              Manage orders, track fulfillment, and process refunds
+              Orders requiring your attention for payment or fulfillment
             </p>
           </div>
         </div>
@@ -360,16 +334,6 @@ export default function OrdersPage() {
             <Download className="w-4 h-4" />
             Export
           </Button>
-          <Button
-            asChild
-            size="sm"
-            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-medium shadow-md gap-2"
-          >
-            <Link href="/dashboard/orders/new">
-              <Plus className="w-4 h-4" />
-              Create order
-            </Link>
-          </Button>
         </div>
       </div>
 
@@ -385,11 +349,11 @@ export default function OrdersPage() {
               className={cn(
                 'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300',
                 isActive
-                  ? 'bg-white/[0.08] text-white border border-white/[0.1]'
+                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                   : 'text-white/50 hover:text-white hover:bg-white/[0.04]'
               )}
             >
-              <Icon className={cn('w-4 h-4', isActive && 'text-amber-400')} />
+              <Icon className="w-4 h-4" />
               {tab.name}
             </Link>
           );
@@ -408,101 +372,90 @@ export default function OrdersPage() {
         ) : (
           <>
             <BentoCard
-              icon={ShoppingCart}
-              label="Total Orders"
+              icon={Clock}
+              label="Pending Orders"
               value={stats.total.toLocaleString()}
-              trend={stats.total > 0 ? '+12.5%' : undefined}
-              trendUp={true}
-              gradient="from-blue-500 to-cyan-500"
+              subValue="Require attention"
+              gradient="from-amber-500 to-yellow-500"
+              valueColor="text-amber-400"
+              urgent={stats.total > 0}
               delay={0}
             />
             <BentoCard
               icon={DollarSign}
-              label="Revenue"
+              label="Pending Revenue"
               value={formatCurrency(stats.revenue, 'USD')}
-              subValue="From visible orders"
-              trend={stats.revenue > 0 ? '+8.2%' : undefined}
-              trendUp={true}
+              subValue="Awaiting completion"
               gradient="from-emerald-500 to-green-500"
               delay={50}
             />
             <BentoCard
-              icon={Clock}
-              label="Pending"
-              value={stats.pending}
-              subValue="Awaiting action"
-              gradient="from-amber-500 to-yellow-500"
-              valueColor={stats.pending > 0 ? 'text-amber-400' : 'text-white'}
-              href="/dashboard/orders/pending"
+              icon={CreditCard}
+              label="Awaiting Payment"
+              value={stats.awaitingPayment}
+              subValue="Payment pending"
+              gradient="from-red-500 to-rose-500"
+              valueColor={stats.awaitingPayment > 0 ? 'text-red-400' : 'text-white'}
+              urgent={stats.awaitingPayment > 0}
               delay={100}
             />
             <BentoCard
-              icon={CheckCircle2}
-              label="Fulfilled"
-              value={stats.fulfilled}
-              subValue="Successfully delivered"
-              gradient="from-emerald-500 to-green-500"
-              valueColor={stats.fulfilled > 0 ? 'text-emerald-400' : 'text-white'}
-              href="/dashboard/orders/completed"
+              icon={Package}
+              label="Ready to Fulfill"
+              value={stats.awaitingFulfillment}
+              subValue="Paid, unfulfilled"
+              gradient="from-blue-500 to-cyan-500"
+              valueColor={stats.awaitingFulfillment > 0 ? 'text-blue-400' : 'text-white'}
               delay={150}
             />
           </>
         )}
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <QuickActionCard
-          icon={CheckCircle2}
-          title="Completed Orders"
-          description={`${stats.completed} orders`}
-          href="/dashboard/orders/completed"
-          gradient="from-emerald-500 to-green-500"
-          delay={200}
-        />
-        <QuickActionCard
-          icon={Clock}
-          title="Pending Orders"
-          description={`${stats.pending} orders need attention`}
-          href="/dashboard/orders/pending"
-          gradient="from-amber-500 to-yellow-500"
-          delay={250}
-        />
-        <QuickActionCard
-          icon={RotateCcw}
-          title="Refunded Orders"
-          description={`${stats.refunded} refunds processed`}
-          href="/dashboard/orders/refunded"
-          gradient="from-purple-500 to-violet-500"
-          delay={300}
-        />
-        <QuickActionCard
-          icon={XCircle}
-          title="Cancelled Orders"
-          description={`${stats.cancelled} orders cancelled`}
-          href="/dashboard/orders/cancelled"
-          gradient="from-red-500 to-rose-500"
-          delay={350}
-        />
-      </div>
-
-      {/* Orders Table / States */}
-      {error ? (
-        <ErrorState onRetry={() => refetch()} />
-      ) : (
-        <OrdersTable
-          data={data?.data || []}
-          meta={data?.meta || { total: 0, page: 1, limit: 20, totalPages: 0, hasMore: false }}
-          isLoading={isLoading}
-          filters={filters}
-          onFiltersChange={setFilters}
-          onRefresh={() => refetch()}
-          onCancel={setCancelOrderId}
-          onFulfill={handleFulfill}
-          showDateFilter
-          emptyState={<EmptyState />}
-        />
+      {/* Action Required Cards */}
+      {!isLoading && stats.total > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <ActionCard
+            icon={CreditCard}
+            title="Payment Blockers"
+            description="Orders waiting for payment confirmation"
+            count={stats.awaitingPayment}
+            gradient="from-red-500 to-rose-500"
+            urgent={stats.awaitingPayment > 0}
+            delay={200}
+          />
+          <ActionCard
+            icon={Package}
+            title="Fulfillment Queue"
+            description="Paid orders ready for shipping"
+            count={stats.awaitingFulfillment}
+            gradient="from-blue-500 to-cyan-500"
+            urgent={stats.awaitingFulfillment > 0}
+            delay={250}
+          />
+        </div>
       )}
+
+      {/* Orders Table */}
+      <OrdersTable
+        data={pendingOrders}
+        meta={{
+          total: pendingOrders.length,
+          page: filters.page || 1,
+          limit: filters.limit || 20,
+          totalPages: Math.ceil(pendingOrders.length / (filters.limit || 20)),
+          hasMore: false,
+        }}
+        isLoading={isLoading}
+        filters={filters}
+        onFiltersChange={setFilters}
+        onRefresh={() => refetch()}
+        onCancel={setCancelOrderId}
+        onFulfill={handleFulfill}
+        hideStatusFilter
+        showDateFilter
+        emptyState={<EmptyState />}
+      />
 
       {/* Cancel Confirmation Dialog */}
       <AlertDialog open={!!cancelOrderId} onOpenChange={() => setCancelOrderId(null)}>

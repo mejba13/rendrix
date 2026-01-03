@@ -40,6 +40,10 @@ import {
   Menu,
   FolderTree,
   Layers,
+  CheckCircle,
+  Clock,
+  RefreshCcw,
+  XCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StoreSelector } from './store-selector';
@@ -63,10 +67,30 @@ const navigation: NavItem[] = [
       { name: 'Categories', href: '/dashboard/categories', icon: FolderTree },
     ],
   },
-  { name: 'Orders', href: '/dashboard/orders', icon: ShoppingCart },
+  {
+    name: 'Orders',
+    href: '/dashboard/orders',
+    icon: ShoppingCart,
+    children: [
+      { name: 'All Orders', href: '/dashboard/orders', icon: Layers },
+      { name: 'Completed', href: '/dashboard/orders/completed', icon: CheckCircle },
+      { name: 'Pending', href: '/dashboard/orders/pending', icon: Clock },
+      { name: 'Refunded', href: '/dashboard/orders/refunded', icon: RefreshCcw },
+      { name: 'Cancelled', href: '/dashboard/orders/cancelled', icon: XCircle },
+    ],
+  },
   { name: 'Customers', href: '/dashboard/customers', icon: Users },
   { name: 'Coupons', href: '/dashboard/coupons', icon: Tag },
-  { name: 'Blog', href: '/dashboard/blog', icon: BookOpen },
+  {
+    name: 'Blog',
+    href: '/dashboard/blog',
+    icon: BookOpen,
+    children: [
+      { name: 'All Posts', href: '/dashboard/blog', icon: FileText },
+      { name: 'Categories', href: '/dashboard/blog/categories', icon: FolderTree },
+      { name: 'Tags', href: '/dashboard/blog/tags', icon: Tag },
+    ],
+  },
   { name: 'Pages', href: '/dashboard/pages', icon: FileText },
   { name: 'Menus', href: '/dashboard/menus', icon: Menu },
   { name: 'Banners', href: '/dashboard/banners', icon: Image },
